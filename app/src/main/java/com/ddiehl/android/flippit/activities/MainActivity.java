@@ -1,9 +1,11 @@
-package com.ddiehl.android.flippit;
+package com.ddiehl.android.flippit.activities;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.ddiehl.android.flippit.R;
 
 
 public class MainActivity extends Activity {

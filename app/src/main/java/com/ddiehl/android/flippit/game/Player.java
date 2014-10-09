@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit;
+package com.ddiehl.android.flippit.game;
 
 public class Player {
 	private Reversi.Color color;
