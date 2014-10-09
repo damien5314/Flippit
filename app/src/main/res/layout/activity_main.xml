@@ -13,23 +13,11 @@
 		android:layout_height="50dp" >
 
 		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="fill_parent"
-			android:paddingLeft="15dp"
-			android:paddingRight="15dp"
-			android:text="Player 1"
-			android:textSize="16sp"
-			android:textStyle="bold"
-			android:gravity="center"/>
+			style="@style/ScoreLabel"
+			android:text="@string/player1_label"/>
 
 		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="fill_parent"
-			android:paddingLeft="15dp"
-			android:paddingRight="15dp"
-			android:text="0"
-			android:textSize="16sp"
-			android:gravity="center"/>
+			style="@style/ScoreValue"/>
 
 		<TextView
 			android:layout_width="0dp"
@@ -37,23 +25,11 @@
 			android:layout_weight="1"/>
 
 		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="fill_parent"
-			android:paddingLeft="15dp"
-			android:paddingRight="15dp"
-			android:text="0"
-			android:textSize="16sp"
-			android:gravity="center"/>
+			style="@style/ScoreValue"/>
 
 		<TextView
-			android:layout_width="wrap_content"
-			android:layout_height="fill_parent"
-			android:paddingLeft="15dp"
-			android:paddingRight="15dp"
-			android:text="Player 2"
-			android:textStyle="bold"
-			android:textSize="16sp"
-			android:gravity="center"/>
+			style="@style/ScoreLabel"
+			android:text="@string/player2_label"/>
 
 	</LinearLayout>
 
