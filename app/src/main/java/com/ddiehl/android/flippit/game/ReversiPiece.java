@@ -2,22 +2,22 @@ package com.ddiehl.android.flippit.game;
 
 
 public class ReversiPiece {
-	private Reversi.Color c;
+	private ReversiColor c;
 
 	private ReversiPiece() { }
 
-	public ReversiPiece(Reversi.Color c) {
+	public ReversiPiece(ReversiColor c) {
 		this.c = c;
 	}
 
-	public Reversi.Color color() {
+	public ReversiColor color() {
 		return c;
 	}
 
 	public void flipColor() {
-		if (c == Reversi.Color.White)
-			c = Reversi.Color.Black;
+		if (c == ReversiColor.White)
+			c = ReversiColor.Black;
 		else
-			c = Reversi.Color.White;
+			c = ReversiColor.White;
 	}
 }

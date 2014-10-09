@@ -19,10 +19,10 @@ public class Board {
 			for (int x = 0; x < spaces[0].length; x++)
 				spaces[y][x] = new BoardSpace(x,y);
 
-		spaces[3][3].setPiece(new ReversiPiece(Reversi.Color.White));
-		spaces[3][4].setPiece(new ReversiPiece(Reversi.Color.Black));
-		spaces[4][4].setPiece(new ReversiPiece(Reversi.Color.White));
-		spaces[4][3].setPiece(new ReversiPiece(Reversi.Color.Black));
+		spaces[3][3].setPiece(new ReversiPiece(ReversiColor.White));
+		spaces[3][4].setPiece(new ReversiPiece(ReversiColor.Black));
+		spaces[4][4].setPiece(new ReversiPiece(ReversiColor.White));
+		spaces[4][3].setPiece(new ReversiPiece(ReversiColor.Black));
 	}
 
 	public boolean hasMove(Player p) {
@@ -49,7 +49,7 @@ public class Board {
 		return (getPieceOn(x, y) != null);
 	}
 
-	public boolean setPieceOn(int x, int y, Reversi.Color playerColor) {
+	public boolean setPieceOn(int x, int y, ReversiColor playerColor) {
 		if (hasPieceOn(x, y))
 			return false;
 
@@ -96,11 +96,11 @@ public class Board {
 		return false;
 	}
 
-	public boolean checkMoveInDirection(int x, int y, int dx, int dy, Reversi.Color playerColor) {
+	public boolean checkMoveInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
 		if (x+dx < 0 || x+dx >= width || y+dy < 0 || y+dy >= height)
 			return false;
 
-		Reversi.Color opponentColor = (playerColor == Reversi.Color.Black) ? Reversi.Color.White : Reversi.Color.Black;
+		ReversiColor opponentColor = (playerColor == ReversiColor.Black) ? ReversiColor.White : ReversiColor.Black;
 		ReversiPiece firstPiece = getPieceOn(x+dx, y+dy);
 
 		if (firstPiece != null && firstPiece.color() == opponentColor) {
@@ -162,7 +162,7 @@ public class Board {
 			for (int x = 0; x < spaces[0].length; x++) {
 				if (!hasPieceOn(x, y))
 					sb.append("0 ");
-				else if (getPieceOn(x, y).color() == Reversi.Color.White)
+				else if (getPieceOn(x, y).color() == ReversiColor.White)
 					sb.append("1 ");
 				else
 					sb.append("2 ");

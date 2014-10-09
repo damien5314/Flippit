@@ -11,22 +11,14 @@ public class Reversi {
 	private Reversi() { }
 
 	private static void start() {
-		p1 = new Player(Color.White);
-		p2 = new Player(Color.Black);
+		p1 = new Player(ReversiColor.White);
+		p2 = new Player(ReversiColor.Black);
 		b = Board.getInstance();
 	}
 
 	private static void newGame() {
 		b.reset();
 		currentPlayer = p1;
-	}
-
-	protected enum Color {
-		Black, White
-	}
-
-	public static void main(String[] args) {
-		Reversi.start();
 	}
 
 }

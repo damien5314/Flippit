@@ -1,16 +1,16 @@
 package com.ddiehl.android.flippit.game;
 
 public class Player {
-	private Reversi.Color color;
+	private ReversiColor color;
 	private int turn = 0;
 
 	private Player() { }
 
-	protected Player(Reversi.Color c) {
+	protected Player(ReversiColor c) {
 		color = c;
 	}
 
-	public Reversi.Color color() {
+	public ReversiColor color() {
 		return color;
 	}
 
