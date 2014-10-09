@@ -6,9 +6,27 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.ddiehl.android.flippit.R;
+import com.ddiehl.android.flippit.game.Board;
+import com.ddiehl.android.flippit.game.Player;
+import com.ddiehl.android.flippit.game.ReversiColor;
 
 
 public class MainActivity extends Activity {
+	private Player p1;
+	private Player p2;
+	private Board b;
+	private Player currentPlayer;
+
+	private void start() {
+		p1 = new Player(ReversiColor.White);
+		p2 = new Player(ReversiColor.Black);
+		b = Board.getInstance();
+	}
+
+	private void newGame() {
+		b.reset();
+		currentPlayer = p1;
+	}
 
 	private void startNewGame() {
 

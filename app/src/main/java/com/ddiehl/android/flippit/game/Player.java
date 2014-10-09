@@ -6,7 +6,7 @@ public class Player {
 
 	private Player() { }
 
-	protected Player(ReversiColor c) {
+	public Player(ReversiColor c) {
 		color = c;
 	}
 
@@ -14,11 +14,4 @@ public class Player {
 		return color;
 	}
 
-	public int turn() {
-		return turn;
-	}
-
-	public void incrementTurn() {
-		turn++;
-	}
 }
