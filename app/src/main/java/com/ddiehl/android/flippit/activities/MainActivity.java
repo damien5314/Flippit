@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.GridLayout;
 
 import com.ddiehl.android.flippit.R;
 import com.ddiehl.android.flippit.game.Board;
@@ -17,11 +18,6 @@ public class MainActivity extends Activity {
 	private Board b;
 	private Player currentPlayer;
 
-	private void startNewGame() {
-		b.reset();
-		currentPlayer = p1;
-	}
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +25,23 @@ public class MainActivity extends Activity {
 
 		p1 = new Player(ReversiColor.White);
 		p2 = new Player(ReversiColor.Black);
-		b = Board.getInstance();
+		b = Board.getInstance(this);
+    }
+
+    private void startNewGame() {
+        b.reset();
+        displayBoard();
+        currentPlayer = p1;
+    }
+
+    private void displayBoard() {
+        GridLayout l = (GridLayout) findViewById(R.id.GameGrid);
+
+        for (int y = 0; y < b.height(); y++) {
+            for (int x = 0; x < b.width(); x++) {
+                l.addView(b.getSpaceAt(x, y));
+            }
+        }
     }
 
     @Override

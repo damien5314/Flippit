@@ -1,17 +1,23 @@
 package com.ddiehl.android.flippit.game;
 
 
-public class BoardSpace {
+import android.content.Context;
+import android.widget.Button;
+
+public class BoardSpace extends Button {
 	private ReversiPiece piece;
 	protected int x, y;
 
-	private BoardSpace() { }
+	private BoardSpace(Context c) {
+        super(c);
+    }
 
-	protected BoardSpace(int x, int y) {
-		piece = null;
-		this.x = x;
-		this.y = y;
-	}
+    public BoardSpace(Context c, int x, int y) {
+        super(c);
+        piece = null;
+        this.x = x;
+        this.y = y;
+    }
 
 	public ReversiPiece piece() {
 		return piece;

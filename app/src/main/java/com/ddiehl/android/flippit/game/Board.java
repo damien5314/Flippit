@@ -1,23 +1,27 @@
 package com.ddiehl.android.flippit.game;
 
 
+import android.content.Context;
+
 public class Board {
 	private static Board _instance = null;
+    private static Context context;
 	private BoardSpace[][] spaces;
 	private int width;
 	private int height;
 
-	private Board() {
-		spaces = new BoardSpace[8][8];
+	private Board(Context c) {
+        context = c;
 		width = 8;
 		height = 8;
+        spaces = new BoardSpace[height][width];
 		reset();
 	}
 
 	public void reset() {
 		for (int y = 0; y < spaces.length; y++)
 			for (int x = 0; x < spaces[0].length; x++)
-				spaces[y][x] = new BoardSpace(x,y);
+				spaces[y][x] = new BoardSpace(context, x, y);
 
 		spaces[3][3].setPiece(new ReversiPiece(ReversiColor.White));
 		spaces[3][4].setPiece(new ReversiPiece(ReversiColor.Black));
@@ -148,9 +152,9 @@ public class Board {
 		return height;
 	}
 
-	public static Board getInstance() {
+	public static Board getInstance(Context c) {
 		if (_instance == null)
-			_instance = new Board();
+			_instance = new Board(c);
 
 		return _instance;
 	}
