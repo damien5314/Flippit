@@ -13,7 +13,7 @@ public class BoardSpace extends Button {
     }
 
     public BoardSpace(Context c, int x, int y) {
-        super(c);
+		super(c);
         piece = null;
         this.x = x;
         this.y = y;
