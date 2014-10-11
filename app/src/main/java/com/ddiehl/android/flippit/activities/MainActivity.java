@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 
 import com.ddiehl.android.flippit.R;
 import com.ddiehl.android.flippit.game.Board;
@@ -60,6 +61,7 @@ public class MainActivity extends Activity {
                     public void onClick(View view) {
                         if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
                             currentPlayer = (currentPlayer == p1) ? p2 : p1;
+                            updateScoreCounts();
                         }
                     }
                 });
@@ -67,6 +69,26 @@ public class MainActivity extends Activity {
             }
 			l.addView(r);
         }
+    }
+
+    public void updateScoreCounts() {
+        int p1c = 0;
+        int p2c = 0;
+
+        for (int y = 0; y < b.height(); y++) {
+            for (int x = 0; x < b.height(); x++) {
+                BoardSpace s= b.getSpaceAt(x,y);
+                if (s.isOwned()) {
+                    if (s.getColor() == ReversiColor.Black)
+                        p1c++;
+                    else
+                       p2c++;
+                }
+            }
+        }
+
+        ((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
+        ((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
     }
 
     @Override

@@ -17,6 +17,7 @@
 			android:text="@string/player1_label"/>
 
 		<TextView
+            android:id="@+id/p1score"
 			style="@style/ScoreValue"/>
 
 		<TextView
@@ -25,6 +26,7 @@
 			android:layout_weight="1"/>
 
 		<TextView
+            android:id="@+id/p2score"
 			style="@style/ScoreValue"/>
 
 		<TextView
