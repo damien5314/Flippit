@@ -2,6 +2,9 @@ package com.ddiehl.android.flippit.game;
 
 
 import android.content.Context;
+import android.widget.Toast;
+
+import com.ddiehl.android.flippit.R;
 
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
@@ -91,7 +94,7 @@ public class Board {
 			return true;
 		}
 
-		System.out.println("ERROR: Invalid move.");
+        Toast.makeText(context, R.string.bad_move, Toast.LENGTH_SHORT).show();
 		return false;
 	}
 
