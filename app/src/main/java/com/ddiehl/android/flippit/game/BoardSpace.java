@@ -2,10 +2,13 @@ package com.ddiehl.android.flippit.game;
 
 
 import android.content.Context;
+import android.graphics.Color;
 import android.widget.Button;
 
+import com.ddiehl.android.flippit.R;
+
 public class BoardSpace extends Button {
-	private ReversiPiece piece;
+    private ReversiColor color;
 	protected int x, y;
 
 	private BoardSpace(Context c) {
@@ -14,21 +17,31 @@ public class BoardSpace extends Button {
 
     public BoardSpace(Context c, int x, int y) {
 		super(c);
-        piece = null;
+        setBackgroundResource(R.drawable.board_space);
+        color = null;
         this.x = x;
         this.y = y;
     }
 
-    public boolean hasPiece() {
-        return piece != null;
+    public boolean isOwned() {
+        return color != null;
     }
 
-	public ReversiPiece piece() {
-		return piece;
+	public void setColor(ReversiColor c) {
+		color = c;
+        updateBackgroundColor();
 	}
 
-	public void setPiece(ReversiPiece p) {
-		piece = p;
-	}
+    public ReversiColor getColor() {
+        return color;
+    }
 
+    public void flipColor() {
+        color = (color == ReversiColor.Black) ? ReversiColor.White : ReversiColor.Black;
+        updateBackgroundColor();
+    }
+
+    private void updateBackgroundColor() {
+        setBackgroundColor( (color == ReversiColor.Black) ? Color.BLACK : Color.WHITE );
+    }
 }

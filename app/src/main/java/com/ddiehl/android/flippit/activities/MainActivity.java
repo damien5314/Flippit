@@ -50,9 +50,6 @@ public class MainActivity extends Activity {
             r.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
                 BoardSpace s = b.getSpaceAt(x, y);
-                s.setBackgroundResource(R.drawable.board_space);
-//                if (s.hasPiece())
-//                    s.setBackgroundColor( (s.piece().color() == ReversiColor.Black) ? Color.BLACK : Color.WHITE );
                 TableRow.LayoutParams p = new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f);
                 p.setMargins(5, 5, 5, 5);

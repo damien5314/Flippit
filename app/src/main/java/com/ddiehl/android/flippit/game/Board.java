@@ -25,10 +25,10 @@ public class Board {
 			}
 		}
 
-		spaces[3][3].setPiece(new ReversiPiece(ReversiColor.White));
-		spaces[3][4].setPiece(new ReversiPiece(ReversiColor.Black));
-		spaces[4][4].setPiece(new ReversiPiece(ReversiColor.White));
-		spaces[4][3].setPiece(new ReversiPiece(ReversiColor.Black));
+		spaces[3][3].setColor(ReversiColor.White);
+		spaces[3][4].setColor(ReversiColor.Black);
+		spaces[4][4].setColor(ReversiColor.White);
+		spaces[4][3].setColor(ReversiColor.Black);
 	}
 
 	public boolean hasMove(Player p) {
@@ -43,16 +43,8 @@ public class Board {
 		return null;
 	}
 
-	public ReversiPiece getPieceOn(int x, int y) {
-		BoardSpace s = getSpaceAt(x, y);
-		if (s != null)
-			return s.piece();
-
-		return null;
-	}
-
 	public boolean hasPieceOn(int x, int y) {
-		return (getPieceOn(x, y) != null);
+		return (getSpaceAt(x, y) != null);
 	}
 
 	public boolean setPieceOn(int x, int y, ReversiColor playerColor) {
@@ -94,7 +86,7 @@ public class Board {
 			valid = true;
 
 		if (valid) {
-			spaces[y][x].setPiece(new ReversiPiece(playerColor));
+			spaces[y][x].setColor(playerColor);
 			return true;
 		}
 
@@ -107,16 +99,16 @@ public class Board {
 			return false;
 
 		ReversiColor opponentColor = (playerColor == ReversiColor.Black) ? ReversiColor.White : ReversiColor.Black;
-		ReversiPiece firstPiece = getPieceOn(x+dx, y+dy);
+        BoardSpace firstPiece = getSpaceAt(x + dx, y + dy);
 
-		if (firstPiece != null && firstPiece.color() == opponentColor) {
+		if (firstPiece != null && firstPiece.getColor() == opponentColor) {
 			int cx = x+dx;
 			int cy = y+dy;
-			while (getPieceOn(cx, cy) != null && getPieceOn(cx, cy).color() == opponentColor) {
+			while (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == opponentColor) {
 				cx += dx;
 				cy += dy;
 			}
-			if (getPieceOn(cx, cy) != null && getPieceOn(cx, cy).color() == playerColor) {
+			if (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == playerColor) {
 				flipColors(x+dx, cx, y+dy, cy);
 				return true;
 			}
@@ -140,7 +132,7 @@ public class Board {
 
 		while ((dx != 0 && xa != xb) || (dy != 0 && ya != yb)) {
 			System.out.println("flipNode: " + xa + " " + ya);
-			getPieceOn(xa, ya).flipColor();
+			getSpaceAt(xa, ya).flipColor();
 			xa += dx;
 			ya += dy;
 		}
@@ -168,7 +160,7 @@ public class Board {
 			for (int x = 0; x < spaces[0].length; x++) {
 				if (!hasPieceOn(x, y))
 					sb.append("0 ");
-				else if (getPieceOn(x, y).color() == ReversiColor.White)
+				else if (getSpaceAt(x, y).getColor() == ReversiColor.White)
 					sb.append("1 ");
 				else
 					sb.append("2 ");
