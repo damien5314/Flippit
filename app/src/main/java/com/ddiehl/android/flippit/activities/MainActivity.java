@@ -1,6 +1,7 @@
 package com.ddiehl.android.flippit.activities;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,6 +27,7 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		p1 = new Player(ReversiColor.White);
 		p2 = new Player(ReversiColor.Black);
@@ -48,8 +50,13 @@ public class MainActivity extends Activity {
             r.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
                 BoardSpace s = b.getSpaceAt(x, y);
-                s.setLayoutParams(new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f));
+                s.setBackgroundResource(R.drawable.board_space);
+//                if (s.hasPiece())
+//                    s.setBackgroundColor( (s.piece().color() == ReversiColor.Black) ? Color.BLACK : Color.WHITE );
+                TableRow.LayoutParams p = new TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f);
+                p.setMargins(5, 5, 5, 5);
+                s.setLayoutParams(p);
                 r.addView(s);
             }
 			l.addView(r);

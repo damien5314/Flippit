@@ -19,6 +19,10 @@ public class BoardSpace extends Button {
         this.y = y;
     }
 
+    public boolean hasPiece() {
+        return piece != null;
+    }
+
 	public ReversiPiece piece() {
 		return piece;
 	}
