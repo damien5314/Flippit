@@ -2,7 +2,7 @@ package com.ddiehl.android.flippit.game;
 
 
 import android.content.Context;
-import android.widget.LinearLayout;
+import android.widget.TableRow;
 
 public class Board {
 	private static Board _instance = null;
@@ -20,15 +20,12 @@ public class Board {
 	}
 
 	public void reset() {
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-		params.width = 5;
-		params.height = 5;
-
 		for (int y = 0; y < spaces.length; y++) {
 			for (int x = 0; x < spaces[0].length; x++) {
 				spaces[y][x] = new BoardSpace(context, x, y);
-				spaces[y][x].setLayoutParams(new LinearLayout.LayoutParams(125, 125));
+				spaces[y][x].setLayoutParams(new TableRow.LayoutParams(
+						TableRow.LayoutParams.MATCH_PARENT,
+						TableRow.LayoutParams.WRAP_CONTENT));
 			}
 		}
 

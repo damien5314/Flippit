@@ -4,7 +4,8 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.GridLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 
 import com.ddiehl.android.flippit.R;
 import com.ddiehl.android.flippit.game.Board;
@@ -13,6 +14,7 @@ import com.ddiehl.android.flippit.game.ReversiColor;
 
 
 public class MainActivity extends Activity {
+	private static final String TAG = MainActivity.class.getSimpleName();
 	private Player p1;
 	private Player p2;
 	private Board b;
@@ -35,12 +37,17 @@ public class MainActivity extends Activity {
     }
 
     private void displayBoard() {
-        GridLayout l = (GridLayout) findViewById(R.id.GameGrid);
+		TableLayout l = (TableLayout) findViewById(R.id.GameGrid);
+		TableLayout.LayoutParams p = new TableLayout.LayoutParams(
+				TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
 
         for (int y = 0; y < b.height(); y++) {
+			TableRow r = new TableRow(this);
+			r.setLayoutParams(p);
             for (int x = 0; x < b.width(); x++) {
-                l.addView(b.getSpaceAt(x, y));
+                r.addView(b.getSpaceAt(x, y));
             }
+			l.addView(r);
         }
     }
 

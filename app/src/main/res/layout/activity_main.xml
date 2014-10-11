@@ -33,11 +33,9 @@
 
 	</LinearLayout>
 
-	<GridLayout
+	<TableLayout
 		android:id="@+id/GameGrid"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-        android:rowCount="8"
-        android:columnCount="8" />
+		android:layout_height="fill_parent"/>
 
 </LinearLayout>
