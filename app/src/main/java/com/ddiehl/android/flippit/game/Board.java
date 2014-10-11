@@ -2,7 +2,6 @@ package com.ddiehl.android.flippit.game;
 
 
 import android.content.Context;
-import android.widget.TableRow;
 
 public class Board {
 	private static Board _instance = null;
@@ -23,9 +22,6 @@ public class Board {
 		for (int y = 0; y < spaces.length; y++) {
 			for (int x = 0; x < spaces[0].length; x++) {
 				spaces[y][x] = new BoardSpace(context, x, y);
-				spaces[y][x].setLayoutParams(new TableRow.LayoutParams(
-						TableRow.LayoutParams.MATCH_PARENT,
-						TableRow.LayoutParams.WRAP_CONTENT));
 			}
 		}
 

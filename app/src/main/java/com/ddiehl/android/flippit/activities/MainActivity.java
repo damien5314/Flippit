@@ -4,11 +4,13 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
 import com.ddiehl.android.flippit.R;
 import com.ddiehl.android.flippit.game.Board;
+import com.ddiehl.android.flippit.game.BoardSpace;
 import com.ddiehl.android.flippit.game.Player;
 import com.ddiehl.android.flippit.game.ReversiColor;
 
@@ -38,14 +40,17 @@ public class MainActivity extends Activity {
 
     private void displayBoard() {
 		TableLayout l = (TableLayout) findViewById(R.id.GameGrid);
-		TableLayout.LayoutParams p = new TableLayout.LayoutParams(
-				TableLayout.LayoutParams.MATCH_PARENT, TableLayout.LayoutParams.WRAP_CONTENT);
+        l.setLayoutParams(new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
 
         for (int y = 0; y < b.height(); y++) {
 			TableRow r = new TableRow(this);
-			r.setLayoutParams(p);
+            r.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
-                r.addView(b.getSpaceAt(x, y));
+                BoardSpace s = b.getSpaceAt(x, y);
+                s.setLayoutParams(new TableRow.LayoutParams(
+                        TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f));
+                r.addView(s);
             }
 			l.addView(r);
         }
