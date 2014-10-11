@@ -4,6 +4,7 @@ package com.ddiehl.android.flippit.game;
 import android.content.Context;
 
 public class Board {
+    private static final String TAG = Board.class.getSimpleName();
 	private static Board _instance = null;
     private static Context context;
 	private BoardSpace[][] spaces;
@@ -43,13 +44,13 @@ public class Board {
 		return null;
 	}
 
-	public boolean hasPieceOn(int x, int y) {
+	public boolean spaceExists(int x, int y) {
 		return (getSpaceAt(x, y) != null);
 	}
 
 	public boolean setPieceOn(int x, int y, ReversiColor playerColor) {
-		if (hasPieceOn(x, y))
-			return false;
+		if (getSpaceAt(x,y).isOwned())
+            return false;
 
 		boolean valid = false;
 
@@ -118,7 +119,6 @@ public class Board {
 	}
 
 	public void flipColors(int xa, int xb, int ya, int yb) {
-		System.out.println("flipColors: " + xa + " " + xb + " " + ya + " " + yb);
 
 		int dx, dy;
 
@@ -131,7 +131,6 @@ public class Board {
 		else dy = 0;
 
 		while ((dx != 0 && xa != xb) || (dy != 0 && ya != yb)) {
-			System.out.println("flipNode: " + xa + " " + ya);
 			getSpaceAt(xa, ya).flipColor();
 			xa += dx;
 			ya += dy;
@@ -158,7 +157,7 @@ public class Board {
 		StringBuilder sb = new StringBuilder();
 		for (int y = 0; y < spaces.length; y++) {
 			for (int x = 0; x < spaces[0].length; x++) {
-				if (!hasPieceOn(x, y))
+				if (!spaceExists(x, y))
 					sb.append("0 ");
 				else if (getSpaceAt(x, y).getColor() == ReversiColor.White)
 					sb.append("1 ");

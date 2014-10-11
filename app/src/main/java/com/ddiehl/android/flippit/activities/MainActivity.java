@@ -5,6 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -49,11 +50,19 @@ public class MainActivity extends Activity {
 			TableRow r = new TableRow(this);
             r.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
-                BoardSpace s = b.getSpaceAt(x, y);
+                final BoardSpace s = b.getSpaceAt(x, y);
                 TableRow.LayoutParams p = new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f);
                 p.setMargins(5, 5, 5, 5);
                 s.setLayoutParams(p);
+                s.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
+                            currentPlayer = (currentPlayer == p1) ? p2 : p1;
+                        }
+                    }
+                });
                 r.addView(s);
             }
 			l.addView(r);

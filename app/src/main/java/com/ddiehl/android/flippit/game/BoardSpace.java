@@ -9,7 +9,7 @@ import com.ddiehl.android.flippit.R;
 
 public class BoardSpace extends Button {
     private ReversiColor color;
-	protected int x, y;
+	public int x, y;
 
 	private BoardSpace(Context c) {
         super(c);

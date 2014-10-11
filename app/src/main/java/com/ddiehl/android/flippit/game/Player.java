@@ -10,7 +10,7 @@ public class Player {
 		color = c;
 	}
 
-	public ReversiColor color() {
+	public ReversiColor getColor() {
 		return color;
 	}
 
