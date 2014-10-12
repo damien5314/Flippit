@@ -10,7 +10,12 @@
 		android:orientation="horizontal"
 		android:background="@drawable/border"
 		android:layout_width="fill_parent"
-		android:layout_height="50dp" >
+		android:layout_height="50dp"
+        android:gravity="center">
+
+        <ImageView
+            style="@style/PlayerIcon"
+            android:background="@drawable/board_space" />
 
 		<TextView
 			style="@style/ScoreLabel"
@@ -32,6 +37,10 @@
 		<TextView
 			style="@style/ScoreLabel"
 			android:text="@string/player2_label"/>
+
+        <ImageView
+            style="@style/PlayerIcon"
+            android:background="@drawable/board_space" />
 
 	</LinearLayout>
 
