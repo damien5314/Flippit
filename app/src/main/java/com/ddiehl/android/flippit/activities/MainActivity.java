@@ -46,6 +46,7 @@ public class MainActivity extends Activity {
 		TableLayout l = (TableLayout) findViewById(R.id.GameGrid);
         l.setLayoutParams(new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        l.removeAllViews();
 
         for (int y = 0; y < b.height(); y++) {
 			TableRow r = new TableRow(this);
@@ -82,7 +83,7 @@ public class MainActivity extends Activity {
                     if (s.getColor() == ReversiColor.Black)
                         p1c++;
                     else
-                       p2c++;
+                        p2c++;
                 }
             }
         }
