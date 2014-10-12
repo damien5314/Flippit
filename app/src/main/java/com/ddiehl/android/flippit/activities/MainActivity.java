@@ -43,6 +43,7 @@ public class MainActivity extends Activity {
     private void startNewGame() {
         b.reset();
         displayBoard();
+        updateScoreCounts();
         currentPlayer = p1;
     }
 

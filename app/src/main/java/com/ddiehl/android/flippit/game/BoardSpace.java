@@ -2,7 +2,6 @@ package com.ddiehl.android.flippit.game;
 
 
 import android.content.Context;
-import android.graphics.Color;
 import android.widget.Button;
 
 import com.ddiehl.android.flippit.R;
@@ -17,7 +16,7 @@ public class BoardSpace extends Button {
 
     public BoardSpace(Context c, int x, int y) {
 		super(c);
-        setBackgroundResource(R.drawable.board_space);
+        setBackgroundResource(R.drawable.board_space_neutral);
         color = null;
         this.x = x;
         this.y = y;
@@ -42,6 +41,8 @@ public class BoardSpace extends Button {
     }
 
     private void updateBackgroundColor() {
-        setBackgroundColor( (color == ReversiColor.Black) ? Color.BLACK : Color.WHITE );
+        setBackgroundResource((color == ReversiColor.Black)
+                ? R.drawable.board_space_p2 : R.drawable.board_space_p1);
+//        setBackgroundColor( (color == ReversiColor.Black) ? Color.BLACK : Color.WHITE );
     }
 }

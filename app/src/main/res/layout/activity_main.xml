@@ -15,7 +15,7 @@
 
         <ImageView
             style="@style/PlayerIcon"
-            android:background="@drawable/board_space" />
+            android:background="@drawable/board_space_p1" />
 
 		<TextView
 			style="@style/ScoreLabel"
@@ -40,7 +40,7 @@
 
         <ImageView
             style="@style/PlayerIcon"
-            android:background="@drawable/board_space" />
+            android:background="@drawable/board_space_p2" />
 
 	</LinearLayout>
 
