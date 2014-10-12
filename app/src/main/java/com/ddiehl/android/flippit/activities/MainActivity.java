@@ -90,7 +90,7 @@ public class MainActivity extends Activity {
             for (int x = 0; x < b.height(); x++) {
                 BoardSpace s= b.getSpaceAt(x,y);
                 if (s.isOwned()) {
-                    if (s.getColor() == ReversiColor.Black)
+                    if (s.getColor() == ReversiColor.White)
                         p1c++;
                     else
                         p2c++;
