@@ -94,7 +94,6 @@ public class Board {
 			return true;
 		}
 
-        Toast.makeText(context, R.string.bad_move, Toast.LENGTH_SHORT).show();
 		return false;
 	}
 

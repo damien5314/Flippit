@@ -1,6 +1,7 @@
 package com.ddiehl.android.flippit.activities;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Menu;
@@ -10,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ddiehl.android.flippit.R;
 import com.ddiehl.android.flippit.game.Board;
@@ -20,6 +22,7 @@ import com.ddiehl.android.flippit.game.ReversiColor;
 
 public class MainActivity extends Activity {
 	private static final String TAG = MainActivity.class.getSimpleName();
+    private Context c;
 	private Player p1;
 	private Player p2;
 	private Board b;
@@ -30,6 +33,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        c = this;
 
 		p1 = new Player(ReversiColor.White);
 		p2 = new Player(ReversiColor.Black);
@@ -52,24 +56,30 @@ public class MainActivity extends Activity {
 			TableRow r = new TableRow(this);
             r.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
-                final BoardSpace s = b.getSpaceAt(x, y);
+                BoardSpace s = b.getSpaceAt(x, y);
                 TableRow.LayoutParams p = new TableRow.LayoutParams(
                         TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f);
                 p.setMargins(5, 5, 5, 5);
                 s.setLayoutParams(p);
-                s.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
-                            currentPlayer = (currentPlayer == p1) ? p2 : p1;
-                            updateScoreCounts();
-                        }
-                    }
-                });
+                s.setOnClickListener(attemptToPlace(s));
                 r.addView(s);
             }
 			l.addView(r);
         }
+    }
+
+    public View.OnClickListener attemptToPlace(final BoardSpace s) {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
+                    currentPlayer = (currentPlayer == p1) ? p2 : p1;
+                    updateScoreCounts();
+                } else {
+                    Toast.makeText(c, R.string.bad_move, Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
     }
 
     public void updateScoreCounts() {
