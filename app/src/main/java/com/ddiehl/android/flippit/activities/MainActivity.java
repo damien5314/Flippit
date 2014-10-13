@@ -35,8 +35,8 @@ public class MainActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         c = this;
 
-		p1 = new Player(ReversiColor.White);
-		p2 = new Player(ReversiColor.Black);
+		p1 = new Player(ReversiColor.White, getString(R.string.player1_label));
+		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
 		b = Board.getInstance(this);
     }
 
@@ -104,17 +104,14 @@ public class MainActivity extends Activity {
     }
 
     public void changePlayerTurn() {
-        if (currentPlayer == p1) {
-            if (b.hasMove(p2)) currentPlayer = p2;
-            else if (b.hasMove(p1)) {
-                currentPlayer = p1;
-            } else Toast.makeText(this, "No more moves.", Toast.LENGTH_LONG).show();
-        } else {
-            if (b.hasMove(p1)) currentPlayer = p1;
-            else if (b.hasMove(p2)) {
-                currentPlayer = p2;
-            } else Toast.makeText(this, "No more moves.", Toast.LENGTH_LONG).show();
-        }
+		Player opponent = (currentPlayer == p1) ? p2 : p1;
+
+		if (b.hasMove(opponent))
+			currentPlayer = opponent;
+		else if (b.hasMove(currentPlayer))
+			Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
+		else
+			Toast.makeText(this, getString(R.string.no_moves), Toast.LENGTH_LONG).show();
 
         findViewById(R.id.turnIndicator).setBackgroundResource(
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
