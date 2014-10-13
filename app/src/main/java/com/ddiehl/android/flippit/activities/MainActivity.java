@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -67,6 +68,11 @@ public class MainActivity extends Activity {
             }
 			l.addView(r);
         }
+
+		b.getSpaceAt(3, 3).setClickable(false);
+		b.getSpaceAt(4, 3).setClickable(false);
+		b.getSpaceAt(3, 4).setClickable(false);
+		b.getSpaceAt(4, 4).setClickable(false);
     }
 
     public View.OnClickListener attemptToPlace(final BoardSpace s) {
@@ -74,6 +80,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
+					s.setClickable(false);
                     changePlayerTurn();
                     updateScoreCounts();
                 } else {
@@ -99,8 +106,11 @@ public class MainActivity extends Activity {
             }
         }
 
-        ((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
-        ((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
+		p1.setScore(p1c);
+		p2.setScore(p2c);
+
+        ((TextView) findViewById(R.id.p1score)).setText(String.valueOf( p1.getScore() ));
+        ((TextView) findViewById(R.id.p2score)).setText(String.valueOf( p2.getScore() ));
     }
 
     public void changePlayerTurn() {
@@ -111,11 +121,31 @@ public class MainActivity extends Activity {
 		else if (b.hasMove(currentPlayer))
 			Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
 		else
-			Toast.makeText(this, getString(R.string.no_moves), Toast.LENGTH_LONG).show();
+			endGame();
 
         findViewById(R.id.turnIndicator).setBackgroundResource(
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
     }
+
+	public void endGame() {
+		Player winner = null;
+
+		if (p1.getScore() != p2.getScore())
+			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
+
+		if (winner != null) {
+			Toast t = Toast.makeText(this, winner.getName() + " wins.", Toast.LENGTH_LONG);
+			t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
+			t.show();
+		} else { // You tied
+			Toast t = Toast.makeText(this, getString(R.string.no_winner), Toast.LENGTH_LONG);
+			t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
+			t.show();
+		}
+
+		// Remove on click functionality from all buttons
+
+	}
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
