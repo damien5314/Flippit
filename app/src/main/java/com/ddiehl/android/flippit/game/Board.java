@@ -11,6 +11,17 @@ public class Board {
 	private int width;
 	private int height;
 
+    private final int[][] moveConfigurations = new int[][] {
+            {0,  -1}, // Down
+            {1,  0}, // Right
+            {-1, 0}, // Left
+            {0,  1}, // Up
+            {-1, -1}, // Down-Left
+            {1,  -1}, // Down-Right
+            {-1, 1}, // Top-Left
+            {1,  1} // Top-Right
+    };
+
 	private Board(Context c) {
         context = c;
 		width = 8;
@@ -33,8 +44,15 @@ public class Board {
 	}
 
 	public boolean hasMove(Player p) {
-		// TODO Write this function to evaluate if player has move
-		return true;
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                if (getSpaceAt(x,y).isOwned())
+                    continue;
+                for (int[] move : moveConfigurations)
+                    if (checkMoveValid(x, y, move[0], move[1], p.getColor())) return true;
+            }
+        }
+		return false;
 	}
 
 	public BoardSpace getSpaceAt(int x, int y) {
@@ -48,25 +66,9 @@ public class Board {
 		return (getSpaceAt(x, y) != null);
 	}
 
-    public boolean verifyGameState(ReversiColor playerColor) {
-
-        return false;
-    }
-
 	public boolean setPieceOn(int x, int y, ReversiColor playerColor) {
 		if (getSpaceAt(x,y).isOwned())
             return false;
-
-        int[][] moveConfigurations = new int[][] {
-                {0,  -1}, // Down
-                {1,  0}, // Right
-                {-1, 0}, // Left
-                {0,  1}, // Up
-                {-1, -1}, // Down-Left
-                {1,  -1}, // Down-Right
-                {-1, 1}, // Top-Left
-                {1,  1} // Top-Right
-        };
 
         boolean valid = false;
         for (int[] move : moveConfigurations) {

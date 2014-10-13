@@ -26,7 +26,7 @@ public class MainActivity extends Activity {
 	private Player p1;
 	private Player p2;
 	private Board b;
-	private Player currentPlayer;
+	private Player currentPlayer = p2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
         b.reset();
         displayBoard();
         updateScoreCounts();
-        setPlayerTurn(p1);
+        changePlayerTurn();
     }
 
     private void displayBoard() {
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
-                    setPlayerTurn((currentPlayer == p1) ? p2 : p1);
+                    changePlayerTurn();
                     updateScoreCounts();
                 } else {
                     Toast.makeText(c, R.string.bad_move, Toast.LENGTH_SHORT).show();
@@ -103,12 +103,21 @@ public class MainActivity extends Activity {
         ((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
     }
 
-    public void setPlayerTurn(Player p) {
-        currentPlayer = p;
-        if (p == p1)
-            findViewById(R.id.turnIndicator).setBackgroundResource(R.drawable.ic_turn_indicator_p1);
-        else // (p == p2)
-            findViewById(R.id.turnIndicator).setBackgroundResource(R.drawable.ic_turn_indicator_p2);
+    public void changePlayerTurn() {
+        if (currentPlayer == p1) {
+            if (b.hasMove(p2)) currentPlayer = p2;
+            else if (b.hasMove(p1)) {
+                currentPlayer = p1;
+            } else Toast.makeText(this, "No more moves.", Toast.LENGTH_LONG).show();
+        } else {
+            if (b.hasMove(p1)) currentPlayer = p1;
+            else if (b.hasMove(p2)) {
+                currentPlayer = p2;
+            } else Toast.makeText(this, "No more moves.", Toast.LENGTH_LONG).show();
+        }
+
+        findViewById(R.id.turnIndicator).setBackgroundResource(
+                (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
     }
 
     @Override
