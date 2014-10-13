@@ -3,8 +3,11 @@ package com.ddiehl.android.flippit.activities;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,8 +40,15 @@ public class MainActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         c = this;
 
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean aiEnabled = prefs.getBoolean("pref_ComputerAI", false);
+		Log.i(TAG, "AI ENABLED = " + aiEnabled);
+
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
+		p2.isCPU(aiEnabled); // Set p2 to Computer AI if enabled
+
 		b = Board.getInstance(this);
     }
 
@@ -80,7 +90,8 @@ public class MainActivity extends Activity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
+                if (b.moveValue(s.x, s.y, currentPlayer.getColor()) > 0) {
+					b.setPieceOn(s.x, s.y, currentPlayer.getColor());
 					s.setClickable(false);
                     changePlayerTurn();
                     updateScoreCounts();
@@ -97,7 +108,7 @@ public class MainActivity extends Activity {
 
         for (int y = 0; y < b.height(); y++) {
             for (int x = 0; x < b.height(); x++) {
-                BoardSpace s= b.getSpaceAt(x,y);
+                BoardSpace s = b.getSpaceAt(x,y);
                 if (s.isOwned()) {
                     if (s.getColor() == ReversiColor.White)
                         p1c++;
@@ -116,7 +127,6 @@ public class MainActivity extends Activity {
 
     public void changePlayerTurn() {
 		Player opponent = (currentPlayer == p1) ? p2 : p1;
-
 		if (b.hasMove(opponent))
 			currentPlayer = opponent;
 		else if (b.hasMove(currentPlayer))
@@ -126,6 +136,13 @@ public class MainActivity extends Activity {
 
         findViewById(R.id.turnIndicator).setBackgroundResource(
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
+
+		BoardSpace move = currentPlayer.performMove(b);
+		if (move != null) {
+			b.setPieceOn(move.x, move.y, currentPlayer.getColor());
+			updateScoreCounts();
+			changePlayerTurn();
+		}
     }
 
 	public void endGame() {
@@ -143,9 +160,6 @@ public class MainActivity extends Activity {
 			t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
 			t.show();
 		}
-
-		// Remove on click functionality from all buttons
-
 	}
 
     @Override

@@ -9,7 +9,7 @@
     <string name="bad_move">Error: Invalid Move</string>
 	<string name="no_moves">No moves remaining</string>
 	<string name="no_winner">No winner.</string>
-	<string name="pref_ComputerAI">Play against Computer?</string>
+	<string name="pref_ComputerAI">Computer AI</string>
 	<string name="activity_settings_title">Settings</string>
 
 </resources>

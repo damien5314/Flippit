@@ -10,12 +10,12 @@ import com.ddiehl.android.flippit.R;
 
 public class SettingsActivity extends Activity {
 	private static final String TAG = SettingsActivity.class.getSimpleName();
+	public static final String CONFIG_NAME = "pref";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// Display the fragment as the main content.
 		getFragmentManager().beginTransaction()
 				.replace(android.R.id.content, new SettingsFragment()).commit();
 	}

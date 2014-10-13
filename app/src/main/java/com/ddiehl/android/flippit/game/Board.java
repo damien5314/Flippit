@@ -11,7 +11,7 @@ public class Board {
 	private int width;
 	private int height;
 
-    private final int[][] moveConfigurations = new int[][] {
+    private final int[][] moveDirections = new int[][] {
             {0,  -1}, // Down
             {1,  0}, // Right
             {-1, 0}, // Left
@@ -48,8 +48,9 @@ public class Board {
             for (int x = 0; x < width(); x++) {
                 if (getSpaceAt(x,y).isOwned())
                     continue;
-                for (int[] move : moveConfigurations)
-                    if (checkMoveValid(x, y, move[0], move[1], p.getColor())) return true;
+                for (int[] move : moveDirections)
+                    if (moveValueInDirection(x, y, move[0], move[1], p.getColor()) != 0)
+						return true;
             }
         }
 		return false;
@@ -70,21 +71,26 @@ public class Board {
 		if (getSpaceAt(x,y).isOwned())
             return false;
 
-        boolean valid = false;
-        for (int[] move : moveConfigurations) {
-            if (checkMoveValid(x, y, move[0], move[1], playerColor)) {
-                flipColorsInDirection(x, y, move[0], move[1], playerColor);
-                valid = true;
-            }
-        }
-
-		return valid;
+		for (int[] move : moveDirections) {
+			if (moveValueInDirection(x, y, move[0], move[1], playerColor) != 0) {
+				flipInDirection(x, y, move[0], move[1], playerColor);
+			}
+		}
+		return true;
 	}
 
-	public boolean checkMoveValid(int x, int y, int dx, int dy, ReversiColor playerColor) {
-		if (x+dx < 0 || x+dx >= width || y+dy < 0 || y+dy >= height)
-			return false;
+	public int moveValue(int x, int y, ReversiColor playerColor) {
+		int moveVal = 0;
+		for (int[] move : moveDirections)
+			moveVal += moveValueInDirection(x, y, move[0], move[1], playerColor);
+		return moveVal;
+	}
 
+	public int moveValueInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
+		if (x+dx < 0 || x+dx >= width || y+dy < 0 || y+dy >= height)
+			return 0;
+
+		int moveVal = 0;
 		ReversiColor opponentColor = (playerColor == ReversiColor.Black) ? ReversiColor.White : ReversiColor.Black;
         BoardSpace firstPiece = getSpaceAt(x + dx, y + dy);
 
@@ -92,18 +98,19 @@ public class Board {
 			int cx = x+dx;
 			int cy = y+dy;
 			while (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == opponentColor) {
+				moveVal++;
 				cx += dx;
 				cy += dy;
 			}
 			if (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == playerColor) {
-				return true;
+				return moveVal;
 			}
 		}
 
-		return false;
+		return 0;
 	}
 
-    public void flipColorsInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
+    public void flipInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
         int cx = x + dx;
         int cy = y + dy;
 
