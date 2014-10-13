@@ -48,6 +48,11 @@ public class Board {
 		return (getSpaceAt(x, y) != null);
 	}
 
+    public boolean verifyGameState(ReversiColor playerColor) {
+
+        return false;
+    }
+
 	public boolean setPieceOn(int x, int y, ReversiColor playerColor) {
 		if (getSpaceAt(x,y).isOwned())
             return false;
@@ -71,12 +76,7 @@ public class Board {
             }
         }
 
-		if (valid) {
-			spaces[y][x].setColor(playerColor);
-			return true;
-		}
-
-		return false;
+		return valid;
 	}
 
 	public boolean checkMoveValid(int x, int y, int dx, int dy, ReversiColor playerColor) {
@@ -94,30 +94,11 @@ public class Board {
 				cy += dy;
 			}
 			if (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == playerColor) {
-//				flipColors(x+dx, cx, y+dy, cy);
 				return true;
 			}
 		}
 
 		return false;
-	}
-
-	public void flipColors(int xa, int xb, int ya, int yb) {
-		int dx, dy;
-
-		if (xa < xb) dx = 1;
-		else if (xb < xa) dx = -1;
-		else dx = 0;
-
-		if (ya < yb) dy = 1;
-		else if (yb < ya) dy = -1;
-		else dy = 0;
-
-		while ((dx != 0 && xa != xb) || (dy != 0 && ya != yb)) {
-			getSpaceAt(xa, ya).flipColor();
-			xa += dx;
-			ya += dy;
-		}
 	}
 
     public void flipColorsInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
@@ -129,6 +110,7 @@ public class Board {
             cx += dx;
             cy += dy;
         }
+        getSpaceAt(x,y).setColor(playerColor);
     }
 
 	public int width() {
