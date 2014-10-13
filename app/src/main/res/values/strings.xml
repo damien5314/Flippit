@@ -7,5 +7,7 @@
 	<string name="player1_label">Player 1</string>
 	<string name="player2_label">Player 2</string>
     <string name="bad_move">Error: Invalid Move</string>
+	<string name="no_moves">No moves remaining</string>
+	<string name="no_winner">No winner.</string>
 
 </resources>
