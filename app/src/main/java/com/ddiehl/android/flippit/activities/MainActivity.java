@@ -44,7 +44,7 @@ public class MainActivity extends Activity {
         b.reset();
         displayBoard();
         updateScoreCounts();
-        currentPlayer = p1;
+        setPlayerTurn(p1);
     }
 
     private void displayBoard() {
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
-                    currentPlayer = (currentPlayer == p1) ? p2 : p1;
+                    setPlayerTurn((currentPlayer == p1)? p2 : p1);
                     updateScoreCounts();
                 } else {
                     Toast.makeText(c, R.string.bad_move, Toast.LENGTH_SHORT).show();
@@ -101,6 +101,14 @@ public class MainActivity extends Activity {
 
         ((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
         ((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
+    }
+
+    public void setPlayerTurn(Player p) {
+        currentPlayer = p;
+        if (p == p1)
+            findViewById(R.id.turnIndicator).setBackgroundResource(R.drawable.ic_turn_indicator_p1);
+        else // (p == p2)
+            findViewById(R.id.turnIndicator).setBackgroundResource(R.drawable.ic_turn_indicator_p2);
     }
 
     @Override
