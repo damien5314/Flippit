@@ -2,6 +2,7 @@ package com.ddiehl.android.flippit.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -109,7 +110,7 @@ public class MainActivity extends Activity {
 		p1.setScore(p1c);
 		p2.setScore(p2c);
 
-        ((TextView) findViewById(R.id.p1score)).setText(String.valueOf( p1.getScore() ));
+        ((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1.getScore()));
         ((TextView) findViewById(R.id.p2score)).setText(String.valueOf( p2.getScore() ));
     }
 
@@ -164,6 +165,8 @@ public class MainActivity extends Activity {
 				return true;
 
 			case R.id.action_settings:
+				Intent intent = new Intent(this, SettingsActivity.class);
+				startActivity(intent);
 				return true;
 
 		}
