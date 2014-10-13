@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 	android:orientation="vertical"
-    android:background="#42A321"
     tools:context=".MainActivity">
 
 	<LinearLayout
@@ -58,6 +57,7 @@
 	<TableLayout
 		android:id="@+id/GameGrid"
 		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"/>
+		android:layout_height="fill_parent"
+        android:background="#42A321"/>
 
 </LinearLayout>
