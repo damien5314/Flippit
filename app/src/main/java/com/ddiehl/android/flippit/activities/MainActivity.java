@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
             for (int x = 0; x < b.width(); x++) {
                 BoardSpace s = b.getSpaceAt(x, y);
                 TableRow.LayoutParams p = new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.MATCH_PARENT, 1.0f);
+                        TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
                 p.setMargins(5, 5, 5, 5);
                 s.setLayoutParams(p);
                 s.setOnClickListener(attemptToPlace(s));
@@ -74,7 +74,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 if (b.setPieceOn(s.x, s.y, currentPlayer.getColor())) {
-                    setPlayerTurn((currentPlayer == p1)? p2 : p1);
+                    setPlayerTurn((currentPlayer == p1) ? p2 : p1);
                     updateScoreCounts();
                 } else {
                     Toast.makeText(c, R.string.bad_move, Toast.LENGTH_SHORT).show();

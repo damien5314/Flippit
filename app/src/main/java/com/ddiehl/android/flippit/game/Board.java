@@ -52,39 +52,24 @@ public class Board {
 		if (getSpaceAt(x,y).isOwned())
             return false;
 
-		boolean valid = false;
+        int[][] moveConfigurations = new int[][] {
+                {0,  -1}, // Down
+                {1,  0}, // Right
+                {-1, 0}, // Left
+                {0,  1}, // Up
+                {-1, -1}, // Down-Left
+                {1,  -1}, // Down-Right
+                {-1, 1}, // Top-Left
+                {1,  1} // Top-Right
+        };
 
-		// Check if move was valid upwards
-		if (checkMoveInDirection(x, y, 0, -1, playerColor))
-			valid = true;
-
-		// Check if move was valid right
-		if (checkMoveInDirection(x, y, 1, 0, playerColor))
-			valid = true;
-
-		// Check if move was valid left
-		if (checkMoveInDirection(x, y, -1, 0, playerColor))
-			valid = true;
-
-		// Check if move was valid downwards
-		if (checkMoveInDirection(x, y, 0, 1, playerColor))
-			valid = true;
-
-		// Check if move was valid up left
-		if (checkMoveInDirection(x, y, -1, -1, playerColor))
-			valid = true;
-
-		// Check if move was valid up right
-		if (checkMoveInDirection(x, y, 1, -1, playerColor))
-			valid = true;
-
-		// Check if move was valid down left
-		if (checkMoveInDirection(x, y, -1, 1, playerColor))
-			valid = true;
-
-		// Check if move was valid down right
-		if (checkMoveInDirection(x, y, 1, 1, playerColor))
-			valid = true;
+        boolean valid = false;
+        for (int[] move : moveConfigurations) {
+            if (checkMoveValid(x, y, move[0], move[1], playerColor)) {
+                flipColorsInDirection(x, y, move[0], move[1], playerColor);
+                valid = true;
+            }
+        }
 
 		if (valid) {
 			spaces[y][x].setColor(playerColor);
@@ -94,7 +79,7 @@ public class Board {
 		return false;
 	}
 
-	public boolean checkMoveInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
+	public boolean checkMoveValid(int x, int y, int dx, int dy, ReversiColor playerColor) {
 		if (x+dx < 0 || x+dx >= width || y+dy < 0 || y+dy >= height)
 			return false;
 
@@ -109,7 +94,7 @@ public class Board {
 				cy += dy;
 			}
 			if (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == playerColor) {
-				flipColors(x+dx, cx, y+dy, cy);
+//				flipColors(x+dx, cx, y+dy, cy);
 				return true;
 			}
 		}
@@ -118,7 +103,6 @@ public class Board {
 	}
 
 	public void flipColors(int xa, int xb, int ya, int yb) {
-
 		int dx, dy;
 
 		if (xa < xb) dx = 1;
@@ -135,6 +119,17 @@ public class Board {
 			ya += dy;
 		}
 	}
+
+    public void flipColorsInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
+        int cx = x + dx;
+        int cy = y + dy;
+
+        while (getSpaceAt(cx, cy).getColor() != playerColor) {
+            getSpaceAt(cx, cy).flipColor();
+            cx += dx;
+            cy += dy;
+        }
+    }
 
 	public int width() {
 		return width;
