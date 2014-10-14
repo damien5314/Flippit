@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ddiehl.android.flippit.R;
 
@@ -21,6 +22,6 @@ public class LauncherActivity extends Activity {
     }
 
     public void startMultiplayer(View view) {
-
+        Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
     }
 }

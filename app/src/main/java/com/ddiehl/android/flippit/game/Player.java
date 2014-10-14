@@ -21,7 +21,6 @@ public class Player {
 		if (!isCPU)
 			return null;
 
-		Log.i(TAG, "Calculating best move...");
 		Move best = null;
 		int bestVal = -1;
 		for (int y = 0; y < b.height(); y++) {
