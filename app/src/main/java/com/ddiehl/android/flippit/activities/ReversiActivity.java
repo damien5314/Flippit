@@ -78,7 +78,7 @@ public class ReversiActivity extends Activity {
                         TableRow.LayoutParams.WRAP_CONTENT, TableRow.LayoutParams.WRAP_CONTENT, 1.0f);
                 p.setMargins(5, 5, 5, 5);
                 s.setLayoutParams(p);
-                s.setOnClickListener(attemptToPlace(s));
+                s.setOnClickListener(claim(s));
                 r.addView(s);
             }
 			l.addView(r);
@@ -90,11 +90,14 @@ public class ReversiActivity extends Activity {
 		b.getSpaceAt(4, 4).setClickable(false);
     }
 
-    public View.OnClickListener attemptToPlace(final BoardSpace s) {
+    public View.OnClickListener claim(final BoardSpace s) {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (b.moveValue(s.x, s.y, currentPlayer.getColor()) > 0) {
+                if (s.isOwned())
+					return;
+
+				if (b.moveValue(s.x, s.y, currentPlayer.getColor()) > 0) {
 					b.setPieceOn(s.x, s.y, currentPlayer.getColor());
 					s.setClickable(false);
                     changePlayerTurn();
@@ -126,7 +129,7 @@ public class ReversiActivity extends Activity {
 		p2.setScore(p2c);
 
         ((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1.getScore()));
-        ((TextView) findViewById(R.id.p2score)).setText(String.valueOf( p2.getScore() ));
+        ((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2.getScore()));
     }
 
     public void changePlayerTurn() {
