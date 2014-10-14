@@ -25,8 +25,8 @@ import com.ddiehl.android.flippit.game.Player;
 import com.ddiehl.android.flippit.game.ReversiColor;
 
 
-public class MainActivity extends Activity {
-	private static final String TAG = MainActivity.class.getSimpleName();
+public class ReversiActivity extends Activity {
+	private static final String TAG = ReversiActivity.class.getSimpleName();
     private Context c;
 	private Player p1;
 	private Player p2;

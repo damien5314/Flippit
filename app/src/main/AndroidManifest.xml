@@ -1,25 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-		  package="com.ddiehl.android.flippit" >
+    package="com.ddiehl.android.flippit" >
 
-	<application
-		android:allowBackup="true"
-		android:icon="@drawable/ic_launcher"
-		android:label="@string/app_name"
-		android:theme="@style/AppTheme" >
-		<activity
-			android:name=".activities.MainActivity"
-			android:label="@string/app_name" >
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
 
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
-		<activity
-			android:name=".activities.SettingsActivity"
-			android:label="@string/activity_settings_title" >
-		</activity>
-	</application>
+        <activity android:name="com.ddiehl.android.flippit.activities.LauncherActivity"
+            android:label="@string/activity_launcher_title" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".activities.ReversiActivity"
+            android:label="@string/app_name" >
+        </activity>
+
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/activity_settings_title" >
+        </activity>
+
+    </application>
 
 </manifest>

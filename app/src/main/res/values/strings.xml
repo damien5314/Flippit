@@ -2,14 +2,17 @@
 <resources>
 
     <string name="app_name">Flippit</string>
-	<string name="action_new_game">New Game</string>
+    <string name="activity_launcher_title">Flippit</string>
+    <string name="action_new_game">New Game</string>
     <string name="action_settings">Settings</string>
-	<string name="player1_label">Player 1</string>
-	<string name="player2_label">Player 2</string>
+    <string name="player1_label">Player 1</string>
+    <string name="player2_label">Player 2</string>
     <string name="bad_move">Error: Invalid Move</string>
-	<string name="no_moves">No moves remaining</string>
-	<string name="no_winner">No winner.</string>
-	<string name="pref_ComputerAI">Computer AI</string>
-	<string name="activity_settings_title">Settings</string>
+    <string name="no_moves">No moves remaining</string>
+    <string name="no_winner">No winner.</string>
+    <string name="pref_ComputerAI">Computer AI</string>
+    <string name="activity_settings_title">Settings</string>
+    <string name="button_start_1p">Single Player</string>
+    <string name="button_start_mp">Start Multiplayer</string>
 
 </resources>
