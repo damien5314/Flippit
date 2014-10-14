@@ -40,16 +40,20 @@ public class ReversiActivity extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         c = this;
 
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		boolean aiEnabled = prefs.getBoolean("pref_ComputerAI", false);
-		Log.i(TAG, "AI ENABLED = " + aiEnabled);
-
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
-		p2.isCPU(aiEnabled); // Set p2 to Computer AI if enabled
 
 		b = Board.getInstance(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean aiEnabled = prefs.getBoolean("pref_ComputerAI", false);
+        p2.isCPU(aiEnabled); // Set p2 to Computer AI if enabled
+        Log.i(TAG, "AI ENABLED = " + aiEnabled);
     }
 
     private void startNewGame() {
@@ -127,12 +131,13 @@ public class ReversiActivity extends Activity {
 
     public void changePlayerTurn() {
 		Player opponent = (currentPlayer == p1) ? p2 : p1;
-		if (b.hasMove(opponent))
-			currentPlayer = opponent;
-		else if (b.hasMove(currentPlayer))
-			Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
-		else
-			endGame();
+		if (b.hasMove(opponent)) { // If opponent can make a move, it's his turn
+            currentPlayer = opponent;
+        } else if (b.hasMove(currentPlayer)) { // Opponent has no move, keep turn
+            Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
+        } else { // No moves remaining, end of game
+            endGame();
+        }
 
         findViewById(R.id.turnIndicator).setBackgroundResource(
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
