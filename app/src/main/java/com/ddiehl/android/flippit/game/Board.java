@@ -2,6 +2,7 @@ package com.ddiehl.android.flippit.game;
 
 
 import android.content.Context;
+import android.util.Log;
 
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
@@ -46,10 +47,11 @@ public class Board {
 	public boolean hasMove(Player p) {
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
-                if (getSpaceAt(x,y).isOwned())
+                BoardSpace s = getSpaceAt(x, y);
+                if (s.isOwned())
                     continue;
                 for (int[] move : moveDirections)
-                    if (moveValueInDirection(x, y, move[0], move[1], p.getColor()) != 0)
+                    if (moveValueInDirection(s, move[0], move[1], p.getColor()) != 0)
 						return true;
             }
         }
@@ -67,36 +69,33 @@ public class Board {
 		return (getSpaceAt(x, y) != null);
 	}
 
-	public boolean setPieceOn(int x, int y, ReversiColor playerColor) {
-		if (getSpaceAt(x,y).isOwned())
-            return false;
-
+	public boolean commitPiece(BoardSpace space, ReversiColor playerColor) {
 		for (int[] move : moveDirections) {
-			if (moveValueInDirection(x, y, move[0], move[1], playerColor) != 0) {
-				flipInDirection(x, y, move[0], move[1], playerColor);
+			if (moveValueInDirection(space, move[0], move[1], playerColor) != 0) {
+				flipInDirection(space, move[0], move[1], playerColor);
 			}
 		}
 		return true;
 	}
 
-	public int moveValue(int x, int y, ReversiColor playerColor) {
+	public int moveValue(BoardSpace s, ReversiColor playerColor) {
 		int moveVal = 0;
 		for (int[] move : moveDirections)
-			moveVal += moveValueInDirection(x, y, move[0], move[1], playerColor);
+			moveVal += moveValueInDirection(s, move[0], move[1], playerColor);
 		return moveVal;
 	}
 
-	public int moveValueInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
-		if (x+dx < 0 || x+dx >= width || y+dy < 0 || y+dy >= height)
+	public int moveValueInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
+		if (s.x+dx < 0 || s.x+dx >= width || s.y+dy < 0 || s.y+dy >= height)
 			return 0;
 
 		int moveVal = 0;
 		ReversiColor opponentColor = (playerColor == ReversiColor.Black) ? ReversiColor.White : ReversiColor.Black;
-        BoardSpace firstPiece = getSpaceAt(x + dx, y + dy);
+        BoardSpace firstPiece = getSpaceAt(s.x + dx, s.y + dy);
 
 		if (firstPiece != null && firstPiece.getColor() == opponentColor) {
-			int cx = x+dx;
-			int cy = y+dy;
+			int cx = s.x+dx;
+			int cy = s.y+dy;
 			while (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == opponentColor) {
 				moveVal++;
 				cx += dx;
@@ -110,16 +109,38 @@ public class Board {
 		return 0;
 	}
 
-    public void flipInDirection(int x, int y, int dx, int dy, ReversiColor playerColor) {
-        int cx = x + dx;
-        int cy = y + dy;
+    public void flipInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
+        s.setColor(playerColor);
+        int cx = s.x + dx;
+        int cy = s.y + dy;
 
         while (getSpaceAt(cx, cy).getColor() != playerColor) {
             getSpaceAt(cx, cy).flipColor();
             cx += dx;
             cy += dy;
         }
-        getSpaceAt(x,y).setColor(playerColor);
+    }
+
+    public BoardSpace getBestMove_d1(Player p) {
+        BoardSpace best = null;
+        int bestVal = 0;
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                BoardSpace space = getSpaceAt(x, y);
+                if (!space.isOwned()) {
+                    int val = moveValue(space, p.getColor());
+                    if (val > bestVal) {
+                        best = space;
+                        bestVal = val;
+                    }
+                }
+            }
+        }
+
+        if (best != null)
+            Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") has value of " + bestVal);
+
+        return best;
     }
 
 	public int width() {

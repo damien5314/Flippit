@@ -60,7 +60,7 @@ public class ReversiActivity extends Activity {
         b.reset();
         displayBoard();
         updateScoreCounts();
-        changePlayerTurn();
+        calculateGameState();
     }
 
     private void displayBoard() {
@@ -97,16 +97,41 @@ public class ReversiActivity extends Activity {
                 if (s.isOwned())
 					return;
 
-				if (b.moveValue(s.x, s.y, currentPlayer.getColor()) > 0) {
-					b.setPieceOn(s.x, s.y, currentPlayer.getColor());
-					s.setClickable(false);
-                    changePlayerTurn();
-                    updateScoreCounts();
+				if (b.moveValue(s, currentPlayer.getColor()) > 0) {
+					b.commitPiece(s, currentPlayer.getColor());
+                    calculateGameState();
                 } else {
                     Toast.makeText(c, R.string.bad_move, Toast.LENGTH_SHORT).show();
                 }
             }
         };
+    }
+
+    public void calculateGameState() {
+        updateScoreCounts();
+		Player opponent = (currentPlayer == p1) ? p2 : p1;
+		if (b.hasMove(opponent)) { // If opponent can make a move, it's his turn
+            currentPlayer = opponent;
+        } else if (b.hasMove(currentPlayer)) { // Opponent has no move, keep turn
+            Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
+        } else { // No moves remaining, end of game
+            endGame();
+        }
+
+        findViewById(R.id.turnIndicator).setBackgroundResource(
+                (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
+
+        if (currentPlayer.isCPU()) {
+            executeCPUMove();
+            calculateGameState();
+        }
+    }
+
+    public void executeCPUMove() {
+        BoardSpace move = b.getBestMove_d1(currentPlayer);
+        if (move == null)
+            Log.e(TAG, "ERROR: getBestMove_d1 did not return a BoardSpace.");
+        b.commitPiece(move, currentPlayer.getColor());
     }
 
     public void updateScoreCounts() {
@@ -125,32 +150,11 @@ public class ReversiActivity extends Activity {
             }
         }
 
-		p1.setScore(p1c);
-		p2.setScore(p2c);
+        p1.setScore(p1c);
+        p2.setScore(p2c);
 
         ((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1.getScore()));
         ((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2.getScore()));
-    }
-
-    public void changePlayerTurn() {
-		Player opponent = (currentPlayer == p1) ? p2 : p1;
-		if (b.hasMove(opponent)) { // If opponent can make a move, it's his turn
-            currentPlayer = opponent;
-        } else if (b.hasMove(currentPlayer)) { // Opponent has no move, keep turn
-            Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
-        } else { // No moves remaining, end of game
-            endGame();
-        }
-
-        findViewById(R.id.turnIndicator).setBackgroundResource(
-                (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
-
-		BoardSpace move = currentPlayer.performMove(b);
-		if (move != null) {
-			b.setPieceOn(move.x, move.y, currentPlayer.getColor());
-			updateScoreCounts();
-			changePlayerTurn();
-		}
     }
 
 	public void endGame() {
