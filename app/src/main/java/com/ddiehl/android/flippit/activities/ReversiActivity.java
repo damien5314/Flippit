@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -123,15 +124,23 @@ public class ReversiActivity extends Activity {
 
         if (currentPlayer.isCPU()) {
             executeCPUMove();
-            calculateGameState();
         }
     }
 
     public void executeCPUMove() {
-        BoardSpace move = b.getBestMove_d1(currentPlayer);
+        final BoardSpace move = b.getBestMove_d1(currentPlayer);
+
         if (move == null)
             Log.e(TAG, "ERROR: getBestMove_d1 did not return a BoardSpace.");
-        b.commitPiece(move, currentPlayer.getColor());
+
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                b.commitPiece(move, currentPlayer.getColor());
+                calculateGameState();
+            }
+        }, 1000);
     }
 
     public void updateScoreCounts() {
