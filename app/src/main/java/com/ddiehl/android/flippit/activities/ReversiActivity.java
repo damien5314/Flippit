@@ -95,7 +95,7 @@ public class ReversiActivity extends Activity {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (s.isOwned())
+                if (s.isOwned() || currentPlayer.isCPU())
 					return;
 
 				if (b.moveValue(s, currentPlayer.getColor()) > 0) {
