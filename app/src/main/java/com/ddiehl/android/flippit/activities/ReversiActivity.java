@@ -31,6 +31,7 @@ public class ReversiActivity extends Activity {
     private Context c;
 	private Player p1;
 	private Player p2;
+    private Player firstTurn;
 	private Board b;
 	private Player currentPlayer = p2;
 
@@ -58,6 +59,10 @@ public class ReversiActivity extends Activity {
     }
 
     private void startNewGame() {
+        if (firstTurn == null)
+            firstTurn = p1;
+        currentPlayer = (firstTurn == p1) ? p2 : p1;
+        firstTurn = currentPlayer;
         b.reset();
         displayBoard();
         updateScoreCounts();

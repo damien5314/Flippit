@@ -70,10 +70,6 @@ public class Board {
 		return null;
 	}
 
-	public boolean spaceExists(int x, int y) {
-		return (getSpaceAt(x, y) != null);
-	}
-
 	public boolean commitPiece(BoardSpace space, ReversiColor playerColor) {
 		for (int[] move : moveDirections) {
 			if (moveValueInDirection(space, move[0], move[1], playerColor) != 0) {
