@@ -28,12 +28,11 @@ import com.ddiehl.android.flippit.game.ReversiColor;
 
 public class ReversiActivity extends Activity {
 	private static final String TAG = ReversiActivity.class.getSimpleName();
+	private static final String PREF_AI = "pref_ComputerAI";
     private Context c;
-	private Player p1;
-	private Player p2;
+	private Player p1, p2, currentPlayer;
     private Player firstTurn;
 	private Board b;
-	private Player currentPlayer = p2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,23 +50,31 @@ public class ReversiActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean aiEnabled = prefs.getBoolean("pref_ComputerAI", false);
-        p2.isCPU(aiEnabled); // Set p2 to Computer AI if enabled
-        Log.i(TAG, "AI ENABLED = " + aiEnabled);
+		p2.isCPU(getAiPreference()); // Set p2 to Computer AI if enabled
+		if (currentPlayer != null && currentPlayer.isCPU())
+			executeCPUMove();
     }
 
+	private boolean getAiPreference() {
+		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		return prefs.getBoolean(PREF_AI, false);
+	}
+
     private void startNewGame() {
-        if (firstTurn == null)
-            firstTurn = p1;
-        currentPlayer = (firstTurn == p1) ? p2 : p1;
-        firstTurn = currentPlayer;
+		switchFirstTurn();
         b.reset();
         displayBoard();
         updateScoreCounts();
         calculateGameState();
     }
+
+	private void switchFirstTurn() {
+		if (firstTurn == null)
+			firstTurn = p1;
+		firstTurn = (firstTurn == p1) ? p2 : p1;
+		currentPlayer = firstTurn;
+	}
 
     private void displayBoard() {
 		TableLayout l = (TableLayout) findViewById(R.id.GameGrid);

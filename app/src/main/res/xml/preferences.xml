@@ -3,7 +3,7 @@
 
     <CheckBoxPreference
         android:key="pref_ComputerAI"
-        android:title="@string/pref_ComputerAI"
+        android:title="@string/pref_ComputerAI_label"
         android:defaultValue="true" />
 
 </PreferenceScreen>
