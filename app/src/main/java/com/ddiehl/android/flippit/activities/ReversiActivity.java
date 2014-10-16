@@ -117,6 +117,7 @@ public class ReversiActivity extends Activity {
             Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
         } else { // No moves remaining, end of game
             endGame();
+            return;
         }
 
         findViewById(R.id.turnIndicator).setBackgroundResource(
@@ -130,8 +131,10 @@ public class ReversiActivity extends Activity {
     public void executeCPUMove() {
         final BoardSpace move = b.getBestMove_d1(currentPlayer);
 
-        if (move == null)
+        if (move == null) {
             Log.e(TAG, "ERROR: getBestMove_d1 did not return a BoardSpace.");
+            return;
+        }
 
         final Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

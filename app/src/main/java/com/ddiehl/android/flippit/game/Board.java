@@ -50,9 +50,14 @@ public class Board {
                 BoardSpace s = getSpaceAt(x, y);
                 if (s.isOwned())
                     continue;
-                for (int[] move : moveDirections)
-                    if (moveValueInDirection(s, move[0], move[1], p.getColor()) != 0)
-						return true;
+                for (int[] move : moveDirections) {
+                    int value = moveValueInDirection(s, move[0], move[1], p.getColor());
+                    if (value != 0) {
+//                        Log.d(TAG, "moveValueInDirection((" + s.x + "," + s.y + ")," + move[0]
+//                                + "," + move[1] + "," + p.getColor() + ") = " + value);
+                        return true;
+                    }
+                }
             }
         }
 		return false;
@@ -161,11 +166,13 @@ public class Board {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		for (int y = 0; y < spaces.length; y++) {
-			for (int x = 0; x < spaces[0].length; x++) {
-				if (!spaceExists(x, y))
-					sb.append("0 ");
-				else if (getSpaceAt(x, y).getColor() == ReversiColor.White)
+        sb.append("\n");
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+                BoardSpace s = getSpaceAt(x, y);
+                if (!s.isOwned())
+                    sb.append("0 ");
+				else if (s.getColor() == ReversiColor.White)
 					sb.append("1 ");
 				else
 					sb.append("2 ");
