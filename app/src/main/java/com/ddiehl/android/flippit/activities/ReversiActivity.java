@@ -44,9 +44,12 @@ public class ReversiActivity extends Activity {
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
 
-        if (savedInstanceState.containsKey("board"))
-            b = savedInstanceState.getString("board")
 		b = Board.getInstance(this);
+        if (savedInstanceState != null && savedInstanceState.containsKey("board")) {
+			Log.d(TAG, "savedInstanceState detected, loading board.");
+			b.deserialize(this, savedInstanceState.getString("board"));
+			displayBoard();
+		}
     }
 
     @Override
@@ -104,11 +107,6 @@ public class ReversiActivity extends Activity {
             }
 			l.addView(r);
         }
-
-		b.getSpaceAt(3, 3).setClickable(false);
-		b.getSpaceAt(4, 3).setClickable(false);
-		b.getSpaceAt(3, 4).setClickable(false);
-		b.getSpaceAt(4, 4).setClickable(false);
     }
 
     public View.OnClickListener claim(final BoardSpace s) {
