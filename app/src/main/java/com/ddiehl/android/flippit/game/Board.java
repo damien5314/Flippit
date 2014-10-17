@@ -159,6 +159,42 @@ public class Board {
 		return _instance;
 	}
 
+    public Board deserialize(Context context, String in) {
+        int index = 0;
+        for (int y = 0; y < _instance.height; y++) {
+            for (int x = 0; x < _instance.width; x++) {
+                char c = in.charAt(index);
+                spaces[y][x] = new BoardSpace(context, x, y);
+                switch (c) {
+                    case '0':
+                        break;
+                    case '1':
+                        spaces[y][x].setColor(ReversiColor.White);
+                        break;
+                    case '2':
+                        spaces[y][x].setColor(ReversiColor.Black);
+                }
+            }
+        }
+        return this;
+    }
+
+    public String serialize() {
+        StringBuilder sb = new StringBuilder();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                BoardSpace s = getSpaceAt(x, y);
+                if (!s.isOwned())
+                    sb.append("0");
+                else if (s.getColor() == ReversiColor.White)
+                    sb.append("1");
+                else
+                    sb.append("2");
+            }
+        }
+        return sb.toString();
+    }
+
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
