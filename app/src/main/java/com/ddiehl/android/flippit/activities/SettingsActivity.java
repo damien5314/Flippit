@@ -10,7 +10,7 @@ import com.ddiehl.android.flippit.R;
 
 public class SettingsActivity extends Activity {
 	private static final String TAG = SettingsActivity.class.getSimpleName();
-	public static final String CONFIG_NAME = "pref";
+//	public static final String CONFIG_NAME = "pref";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

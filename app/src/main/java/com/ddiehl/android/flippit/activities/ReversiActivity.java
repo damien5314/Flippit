@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -28,7 +27,8 @@ import com.ddiehl.android.flippit.game.ReversiColor;
 
 public class ReversiActivity extends Activity {
 	private static final String TAG = ReversiActivity.class.getSimpleName();
-	private static final String PREF_AI = "pref_ComputerAI";
+	private static final String PREF_AI_ENABLED = "pref_ai_enabled";
+	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
     private Context c;
 	private Player p1, p2, currentPlayer;
     private Player firstTurn;
@@ -38,7 +38,7 @@ public class ReversiActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reversi);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         c = this;
 
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label));
@@ -55,8 +55,27 @@ public class ReversiActivity extends Activity {
     @Override
     public void onSaveInstanceState(Bundle out) {
         super.onSaveInstanceState(out);
+		Log.d(TAG, "onSaveInstanceState(Bundle out) called");
         out.putString("board", b.serialize());
     }
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		Log.d(TAG, "onPause() called");
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		Log.d(TAG, "onStop() called");
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		Log.d(TAG, "onDestroy() called");
+	}
 
     @Override
     public void onResume() {
@@ -69,7 +88,7 @@ public class ReversiActivity extends Activity {
 	private boolean getAiPreference() {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		return prefs.getBoolean(PREF_AI, false);
+		return prefs.getBoolean(PREF_AI_ENABLED, false);
 	}
 
     private void startNewGame() {
