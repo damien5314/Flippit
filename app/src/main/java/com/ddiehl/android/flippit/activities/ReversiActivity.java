@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
@@ -29,7 +30,7 @@ public class ReversiActivity extends Activity {
 	private static final String TAG = ReversiActivity.class.getSimpleName();
 	private static final String PREF_AI_ENABLED = "pref_ai_enabled";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
-    private Context c;
+    private Context ctx;
 	private Player p1, p2, currentPlayer;
     private Player firstTurn;
 	private Board b;
@@ -38,8 +39,9 @@ public class ReversiActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reversi);
-//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        c = this;
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
+        ctx = this;
 
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
@@ -86,7 +88,6 @@ public class ReversiActivity extends Activity {
     }
 
 	private boolean getAiPreference() {
-		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		return prefs.getBoolean(PREF_AI_ENABLED, false);
 	}
@@ -139,7 +140,7 @@ public class ReversiActivity extends Activity {
 					b.commitPiece(s, currentPlayer.getColor());
                     calculateGameState();
                 } else {
-                    Toast.makeText(c, R.string.bad_move, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ctx, R.string.bad_move, Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -166,7 +167,21 @@ public class ReversiActivity extends Activity {
     }
 
     public void executeCPUMove() {
-        final BoardSpace move = b.getBestMove_d1(currentPlayer);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        int difficulty = Integer.valueOf(prefs.getString(PREF_AI_DIFFICULTY, "0"));
+        Log.d(TAG, "AI level: " + difficulty);
+        final BoardSpace move;
+        switch (difficulty) {
+            case 1:
+                move = b.getBestMove_d1(currentPlayer);
+                break;
+            case 2:
+                move = b.getBestMove_d1(currentPlayer);
+                break;
+            default:
+                Log.e(TAG, "AI difficulty setting not recognized: " + difficulty);
+                move = null;
+        }
 
         if (move == null) {
             Log.e(TAG, "ERROR: getBestMove_d1 did not return a BoardSpace.");
