@@ -11,11 +11,13 @@
 
 		<ListPreference
 			android:key="pref_ai_difficulty"
+            android:dependency="pref_ai_enabled"
 			android:title="@string/pref_ai_difficulty"
 			android:dialogTitle="@string/pref_ai_difficulty"
 			android:entries="@array/pref_ai_difficulty_entries"
 			android:entryValues="@array/pref_ai_difficulty_values"
-			android:defaultValue="1"/>
+			android:defaultValue="1"
+            android:summary="%s"/>
 
 	</PreferenceCategory>
 
