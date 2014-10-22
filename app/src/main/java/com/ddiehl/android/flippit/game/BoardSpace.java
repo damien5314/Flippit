@@ -22,6 +22,10 @@ public class BoardSpace extends Button {
         this.y = y;
     }
 
+    protected BoardSpace copy(Context context) {
+        return new BoardSpace(context, x, y);
+    }
+
     public boolean isOwned() {
         return color != null;
     }

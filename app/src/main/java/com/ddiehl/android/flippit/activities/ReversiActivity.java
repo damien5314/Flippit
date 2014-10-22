@@ -176,7 +176,7 @@ public class ReversiActivity extends Activity {
                 move = b.getBestMove_d1(currentPlayer);
                 break;
             case 2:
-                move = b.getBestMove_d1(currentPlayer);
+                move = b.getBestMove_d2(currentPlayer, (currentPlayer == p1) ? p2 : p1);
                 break;
             default:
                 Log.e(TAG, "AI difficulty setting not recognized: " + difficulty);

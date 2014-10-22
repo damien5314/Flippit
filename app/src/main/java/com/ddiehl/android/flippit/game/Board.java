@@ -31,6 +31,16 @@ public class Board {
 		reset();
 	}
 
+    private Board copy() {
+        Board copy = new Board(context);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                copy.spaces[y][x] = spaces[y][x].copy(context);
+            }
+        }
+        return copy;
+    }
+
 	public void reset() {
 		for (int y = 0; y < spaces.length; y++) {
 			for (int x = 0; x < spaces[0].length; x++) {
@@ -142,6 +152,50 @@ public class Board {
             Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") has value of " + bestVal);
 
         return best;
+    }
+
+    public BoardSpace getBestMove_d2(Player p, Player o) {
+        BoardSpace best = null;
+        int bestVal = 999;
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                BoardSpace space = getSpaceAt(x, y);
+                if (!space.isOwned()) {
+                    if (moveValue(space, p.getColor()) > 0) {
+                        // Copy board to identical object
+                        Board copy = this.copy();
+                        // Play move on copied board object
+                        copy.commitPiece(space, p.getColor());
+                        // Count possible moves for Player's opponent
+                        int movesOpened = copy.getPossibleMoves(o);
+                        if (movesOpened < bestVal) {
+                            best = space;
+                            bestVal = movesOpened;
+                        }
+                    }
+                }
+            }
+        }
+        Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") reduces player to " + bestVal + " moves");
+        return best;
+    }
+
+    public int getPossibleMoves(Player p) {
+        Log.d(TAG, "Get possible moves for " + p.getColor());
+        int possible = 0;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int value = moveValue(getSpaceAt(x, y), p.getColor());
+                if (value > 0) {
+                    possible++;
+                } else if (value == 0) {
+                    Log.d(TAG, "Move @(" + x + "," + y + ") is invalid.");
+                } else {
+                    Log.d(TAG, "Move @(" + x + "," + y + ") gives player " + possible + " moves.");
+                }
+            }
+        }
+        return possible;
     }
 
 	public int width() {
