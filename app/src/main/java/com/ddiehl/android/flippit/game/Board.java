@@ -132,6 +132,10 @@ public class Board {
         }
     }
 
+	/**
+	 * Easy difficulty logic for computer AI
+	 * Finds the space on the board which would capture the most spaces for Player p.
+	 */
     public BoardSpace getBestMove_d1(Player p) {
         BoardSpace best = null;
         int bestVal = 0;
@@ -154,16 +158,25 @@ public class Board {
         return best;
     }
 
+	/**
+	 * Medium difficulty logic for computer AI
+	 * Finds the space on the board which would result in a board configuration leaving the
+	 * opposing player with the least choices.
+	 */
     public BoardSpace getBestMove_d2(Player p, Player o) {
         BoardSpace best = null;
         int bestVal = 999;
+		Log.d(TAG, "Calculating best move for " + p.getName() + " against " + o.getName());
+		Log.d(TAG, "ORIGINAL" + toString());
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 BoardSpace space = getSpaceAt(x, y);
                 if (!space.isOwned()) {
                     if (moveValue(space, p.getColor()) > 0) {
+						Log.d(TAG, "Move @(" + x + "," + y + ")");
                         // Copy board to identical object
                         Board copy = this.copy();
+						Log.d(TAG, "COPY" + copy.toString());
                         // Play move on copied board object
                         copy.commitPiece(space, p.getColor());
                         // Count possible moves for Player's opponent
@@ -176,7 +189,11 @@ public class Board {
                 }
             }
         }
-        Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") reduces player to " + bestVal + " moves");
+
+		if (best != null)
+        	Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") reduces "
+					+ o.getName() + " to " + bestVal + " moves");
+
         return best;
     }
 
@@ -189,7 +206,7 @@ public class Board {
                 if (value > 0) {
                     possible++;
                 } else if (value == 0) {
-                    Log.d(TAG, "Move @(" + x + "," + y + ") is invalid.");
+//                    Log.d(TAG, "Move @(" + x + "," + y + ") is invalid.");
                 } else {
                     Log.d(TAG, "Move @(" + x + "," + y + ") gives player " + possible + " moves.");
                 }
