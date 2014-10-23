@@ -5,8 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -84,7 +84,7 @@ public class ReversiActivity extends Activity {
         super.onResume();
 		p2.isCPU(getAiPreference()); // Set p2 to Computer AI if enabled
 		if (currentPlayer != null && currentPlayer.isCPU())
-			executeCPUMove();
+            new ExecuteCPUMove().execute();
     }
 
 	private boolean getAiPreference() {
@@ -162,40 +162,39 @@ public class ReversiActivity extends Activity {
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
 
         if (currentPlayer.isCPU()) {
-            executeCPUMove();
+            new ExecuteCPUMove().execute();
         }
     }
 
-    public void executeCPUMove() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int difficulty = Integer.valueOf(prefs.getString(PREF_AI_DIFFICULTY, "0"));
-        Log.d(TAG, "AI level: " + difficulty);
-        final BoardSpace move;
-        switch (difficulty) {
-            case 1:
-                move = b.getBestMove_d1(currentPlayer);
-                break;
-            case 2:
-                move = b.getBestMove_d2(currentPlayer, (currentPlayer == p1) ? p2 : p1);
-                break;
-            default:
-                Log.e(TAG, "AI difficulty setting not recognized: " + difficulty);
-                move = null;
-        }
-
-        if (move == null) {
-            Log.e(TAG, "ERROR: getBestMove_d1 did not return a BoardSpace.");
-            return;
-        }
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                b.commitPiece(move, currentPlayer.getColor());
-                calculateGameState();
+    private class ExecuteCPUMove extends AsyncTask<Void, Void, BoardSpace> {
+        @Override
+        protected BoardSpace doInBackground(Void... voids) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
+            int difficulty = Integer.valueOf(prefs.getString(PREF_AI_DIFFICULTY, "0"));
+            BoardSpace move;
+            switch (difficulty) {
+                case 1:
+                    move = b.getBestMove_d1(currentPlayer);
+                    break;
+                case 2:
+                    move = b.getBestMove_d2(currentPlayer, (currentPlayer == p1) ? p2 : p1);
+                    break;
+                default:
+                    Log.e(TAG, "AI difficulty setting not recognized: " + difficulty);
+                    move = null;
             }
-        }, 1000);
+
+            if (move == null) {
+                Log.e(TAG, "ERROR: getBestMove did not return a BoardSpace.");
+            }
+            return move;
+        }
+
+        @Override
+        protected void onPostExecute(BoardSpace space) {
+            b.commitPiece(space, currentPlayer.getColor());
+            calculateGameState();
+        }
     }
 
     public void updateScoreCounts() {
