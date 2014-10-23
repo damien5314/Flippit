@@ -15,6 +15,7 @@
     <string name="button_start_mp">Multiplayer</string>
     <string name="coming_soon">Coming Soon</string>
 
+	<string name="pref_player_name_title">Player Name</string>
 	<string name="pref_cat_ai">Computer AI</string>
 	<string name="pref_ComputerAI_label">Enabled</string>
 	<string name="pref_ai_difficulty">Difficulty</string>
