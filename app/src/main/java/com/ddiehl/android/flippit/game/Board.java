@@ -166,19 +166,15 @@ public class Board {
     public BoardSpace getBestMove_d2(Player p, Player o) {
         BoardSpace best = null;
         int bestVal = 999;
-		Log.d(TAG, "Calculating best move for " + p.getName() + " against " + o.getName());
-		Log.d(TAG, "ORIGINAL" + toString());
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 BoardSpace space = getSpaceAt(x, y);
                 if (!space.isOwned()) {
                     if (moveValue(space, p.getColor()) > 0) {
-						Log.d(TAG, "Move @(" + x + "," + y + ")");
                         // Copy board to identical object
                         Board copy = this.copy();
-						Log.d(TAG, "COPY" + copy.toString());
                         // Play move on copied board object
-                        copy.commitPiece(space, p.getColor());
+                        copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
                         // Count possible moves for Player's opponent
                         int movesOpened = copy.getPossibleMoves(o);
                         if (movesOpened < bestVal) {
@@ -198,20 +194,12 @@ public class Board {
     }
 
     public int getPossibleMoves(Player p) {
-        Log.d(TAG, "Get possible moves for " + p.getColor());
         int possible = 0;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int value = moveValue(getSpaceAt(x, y), p.getColor());
-                if (value > 0) {
-                    possible++;
-                } else if (value == 0) {
-//                    Log.d(TAG, "Move @(" + x + "," + y + ") is invalid.");
-                } else {
-                    Log.d(TAG, "Move @(" + x + "," + y + ") gives player " + possible + " moves.");
-                }
-            }
-        }
+        for (int y = 0; y < height; y++)
+            for (int x = 0; x < width; x++)
+                if (!getSpaceAt(x, y).isOwned())
+                    if (moveValue(getSpaceAt(x, y), p.getColor()) > 0)
+                        possible++;
         return possible;
     }
 
