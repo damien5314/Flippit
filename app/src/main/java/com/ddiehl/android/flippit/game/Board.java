@@ -159,7 +159,7 @@ public class Board {
     }
 
 	/**
-	 * Medium difficulty logic for computer AI
+	 * Hard difficulty logic for computer AI
 	 * Finds the space on the board which would result in a board configuration leaving the
 	 * opposing player with the least choices.
 	 */

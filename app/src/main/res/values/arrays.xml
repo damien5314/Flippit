@@ -3,7 +3,7 @@
 
 	<string-array name="pref_ai_difficulty_entries">
 		<item name="pref_ai_difficulty_easy">Easy</item>
-		<item name="pref_ai_difficulty_hard">Medium</item>
+		<item name="pref_ai_difficulty_hard">Hard</item>
 	</string-array>
 
 	<string-array name="pref_ai_difficulty_values">
