@@ -28,6 +28,7 @@ import com.ddiehl.android.flippit.game.ReversiColor;
 
 public class ReversiActivity extends Activity {
 	private static final String TAG = ReversiActivity.class.getSimpleName();
+	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_ENABLED = "pref_ai_enabled";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
     private Context ctx;
@@ -43,7 +44,7 @@ public class ReversiActivity extends Activity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         ctx = this;
 
-		p1 = new Player(ReversiColor.White, getString(R.string.player1_label));
+		p1 = new Player(ReversiColor.White, getString(R.string.player1_label_default));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
 
 		b = Board.getInstance(this);
@@ -82,10 +83,17 @@ public class ReversiActivity extends Activity {
     @Override
     public void onResume() {
         super.onResume();
+		p1.setName(getPlayerName());
+		((TextView)findViewById(R.id.p1_label)).setText(p1.getName());
 		p2.isCPU(getAiPreference()); // Set p2 to Computer AI if enabled
 		if (currentPlayer != null && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
+
+	private String getPlayerName() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		return prefs.getString(PREF_PLAYER_NAME, getString(R.string.player1_label_default));
+	}
 
 	private boolean getAiPreference() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);

@@ -23,6 +23,10 @@ public class Player {
 		return name;
 	}
 
+	public void setName(String s) {
+		name = s;
+	}
+
 	public int getScore() {
 		return score;
 	}

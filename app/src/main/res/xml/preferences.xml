@@ -4,7 +4,7 @@
 	<EditTextPreference
 		android:key="pref_player_name"
 		android:title="@string/pref_player_name_title"
-		android:defaultValue="@string/player1_label"/>
+		android:defaultValue="@string/player1_label_default"/>
 
 	<PreferenceCategory
 		android:title="@string/pref_cat_ai">

@@ -19,7 +19,8 @@
 
 		<TextView
 			style="@style/ScoreLabel"
-			android:text="@string/player1_label"/>
+			android:id="@+id/p1_label"
+			android:text="@string/player1_label_default"/>
 
 		<TextView
             android:id="@+id/p1score"
@@ -46,6 +47,7 @@
 
 		<TextView
 			style="@style/ScoreLabel"
+			android:id="@+id/p2_label"
 			android:text="@string/player2_label"/>
 
         <ImageView
