@@ -6,24 +6,13 @@
 		android:title="@string/pref_player_name_title"
 		android:defaultValue="@string/player1_label_default"/>
 
-	<PreferenceCategory
-		android:title="@string/pref_cat_ai">
-
-		<CheckBoxPreference
-			android:key="pref_ai_enabled"
-			android:title="@string/pref_ComputerAI_label"
-			android:defaultValue="true" />
-
-		<ListPreference
-			android:key="pref_ai_difficulty"
-            android:dependency="pref_ai_enabled"
-			android:title="@string/pref_ai_difficulty"
-			android:dialogTitle="@string/pref_ai_difficulty"
-			android:entries="@array/pref_ai_difficulty_entries"
-			android:entryValues="@array/pref_ai_difficulty_values"
-			android:defaultValue="1"
-            android:summary="%s"/>
-
-	</PreferenceCategory>
+	<ListPreference
+		android:key="pref_ai_difficulty"
+		android:title="@string/pref_ai_difficulty"
+		android:dialogTitle="@string/pref_ai_difficulty"
+		android:entries="@array/pref_ai_difficulty_entries"
+		android:entryValues="@array/pref_ai_difficulty_values"
+		android:defaultValue="1"
+		android:summary="%s"/>
 
 </PreferenceScreen>

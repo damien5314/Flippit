@@ -46,6 +46,7 @@ public class ReversiActivity extends Activity {
 
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label_default));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
+		p2.isCPU(true);
 
 		b = Board.getInstance(this);
         if (savedInstanceState != null && savedInstanceState.containsKey("board")) {
@@ -85,7 +86,6 @@ public class ReversiActivity extends Activity {
         super.onResume();
 		p1.setName(getPlayerName());
 		((TextView)findViewById(R.id.p1_label)).setText(p1.getName());
-		p2.isCPU(getAiPreference()); // Set p2 to Computer AI if enabled
 		if (currentPlayer != null && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
@@ -253,21 +253,16 @@ public class ReversiActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-		switch (id) {
-
+		switch (item.getItemId()) {
 			case R.id.action_new_game:
 				startNewGame();
 				return true;
-
 			case R.id.action_settings:
 				Intent intent = new Intent(this, SettingsActivity.class);
 				startActivity(intent);
 				return true;
 
 		}
-
         return super.onOptionsItemSelected(item);
     }
 }
