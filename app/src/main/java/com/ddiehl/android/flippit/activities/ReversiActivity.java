@@ -29,7 +29,6 @@ import com.ddiehl.android.flippit.game.ReversiColor;
 public class ReversiActivity extends Activity {
 	private static final String TAG = ReversiActivity.class.getSimpleName();
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
-	private static final String PREF_AI_ENABLED = "pref_ai_enabled";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
     private Context ctx;
 	private Player p1, p2, currentPlayer;

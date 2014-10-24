@@ -4,6 +4,10 @@ package com.ddiehl.android.flippit.game;
 import android.content.Context;
 import android.util.Log;
 
+import com.ddiehl.android.flippit.utils.BoardIterator;
+
+import java.util.HashMap;
+
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
 	private static Board _instance = null;
@@ -42,8 +46,8 @@ public class Board {
     }
 
 	public void reset() {
-		for (int y = 0; y < spaces.length; y++) {
-			for (int x = 0; x < spaces[0].length; x++) {
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
 				spaces[y][x] = new BoardSpace(context, x, y);
 			}
 		}
@@ -55,21 +59,18 @@ public class Board {
 	}
 
 	public boolean hasMove(Player p) {
-        for (int y = 0; y < height(); y++) {
-            for (int x = 0; x < width(); x++) {
-                BoardSpace s = getSpaceAt(x, y);
-                if (s.isOwned())
-                    continue;
-                for (int[] move : moveDirections) {
-                    int value = moveValueInDirection(s, move[0], move[1], p.getColor());
-                    if (value != 0) {
-//                        Log.d(TAG, "moveValueInDirection((" + s.x + "," + s.y + ")," + move[0]
-//                                + "," + move[1] + "," + p.getColor() + ") = " + value);
-                        return true;
-                    }
-                }
-            }
-        }
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (s.isOwned())
+				continue;
+			for (int[] move : moveDirections) {
+				int value = moveValueInDirection(s, move[0], move[1], p.getColor());
+				if (value != 0) {
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
@@ -133,24 +134,22 @@ public class Board {
     }
 
 	/**
-	 * Easy difficulty logic for computer AI
 	 * Finds the space on the board which would capture the most spaces for Player p.
 	 */
     public BoardSpace getBestMove_d1(Player p) {
         BoardSpace best = null;
         int bestVal = 0;
-        for (int y = 0; y < height(); y++) {
-            for (int x = 0; x < width(); x++) {
-                BoardSpace space = getSpaceAt(x, y);
-                if (!space.isOwned()) {
-                    int val = moveValue(space, p.getColor());
-                    if (val > bestVal) {
-                        best = space;
-                        bestVal = val;
-                    }
-                }
-            }
-        }
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace space = i.next();
+			if (!space.isOwned()) {
+				int val = moveValue(space, p.getColor());
+				if (val > bestVal) {
+					best = space;
+					bestVal = val;
+				}
+			}
+		}
 
         if (best != null)
             Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") has value of " + bestVal);
@@ -159,32 +158,30 @@ public class Board {
     }
 
 	/**
-	 * Hard difficulty logic for computer AI
 	 * Finds the space on the board which would result in a board configuration leaving the
 	 * opposing player with the least choices.
 	 */
     public BoardSpace getBestMove_d2(Player p, Player o) {
         BoardSpace best = null;
         int bestVal = 999;
-        for (int y = 0; y < height(); y++) {
-            for (int x = 0; x < width(); x++) {
-                BoardSpace space = getSpaceAt(x, y);
-                if (!space.isOwned()) {
-                    if (moveValue(space, p.getColor()) > 0) {
-                        // Copy board to identical object
-                        Board copy = this.copy();
-                        // Play move on copied board object
-                        copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
-                        // Count possible moves for Player's opponent
-                        int movesOpened = copy.getPossibleMoves(o);
-                        if (movesOpened < bestVal) {
-                            best = space;
-                            bestVal = movesOpened;
-                        }
-                    }
-                }
-            }
-        }
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace space = i.next();
+			if (!space.isOwned()) {
+				if (moveValue(space, p.getColor()) > 0) {
+					// Copy board to identical object
+					Board copy = this.copy();
+					// Play move on copied board object
+					copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
+					// Count possible moves for Player's opponent
+					int movesOpened = copy.getPossibleMoves(o);
+					if (movesOpened < bestVal) {
+						best = space;
+						bestVal = movesOpened;
+					}
+				}
+			}
+		}
 
 		if (best != null)
         	Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") reduces "
@@ -193,13 +190,23 @@ public class Board {
         return best;
     }
 
+	/**
+	 * Finds space which reduces opponent's move options to lowest value
+	 */
+	public BoardSpace getBestMove_d3(Player p, Player opp) {
+		HashMap<BoardSpace, Integer> spaceValues = new HashMap<BoardSpace, Integer>();
+		return null;
+	}
+
     public int getPossibleMoves(Player p) {
         int possible = 0;
-        for (int y = 0; y < height; y++)
-            for (int x = 0; x < width; x++)
-                if (!getSpaceAt(x, y).isOwned())
-                    if (moveValue(getSpaceAt(x, y), p.getColor()) > 0)
-                        possible++;
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (!s.isOwned())
+				if (moveValue(s, p.getColor()) > 0)
+					possible++;
+		}
         return possible;
     }
 
@@ -240,17 +247,16 @@ public class Board {
 
     public String serialize() {
         StringBuilder sb = new StringBuilder();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                BoardSpace s = getSpaceAt(x, y);
-                if (!s.isOwned())
-                    sb.append("0");
-                else if (s.getColor() == ReversiColor.White)
-                    sb.append("1");
-                else
-                    sb.append("2");
-            }
-        }
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (!s.isOwned())
+				sb.append("0");
+			else if (s.getColor() == ReversiColor.White)
+				sb.append("1");
+			else
+				sb.append("2");
+		}
         return sb.toString();
     }
 
