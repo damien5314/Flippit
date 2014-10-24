@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.ddiehl.android.flippit.R;
 import com.ddiehl.android.flippit.game.Board;
 import com.ddiehl.android.flippit.game.BoardSpace;
+import com.ddiehl.android.flippit.game.ComputerAI;
 import com.ddiehl.android.flippit.game.Player;
 import com.ddiehl.android.flippit.game.ReversiColor;
 import com.ddiehl.android.flippit.utils.BoardIterator;
@@ -45,7 +46,7 @@ public class ReversiActivity extends Activity {
         ctx = this;
 
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label_default));
-		p1.isCPU(true);
+//		p1.isCPU(true);
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
 		p2.isCPU(true);
 
@@ -180,10 +181,10 @@ public class ReversiActivity extends Activity {
             BoardSpace move;
             switch (difficulty) {
                 case 1:
-                    move = b.getBestMove_d1(currentPlayer);
+                    move = ComputerAI.getBestMove_d1(b, currentPlayer);
                     break;
                 case 2:
-                    move = b.getBestMove_d3(currentPlayer, (currentPlayer == p1) ? p2 : p1);
+                    move = ComputerAI.getBestMove_d3(b, currentPlayer, (currentPlayer == p1) ? p2 : p1);
                     break;
                 default:
                     Log.e(TAG, "AI difficulty setting not recognized: " + difficulty);
@@ -200,6 +201,7 @@ public class ReversiActivity extends Activity {
         protected void onPostExecute(BoardSpace space) {
 			try { // Add delay to 1 second if calculation takes less
 				long tt = System.currentTimeMillis() - startTime;
+//                Log.d(TAG, "Time taken to calculate move: " + tt + "ms");
 				Thread.sleep(Math.max(0, getResources().getInteger(R.integer.cpu_turn_delay) - tt));
 			} catch (InterruptedException e) { }
             b.commitPiece(space, currentPlayer.getColor());
