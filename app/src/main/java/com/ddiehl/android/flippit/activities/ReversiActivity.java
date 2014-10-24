@@ -95,11 +95,6 @@ public class ReversiActivity extends Activity {
 		return prefs.getString(PREF_PLAYER_NAME, getString(R.string.player1_label_default));
 	}
 
-	private boolean getAiPreference() {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		return prefs.getBoolean(PREF_AI_ENABLED, false);
-	}
-
     private void startNewGame() {
 		switchFirstTurn();
         b.reset();
@@ -175,6 +170,8 @@ public class ReversiActivity extends Activity {
     }
 
     private class ExecuteCPUMove extends AsyncTask<Void, Void, BoardSpace> {
+		long startTime = System.currentTimeMillis();
+
         @Override
         protected BoardSpace doInBackground(Void... voids) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
@@ -200,6 +197,10 @@ public class ReversiActivity extends Activity {
 
         @Override
         protected void onPostExecute(BoardSpace space) {
+			try { // Add delay to 1 second if calculation takes less
+				long tt = System.currentTimeMillis() - startTime;
+				Thread.sleep(Math.max(0, 1000 - tt));
+			} catch (InterruptedException e) { }
             b.commitPiece(space, currentPlayer.getColor());
             calculateGameState();
         }
