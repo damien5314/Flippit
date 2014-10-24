@@ -7,6 +7,7 @@ import android.util.Log;
 import com.ddiehl.android.flippit.utils.BoardIterator;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
@@ -27,8 +28,6 @@ public class Board {
             {1,  1} // Top-Right
     };
 
-	private final int spaceValue_weight = 1;
-	private final int moveValue_weight = 1;
     private final int[][] spaceValues = new int[][] {
             { 99,  -8,   8,   6,   6,   8,  -8,  99},
             { -8, -24,  -4,  -3,  -3,  -4, -24,  -8},
@@ -103,7 +102,7 @@ public class Board {
 		return true;
 	}
 
-	public int moveValue(BoardSpace s, ReversiColor playerColor) {
+	public int spacesCapturedWithMove(BoardSpace s, ReversiColor playerColor) {
 		int moveVal = 0;
 		for (int[] move : moveDirections)
 			moveVal += moveValueInDirection(s, move[0], move[1], playerColor);
@@ -156,7 +155,7 @@ public class Board {
 		while (i.hasNext()) {
 			BoardSpace space = i.next();
 			if (!space.isOwned()) {
-				int val = moveValue(space, p.getColor());
+				int val = spacesCapturedWithMove(space, p.getColor());
 				if (val > bestVal) {
 					best = space;
 					bestVal = val;
@@ -181,7 +180,7 @@ public class Board {
 		while (i.hasNext()) {
 			BoardSpace space = i.next();
 			if (!space.isOwned()) {
-				if (moveValue(space, p.getColor()) > 0) {
+				if (spacesCapturedWithMove(space, p.getColor()) > 0) {
 					// Copy board to identical object
 					Board copy = this.copy();
 					// Play move on copied board object
@@ -206,25 +205,54 @@ public class Board {
 	/**
 	 * Finds space which maximizes space value * number of spaces obtained
 	 */
-	public BoardSpace getBestMove_d3(Player p) {
+	public BoardSpace getBestMove_d3(Player p, Player o) {
 		HashMap<BoardSpace, Integer> moveValues = new HashMap<BoardSpace, Integer>();
+		final int spaceValue_weight = 1;
+		final int spacesCaptured_weight = 0;
         BoardIterator i = new BoardIterator(this);
         while (i.hasNext()) {
             BoardSpace space = i.next();
             if (!space.isOwned()) {
-                if (moveValue(space, p.getColor()) > 0) {
+                if (spacesCapturedWithMove(space, p.getColor()) > 0) {
+					int moveValue;
+					// Copy board to identical object
+					Board copy = this.copy();
+					// Play move on copied board object
+					copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
+					int movesOpenedForOpponent = copy.getPossibleMoves(o);
+					if (movesOpenedForOpponent == 0)
+						moveValue = 999;
+					else
+						moveValue = getSpaceValue(space) * spaceValue_weight
+								+ spacesCapturedWithMove(space, p.getColor()) * spacesCaptured_weight;
                     // Store value of BoardSpace against weighting for that space
-                    moveValues.put(space,
-                            getSpaceValue(space) * spaceValue_weight
-                            + moveValue(space, p.getColor()) * moveValue_weight);
+                    moveValues.put(space, moveValue);
                 }
             }
         }
-        BoardSpace best = null;
+		// Add all of the moves with the best value to a HashSet
+		int bestValue = Integer.MIN_VALUE;
+        HashSet<BoardSpace> bestMoves = new HashSet<BoardSpace>();
         for (BoardSpace s : moveValues.keySet()) {
-            if (best == null || moveValues.get(s) > moveValues.get(best))
-                best = s;
+			int val = moveValues.get(s);
+            if (val > bestValue) {
+				bestValue = val;
+				bestMoves.clear();
+				bestMoves.add(s);
+			} else if (val == bestValue) {
+				bestMoves.add(s);
+			}
         }
+		// Select a move out of the spaces with the best calculated value
+		BoardSpace best = null;
+		for (BoardSpace s : bestMoves) {
+			if (best == null){
+				best = s;
+			} else {
+				if (getSpaceValue(s) > getSpaceValue(best))
+					best = s;
+			}
+		}
         Log.i(TAG, p.getName() + ": " + "Best move @(" + best.x + "," + best.y + "); Value = " + moveValues.get(best));
 		return best;
 	}
@@ -235,7 +263,7 @@ public class Board {
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
 			if (!s.isOwned())
-				if (moveValue(s, p.getColor()) > 0)
+				if (spacesCapturedWithMove(s, p.getColor()) > 0)
 					possible++;
 		}
         return possible;

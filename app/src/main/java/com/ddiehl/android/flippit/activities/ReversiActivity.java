@@ -140,7 +140,7 @@ public class ReversiActivity extends Activity {
                 if (s.isOwned() || currentPlayer.isCPU())
 					return;
 
-				if (b.moveValue(s, currentPlayer.getColor()) > 0) {
+				if (b.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
 					b.commitPiece(s, currentPlayer.getColor());
                     calculateGameState();
                 } else {
@@ -183,8 +183,7 @@ public class ReversiActivity extends Activity {
                     move = b.getBestMove_d1(currentPlayer);
                     break;
                 case 2:
-//                    move = b.getBestMove_d2(currentPlayer, (currentPlayer == p1) ? p2 : p1);
-                    move = b.getBestMove_d3(currentPlayer);
+                    move = b.getBestMove_d3(currentPlayer, (currentPlayer == p1) ? p2 : p1);
                     break;
                 default:
                     Log.e(TAG, "AI difficulty setting not recognized: " + difficulty);
