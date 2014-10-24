@@ -24,6 +24,7 @@ import com.ddiehl.android.flippit.game.Board;
 import com.ddiehl.android.flippit.game.BoardSpace;
 import com.ddiehl.android.flippit.game.Player;
 import com.ddiehl.android.flippit.game.ReversiColor;
+import com.ddiehl.android.flippit.utils.BoardIterator;
 
 
 public class ReversiActivity extends Activity {
@@ -211,31 +212,42 @@ public class ReversiActivity extends Activity {
         int p1c = 0;
         int p2c = 0;
 
-        for (int y = 0; y < b.height(); y++) {
-            for (int x = 0; x < b.height(); x++) {
-                BoardSpace s = b.getSpaceAt(x,y);
-                if (s.isOwned()) {
-                    if (s.getColor() == ReversiColor.White)
-                        p1c++;
-                    else
-                        p2c++;
-                }
-            }
-        }
+		BoardIterator i = new BoardIterator(b);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (s.isOwned()) {
+				if (s.getColor() == ReversiColor.White)
+					p1c++;
+				else
+					p2c++;
+			}
+		}
 
         p1.setScore(p1c);
         p2.setScore(p2c);
-
-        ((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1.getScore()));
-        ((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2.getScore()));
+		updateScoreForPlayer(p1);
+		updateScoreForPlayer(p2);
     }
+
+	public void updateScoreForPlayer(Player p) {
+		TextView vScore;
+		if (p == p1) vScore = (TextView) findViewById(R.id.p1score);
+		else vScore = (TextView) findViewById(R.id.p2score);
+		vScore.setText(String.valueOf(p.getScore()));
+	}
 
 	public void endGame() {
 		Player winner = null;
 
 		if (p1.getScore() != p2.getScore())
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
+		showWinningToast(winner);
+		int diff = 64 - p1.getScore() - p2.getScore();
+		winner.setScore(winner.getScore() + diff);
+		updateScoreForPlayer(winner);
+	}
 
+	public void showWinningToast(Player winner) {
 		if (winner != null) {
 			Toast t;
 			if (winner == p1)
@@ -244,7 +256,6 @@ public class ReversiActivity extends Activity {
 				t = Toast.makeText(this, getString(R.string.winner_cpu), Toast.LENGTH_LONG);
 			t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
 			t.show();
-
 		} else { // You tied
 			Toast t = Toast.makeText(this, getString(R.string.winner_none), Toast.LENGTH_LONG);
 			t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
