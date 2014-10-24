@@ -8,6 +8,6 @@
 
 	<integer name="cpu_turn_delay">1000</integer>
 
-    <bool name="p1_cpu">true</bool>
+    <bool name="p1_cpu">false</bool>
 
 </resources>

@@ -63,7 +63,7 @@ public class ComputerAI {
                     // Play move on copied board object
                     copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
                     // Count possible moves for Player's opponent
-                    int movesOpened = getPossibleMoves(board, o);
+                    int movesOpened = getPossibleMoves(copy, o);
                     if (movesOpened < bestVal) {
                         best = space;
                         bestVal = movesOpened;
@@ -87,8 +87,9 @@ public class ComputerAI {
         final int spaceValue_weight = 1;
         final int spacesCaptured_weight = 0;
         BoardIterator i = new BoardIterator(board);
+        BoardSpace space;
         while (i.hasNext()) {
-            BoardSpace space = i.next();
+            space = i.next();
             if (!space.isOwned()) {
                 if (board.spacesCapturedWithMove(space, p.getColor()) > 0) {
                     int moveValue;
@@ -96,7 +97,7 @@ public class ComputerAI {
                     Board copy = board.copy();
                     // Play move on copied board object
                     copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
-                    int movesOpenedForOpponent = getPossibleMoves(board, o);
+                    int movesOpenedForOpponent = getPossibleMoves(copy, o);
                     if (movesOpenedForOpponent == 0)
                         moveValue = 999;
                     else
@@ -130,7 +131,8 @@ public class ComputerAI {
                     best = s;
             }
         }
-        Log.i(TAG, p.getName() + ": " + "Best move @(" + best.x + "," + best.y + "); Value = " + moveValues.get(best));
+        if (best != null)
+            Log.i(TAG, p.getName() + ": " + "Best move @(" + best.x + "," + best.y + "); Value = " + moveValues.get(best));
         return best;
     }
 
