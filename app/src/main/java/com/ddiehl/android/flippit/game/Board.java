@@ -27,6 +27,19 @@ public class Board {
             {1,  1} // Top-Right
     };
 
+    private final double spaceValue_weight = 1.0;
+    private final double moveValue_weight = 0;
+    private final int[][] spaceValues = new int[][] {
+            { 99,  -8,   8,   6,   6,   8,  -8,  99},
+            { -8, -24,  -4,  -3,  -3,  -4, -24,  -8},
+            {  8,  -4,   7,   4,   4,   7,  -4,   8},
+            {  6,  -3,   4,   0,   0,   4,  -3,   6},
+            {  6,  -3,   4,   0,   0,   4,  -3,   6},
+            {  8,  -4,   7,   4,   4,   7,  -4,   8},
+            { -8, -24,  -4,  -3,  -3,  -4, -24,  -8},
+            { 99,  -8,   8,   6,   6,   8,  -8,  99}
+    };
+
 	private Board(Context c) {
         context = c;
 		width = 8;
@@ -191,11 +204,30 @@ public class Board {
     }
 
 	/**
-	 * Finds space which reduces opponent's move options to lowest value
+	 * Finds space which maximizes space value * number of spaces obtained
 	 */
-	public BoardSpace getBestMove_d3(Player p, Player opp) {
-		HashMap<BoardSpace, Integer> spaceValues = new HashMap<BoardSpace, Integer>();
-		return null;
+	public BoardSpace getBestMove_d3(Player p) {
+		HashMap<BoardSpace, Double> moveValues = new HashMap<BoardSpace, Double>();
+        BoardIterator i = new BoardIterator(this);
+        while (i.hasNext()) {
+            BoardSpace space = i.next();
+            if (!space.isOwned()) {
+                if (moveValue(space, p.getColor()) > 0) {
+                    // Store value of BoardSpace against weighting for that space
+                    double value = spaceValues[space.y][space.x];
+                    moveValues.put(space,
+                            getSpaceValue(space) * spaceValue_weight
+                            + moveValue(space, p.getColor()) * moveValue_weight);
+                }
+            }
+        }
+        BoardSpace best = null;
+        for (BoardSpace s : moveValues.keySet()) {
+            if (best == null || moveValues.get(s) > moveValues.get(best))
+                best = s;
+        }
+        Log.i(TAG, "Best move @(" + best.x + "," + best.y + "); Value = " + moveValues.get(best));
+		return best;
 	}
 
     public int getPossibleMoves(Player p) {
@@ -208,6 +240,10 @@ public class Board {
 					possible++;
 		}
         return possible;
+    }
+
+    public int getSpaceValue(BoardSpace s) {
+        return spaceValues[s.y][s.x];
     }
 
 	public int width() {
