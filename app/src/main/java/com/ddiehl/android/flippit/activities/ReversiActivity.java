@@ -44,7 +44,7 @@ public class ReversiActivity extends Activity {
         ctx = this;
 
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label_default));
-//		p1.isCPU(true);
+		p1.isCPU(true);
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
 		p2.isCPU(true);
 
@@ -155,7 +155,7 @@ public class ReversiActivity extends Activity {
 		if (b.hasMove(opponent)) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
         } else if (b.hasMove(currentPlayer)) { // Opponent has no move, keep turn
-            Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_SHORT).show();
         } else { // No moves remaining, end of game
             endGame();
             return;
@@ -200,7 +200,7 @@ public class ReversiActivity extends Activity {
         protected void onPostExecute(BoardSpace space) {
 			try { // Add delay to 1 second if calculation takes less
 				long tt = System.currentTimeMillis() - startTime;
-				Thread.sleep(Math.max(0, 1000 - tt));
+				Thread.sleep(Math.max(0, getResources().getInteger(R.integer.cpu_turn_delay) - tt));
 			} catch (InterruptedException e) { }
             b.commitPiece(space, currentPlayer.getColor());
             calculateGameState();
@@ -237,11 +237,16 @@ public class ReversiActivity extends Activity {
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
 
 		if (winner != null) {
-			Toast t = Toast.makeText(this, winner.getName() + " wins.", Toast.LENGTH_LONG);
+			Toast t;
+			if (winner == p1)
+				t = Toast.makeText(this, getString(R.string.winner_p1), Toast.LENGTH_LONG);
+			else
+				t = Toast.makeText(this, getString(R.string.winner_cpu), Toast.LENGTH_LONG);
 			t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
 			t.show();
+
 		} else { // You tied
-			Toast t = Toast.makeText(this, getString(R.string.no_winner), Toast.LENGTH_LONG);
+			Toast t = Toast.makeText(this, getString(R.string.winner_none), Toast.LENGTH_LONG);
 			t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
 			t.show();
 		}

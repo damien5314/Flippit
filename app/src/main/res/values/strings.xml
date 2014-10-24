@@ -9,7 +9,9 @@
     <string name="player2_label">Computer</string>
     <string name="bad_move">Error: Invalid Move</string>
     <string name="no_moves">No moves remaining</string>
-    <string name="no_winner">No winner.</string>
+	<string name="winner_p1">You win.</string>
+	<string name="winner_cpu">CPU wins.</string>
+	<string name="winner_none">No winner.</string>
     <string name="activity_settings_title">Settings</string>
     <string name="button_start_1p">Single Player</string>
     <string name="button_start_mp">Multiplayer</string>
