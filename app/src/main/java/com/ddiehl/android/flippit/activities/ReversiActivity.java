@@ -33,9 +33,9 @@ public class ReversiActivity extends Activity {
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
     private Context ctx;
-	private Player p1, p2, currentPlayer;
-    private Player firstTurn;
-	private Board b;
+	protected Player p1, p2, currentPlayer;
+    protected Player firstTurn;
+    protected Board b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,45 +51,58 @@ public class ReversiActivity extends Activity {
 		p2.isCPU(true);
 
 		b = Board.getInstance(this);
-        if (savedInstanceState != null && savedInstanceState.containsKey("board")) {
-			Log.d(TAG, "savedInstanceState detected, loading board.");
-			b.deserialize(this, savedInstanceState.getString("board"));
-			displayBoard();
-		}
     }
 
     @Override
-    public void onSaveInstanceState(Bundle out) {
-        super.onSaveInstanceState(out);
-		Log.d(TAG, "onSaveInstanceState(Bundle out) called");
-        out.putString("board", b.serialize());
+    public void onPause() {
+        super.onPause();
+        saveGameToPrefs();
     }
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		Log.d(TAG, "onPause() called");
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-		Log.d(TAG, "onStop() called");
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		Log.d(TAG, "onDestroy() called");
-	}
 
     @Override
     public void onResume() {
         super.onResume();
+        if (getSavedGame()) {
+            Log.d(TAG, "Saved game detected, loaded from SharedPreferences.");
+            displayBoard();
+            updateScoreCounts();
+        } else {
+            Log.d(TAG, "No saved game detected in SharedPreferences.");
+        }
 		p1.setName(getPlayerName());
 		((TextView)findViewById(R.id.p1_label)).setText(p1.getName());
 		if (currentPlayer != null && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
+    }
+
+    private static final String KEY_CURRENT_PLAYER = "key_currentPlayer";
+    private static final String KEY_FIRST_TURN = "key_firstTurn";
+    private static final String KEY_BOARD_STATE = "key_boardState";
+
+    public boolean getSavedGame() {
+        SharedPreferences sp = getSharedPreferences("key_gamePrefs", 0);
+        if (sp.contains(KEY_CURRENT_PLAYER)
+                && sp.contains(KEY_FIRST_TURN)
+                && sp.contains(KEY_BOARD_STATE)) {
+            currentPlayer = (sp.getBoolean(KEY_CURRENT_PLAYER, true) ? p1 : p2);
+            firstTurn = (sp.getBoolean(KEY_FIRST_TURN, true) ? p1 : p2);
+            GameStorage.deserialize(this, sp.getString(KEY_BOARD_STATE, ""));
+            Log.d(TAG, "SharedPreferences Contents");
+            Log.d(TAG, "Current Player: " + currentPlayer.getName());
+            Log.d(TAG, "First Turn: " + firstTurn.getName());
+            Log.d(TAG, "Board Status: " + sp.getString(KEY_BOARD_STATE, ""));
+            return true;
+        }
+        return false;
+    }
+
+    public void saveGameToPrefs() {
+        SharedPreferences sp = getSharedPreferences("key_gamePrefs", 0);
+        SharedPreferences.Editor e = sp.edit();
+        e.putBoolean(KEY_CURRENT_PLAYER, (currentPlayer == p1));
+        e.putBoolean(KEY_FIRST_TURN, (firstTurn == p1));
+        e.putString(KEY_BOARD_STATE, GameStorage.serialize(b));
+        e.apply();
     }
 
 	private String getPlayerName() {

@@ -28,7 +28,7 @@ public class Player {
 	}
 
 	public int getScore() {
-		return score;
+        return score;
 	}
 
 	public void setScore(int s) {

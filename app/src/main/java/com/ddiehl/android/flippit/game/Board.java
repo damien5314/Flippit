@@ -78,6 +78,10 @@ public class Board {
 		return null;
 	}
 
+    public void setSpace(int x, int y, BoardSpace s) {
+        this.spaces[y][x] = s;
+    }
+
 	public boolean commitPiece(BoardSpace space, ReversiColor playerColor) {
 		for (int[] move : moveDirections) {
 			if (moveValueInDirection(space, move[0], move[1], playerColor) != 0) {
@@ -144,41 +148,6 @@ public class Board {
 
 		return _instance;
 	}
-
-    public Board deserialize(Context context, String in) {
-        int index = 0;
-        for (int y = 0; y < _instance.height; y++) {
-            for (int x = 0; x < _instance.width; x++) {
-                char c = in.charAt(index);
-                spaces[y][x] = new BoardSpace(context, x, y);
-                switch (c) {
-                    case '0':
-                        break;
-                    case '1':
-                        spaces[y][x].setColor(ReversiColor.White);
-                        break;
-                    case '2':
-                        spaces[y][x].setColor(ReversiColor.Black);
-                }
-            }
-        }
-        return this;
-    }
-
-    public String serialize() {
-        StringBuilder sb = new StringBuilder();
-		BoardIterator i = new BoardIterator(this);
-		while (i.hasNext()) {
-			BoardSpace s = i.next();
-			if (!s.isOwned())
-				sb.append("0");
-			else if (s.getColor() == ReversiColor.White)
-				sb.append("1");
-			else
-				sb.append("2");
-		}
-        return sb.toString();
-    }
 
 	@Override
 	public String toString() {
