@@ -22,10 +22,15 @@
             android:label="@string/app_name" >
         </activity>
 
-		<activity
-			android:name=".activities.SettingsActivity"
-			android:label="@string/activity_settings_title" >
-		</activity>
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:label="@string/activity_settings_title" >
+        </activity>
+
+        <activity
+            android:name=".activities.HowToPlayActivity"
+            android:label="@string/activity_howToPlay_title" >
+        </activity>
 
     </application>
 

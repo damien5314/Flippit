@@ -291,9 +291,13 @@ public class ReversiActivity extends Activity {
 				startNewGame();
 				return true;
 			case R.id.action_settings:
-				Intent intent = new Intent(this, SettingsActivity.class);
-				startActivity(intent);
+				Intent settings = new Intent(this, SettingsActivity.class);
+				startActivity(settings);
 				return true;
+            case R.id.action_howtoplay:
+                Intent htp = new Intent(this, HowToPlayActivity.class);
+                startActivity(htp);
+                return true;
 		}
         return super.onOptionsItemSelected(item);
     }
