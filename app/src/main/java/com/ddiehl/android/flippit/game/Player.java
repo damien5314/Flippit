@@ -7,12 +7,11 @@ public class Player {
 	private int score;
 	private boolean isCPU;
 
-	private Player() { }
-
 	public Player(ReversiColor c, String n) {
 		color = c;
 		name = n;
 		isCPU = false;
+        score = 0;
 	}
 
 	public ReversiColor getColor() {

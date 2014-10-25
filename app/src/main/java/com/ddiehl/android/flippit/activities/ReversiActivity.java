@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,9 +33,9 @@ public class ReversiActivity extends Activity {
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
     private static final String KEY_GAME_STATE = "key_gamePrefs";
-    private static final String KEY_CURRENT_PLAYER = "key_currentPlayer";
-    private static final String KEY_FIRST_TURN = "key_firstTurn";
-    private static final String KEY_BOARD_STATE = "key_boardState";
+    private static final String KEY_CURRENT_PLAYER = "pref_currentPlayer";
+    private static final String KEY_FIRST_TURN = "pref_firstTurn";
+    private static final String KEY_BOARD_STATE = "pref_boardState";
     private Context ctx;
 	protected Player p1, p2, currentPlayer;
     protected Player firstTurn;
@@ -59,12 +58,10 @@ public class ReversiActivity extends Activity {
 		b = Board.getInstance(this);
 
         if (getSavedGame()) {
-            Log.d(TAG, "Saved game detected, loaded from SharedPreferences.");
             displayBoard();
             updateScoreDisplay();
             gameInProgress = true;
         } else {
-            Log.d(TAG, "No saved game detected in SharedPreferences.");
             gameInProgress = false;
         }
     }
@@ -176,7 +173,7 @@ public class ReversiActivity extends Activity {
 		if (b.hasMove(opponent)) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
         } else if (b.hasMove(currentPlayer)) { // Opponent has no move, keep turn
-            Toast.makeText(this, "No moves for " + opponent.getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_moves) + opponent.getName(), Toast.LENGTH_SHORT).show();
         } else { // No moves remaining, end of game
             endGame();
             return;
@@ -202,20 +199,15 @@ public class ReversiActivity extends Activity {
                     move = ComputerAI.getBestMove_d3(b, currentPlayer, (currentPlayer == p1) ? p2 : p1);
                     break;
                 default:
-                    Log.e(TAG, "AI difficulty setting not recognized: " + difficulty);
                     move = null;
             }
 
-            if (move == null) {
-                Log.e(TAG, "ERROR: getBestMove did not return a BoardSpace.");
-            }
             return move;
         }
 
         @Override
         protected void onPostExecute(final BoardSpace space) {
             long tt = System.currentTimeMillis() - startTime;
-//            Log.d(TAG, "Time taken to calculate move: " + tt + "ms");
             // Add delay to 1 second if calculation takes less
             new Handler().postDelayed(new Runnable() {
                 @Override

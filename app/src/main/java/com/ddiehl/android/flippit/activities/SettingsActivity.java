@@ -76,7 +76,7 @@ public class SettingsActivity extends Activity {
 			}
 			if (p instanceof EditTextPreference) {
 				EditTextPreference editTextPref = (EditTextPreference) p;
-				if (p.getTitle().toString().contains("assword"))
+				if (p.getTitle().toString().toLowerCase().contains("password"))
 				{
 					p.setSummary("******");
 				} else {
