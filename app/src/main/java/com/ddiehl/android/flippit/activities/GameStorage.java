@@ -22,10 +22,10 @@ public class GameStorage {
                     case '0':
                         break;
                     case '1':
-                        _instance.getSpaceAt(x, y).setColor(ReversiColor.White);
+                        _instance.getSpaceAt(x, y).setColorNoAnimation(ReversiColor.White);
                         break;
                     case '2':
-                        _instance.getSpaceAt(x, y).setColor(ReversiColor.Black);
+                        _instance.getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Black);
                 }
             }
         }

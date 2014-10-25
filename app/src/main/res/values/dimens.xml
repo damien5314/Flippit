@@ -10,4 +10,7 @@
 
     <bool name="p1_cpu">false</bool>
 
+    <integer name="fadeOutDuration">0</integer>
+    <integer name="fadeInDuration">150</integer>
+
 </resources>

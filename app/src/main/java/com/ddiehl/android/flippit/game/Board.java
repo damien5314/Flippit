@@ -8,7 +8,7 @@ import com.ddiehl.android.flippit.utils.BoardIterator;
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
 	private static Board _instance = null;
-    private static Context context;
+    private static Context ctx;
 	private BoardSpace[][] spaces;
 	private int width;
 	private int height;
@@ -25,7 +25,7 @@ public class Board {
     };
 
 	private Board(Context c) {
-        context = c;
+        ctx = c;
 		width = 8;
 		height = 8;
         spaces = new BoardSpace[height][width];
@@ -33,10 +33,10 @@ public class Board {
 	}
 
     protected Board copy() {
-        Board copy = new Board(context);
+        Board copy = new Board(ctx);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                copy.spaces[y][x] = spaces[y][x].copy(context);
+                copy.spaces[y][x] = spaces[y][x].copy(ctx);
             }
         }
         return copy;
@@ -45,14 +45,13 @@ public class Board {
 	public void reset() {
 		for (int y = 0; y < height; y++) {
 			for (int x = 0; x < width; x++) {
-				spaces[y][x] = new BoardSpace(context, x, y);
+				spaces[y][x] = new BoardSpace(ctx, x, y);
 			}
 		}
-
-		spaces[3][3].setColor(ReversiColor.White);
-		spaces[3][4].setColor(ReversiColor.Black);
-		spaces[4][4].setColor(ReversiColor.White);
-		spaces[4][3].setColor(ReversiColor.Black);
+		spaces[3][3].setColorNoAnimation(ReversiColor.White);
+		spaces[3][4].setColorNoAnimation(ReversiColor.Black);
+		spaces[4][4].setColorNoAnimation(ReversiColor.White);
+		spaces[4][3].setColorNoAnimation(ReversiColor.Black);
 	}
 
 	public boolean hasMove(Player p) {
@@ -123,7 +122,7 @@ public class Board {
 	}
 
     public void flipInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
-        s.setColor(playerColor);
+        s.setColorAnimated(playerColor);
         int cx = s.x + dx;
         int cy = s.y + dy;
 
