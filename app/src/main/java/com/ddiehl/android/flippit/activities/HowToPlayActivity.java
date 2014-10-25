@@ -7,7 +7,6 @@ import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.ddiehl.android.flippit.R;
 import com.ddiehl.android.flippit.adapters.MyPageAdapter;
@@ -36,35 +35,35 @@ public class HowToPlayActivity extends FragmentActivity {
 
     private List<Fragment> getFragments() {
         List<Fragment> flist = new ArrayList<Fragment>();
+        final int[] FRAGMENT_LAYOUT_ID = new int[] {
+                R.layout.activity_howtoplay_p1,
+                R.layout.activity_howtoplay_p1,
+                R.layout.activity_howtoplay_p1
+        };
 
-        flist.add(HowToPlayFragment.newInstance("Fragment 1"));
-        flist.add(HowToPlayFragment.newInstance("Fragment 2"));
-        flist.add(HowToPlayFragment.newInstance("Fragment 3"));
+        for (int id : FRAGMENT_LAYOUT_ID) {
+            flist.add(HowToPlayFragment.newInstance(id));
+        }
 
         return flist;
     }
 
     public static class HowToPlayFragment extends Fragment {
-        private final static String EXTRA_MESSAGE = "EXTRA_MESSAGE";
+        private final static String LAYOUT_ID = "id";
 
         public HowToPlayFragment() { }
 
-        public static Fragment newInstance(String s) {
+        public static Fragment newInstance(int id) {
             HowToPlayFragment frag = new HowToPlayFragment();
             Bundle args = new Bundle();
-            args.putString(EXTRA_MESSAGE, s);
+            args.putInt(LAYOUT_ID, id);
             frag.setArguments(args);
             return frag;
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            String message = getArguments().getString(EXTRA_MESSAGE);
-            View v = inflater.inflate(R.layout.activity_howtoplay_fragment, container, false);
-            TextView tv = (TextView) v.findViewById(R.id.textView);
-            tv.setText(message);
-
-            return v;
+            return inflater.inflate(getArguments().getInt(LAYOUT_ID), container, false);
         }
     }
 
