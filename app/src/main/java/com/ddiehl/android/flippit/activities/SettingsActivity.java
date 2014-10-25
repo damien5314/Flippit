@@ -19,14 +19,14 @@ import com.ddiehl.android.flippit.R;
  */
 public class SettingsActivity extends Activity {
 
-	public static class CustomSettingsFragment extends PreferenceFragment
+	public static class SettingsFragment extends PreferenceFragment
 			implements SharedPreferences.OnSharedPreferenceChangeListener {
-		public CustomSettingsFragment() {
+		public SettingsFragment() {
 
 		}
 
 		public static Fragment newInstance() {
-			CustomSettingsFragment frag = new CustomSettingsFragment();
+			SettingsFragment frag = new SettingsFragment();
 			Bundle args = new Bundle();
 			frag.setArguments(args);
 			return frag;
@@ -99,6 +99,6 @@ public class SettingsActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getFragmentManager().beginTransaction()
-				.replace(android.R.id.content, new CustomSettingsFragment()).commit();
+				.replace(android.R.id.content, new SettingsFragment()).commit();
 	}
 }
