@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Gravity;
@@ -212,14 +213,17 @@ public class ReversiActivity extends Activity {
         }
 
         @Override
-        protected void onPostExecute(BoardSpace space) {
-			try { // Add delay to 1 second if calculation takes less
-				long tt = System.currentTimeMillis() - startTime;
-//                Log.d(TAG, "Time taken to calculate move: " + tt + "ms");
-				Thread.sleep(Math.max(0, getResources().getInteger(R.integer.cpu_turn_delay) - tt));
-			} catch (InterruptedException e) { }
-            b.commitPiece(space, currentPlayer.getColor());
-            calculateGameState();
+        protected void onPostExecute(final BoardSpace space) {
+            long tt = System.currentTimeMillis() - startTime;
+//            Log.d(TAG, "Time taken to calculate move: " + tt + "ms");
+            // Add delay to 1 second if calculation takes less
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    b.commitPiece(space, currentPlayer.getColor());
+                    calculateGameState();
+                }
+            }, Math.max(0, getResources().getInteger(R.integer.cpu_turn_delay) - tt));
         }
     }
 
