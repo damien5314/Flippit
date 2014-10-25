@@ -32,10 +32,15 @@ public class ReversiActivity extends Activity {
 	private static final String TAG = ReversiActivity.class.getSimpleName();
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
+    private static final String KEY_GAME_STATE = "key_gamePrefs";
+    private static final String KEY_CURRENT_PLAYER = "key_currentPlayer";
+    private static final String KEY_FIRST_TURN = "key_firstTurn";
+    private static final String KEY_BOARD_STATE = "key_boardState";
     private Context ctx;
 	protected Player p1, p2, currentPlayer;
     protected Player firstTurn;
     protected Board b;
+    protected boolean gameInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,53 +56,49 @@ public class ReversiActivity extends Activity {
 		p2.isCPU(true);
 
 		b = Board.getInstance(this);
-    }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        saveGameToPrefs();
+        if (getSavedGame()) {
+            Log.d(TAG, "Saved game detected, loaded from SharedPreferences.");
+            displayBoard();
+            updateScoreDisplay();
+            gameInProgress = true;
+        } else {
+            Log.d(TAG, "No saved game detected in SharedPreferences.");
+            gameInProgress = false;
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (getSavedGame()) {
-            Log.d(TAG, "Saved game detected, loaded from SharedPreferences.");
-            displayBoard();
-            updateScoreCounts();
-        } else {
-            Log.d(TAG, "No saved game detected in SharedPreferences.");
-        }
-		p1.setName(getPlayerName());
-		((TextView)findViewById(R.id.p1_label)).setText(p1.getName());
-		if (currentPlayer != null && currentPlayer.isCPU())
+        p1.setName(getPlayerName());
+        ((TextView)findViewById(R.id.p1_label)).setText(p1.getName());
+        if (gameInProgress && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
 
-    private static final String KEY_CURRENT_PLAYER = "key_currentPlayer";
-    private static final String KEY_FIRST_TURN = "key_firstTurn";
-    private static final String KEY_BOARD_STATE = "key_boardState";
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (gameInProgress)
+            saveGameToPrefs();
+    }
 
     public boolean getSavedGame() {
-        SharedPreferences sp = getSharedPreferences("key_gamePrefs", 0);
+        SharedPreferences sp = getSharedPreferences(KEY_GAME_STATE, 0);
         if (sp.contains(KEY_CURRENT_PLAYER)
                 && sp.contains(KEY_FIRST_TURN)
                 && sp.contains(KEY_BOARD_STATE)) {
             currentPlayer = (sp.getBoolean(KEY_CURRENT_PLAYER, true) ? p1 : p2);
             firstTurn = (sp.getBoolean(KEY_FIRST_TURN, true) ? p1 : p2);
             GameStorage.deserialize(this, sp.getString(KEY_BOARD_STATE, ""));
-            Log.d(TAG, "SharedPreferences Contents");
-            Log.d(TAG, "Current Player: " + currentPlayer.getName());
-            Log.d(TAG, "First Turn: " + firstTurn.getName());
-            Log.d(TAG, "Board Status: " + sp.getString(KEY_BOARD_STATE, ""));
             return true;
         }
         return false;
     }
 
     public void saveGameToPrefs() {
-        SharedPreferences sp = getSharedPreferences("key_gamePrefs", 0);
+        SharedPreferences sp = getSharedPreferences(KEY_GAME_STATE, 0);
         SharedPreferences.Editor e = sp.edit();
         e.putBoolean(KEY_CURRENT_PLAYER, (currentPlayer == p1));
         e.putBoolean(KEY_FIRST_TURN, (firstTurn == p1));
@@ -111,17 +112,22 @@ public class ReversiActivity extends Activity {
 	}
 
     private void startNewGame() {
-		switchFirstTurn();
         b.reset();
         displayBoard();
-        updateScoreCounts();
-        calculateGameState();
+        switchFirstTurn();
+        updateScoreDisplay();
+        gameInProgress = true;
+
+        // CPU takes first move if has turn
+        if (currentPlayer.isCPU())
+            new ExecuteCPUMove().execute();
     }
 
 	private void switchFirstTurn() {
 		if (firstTurn == null)
 			firstTurn = p1;
-		firstTurn = (firstTurn == p1) ? p2 : p1;
+        else
+    		firstTurn = (firstTurn == p1) ? p2 : p1;
 		currentPlayer = firstTurn;
 	}
 
@@ -165,7 +171,6 @@ public class ReversiActivity extends Activity {
     }
 
     public void calculateGameState() {
-        updateScoreCounts();
 		Player opponent = (currentPlayer == p1) ? p2 : p1;
 		if (b.hasMove(opponent)) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
@@ -175,13 +180,9 @@ public class ReversiActivity extends Activity {
             endGame();
             return;
         }
-
-        findViewById(R.id.turnIndicator).setBackgroundResource(
-                (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
-
-        if (currentPlayer.isCPU()) {
+        updateScoreDisplay();
+        if (currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
-        }
     }
 
     private class ExecuteCPUMove extends AsyncTask<Void, Void, BoardSpace> {
@@ -222,7 +223,7 @@ public class ReversiActivity extends Activity {
         }
     }
 
-    public void updateScoreCounts() {
+    public void updateScoreDisplay() {
         int p1c = 0;
         int p2c = 0;
 
@@ -241,6 +242,8 @@ public class ReversiActivity extends Activity {
         p2.setScore(p2c);
 		updateScoreForPlayer(p1);
 		updateScoreForPlayer(p2);
+        findViewById(R.id.turnIndicator).setBackgroundResource(
+                (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
     }
 
 	public void updateScoreForPlayer(Player p) {
@@ -252,13 +255,15 @@ public class ReversiActivity extends Activity {
 
 	public void endGame() {
 		Player winner = null;
-
 		if (p1.getScore() != p2.getScore())
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
 		showWinningToast(winner);
 		int diff = 64 - p1.getScore() - p2.getScore();
 		winner.setScore(winner.getScore() + diff);
 		updateScoreForPlayer(winner);
+        switchFirstTurn();
+        getSharedPreferences(KEY_GAME_STATE, 0).edit().clear().apply();
+        gameInProgress = false;
 	}
 
 	public void showWinningToast(Player winner) {
@@ -293,7 +298,6 @@ public class ReversiActivity extends Activity {
 				Intent intent = new Intent(this, SettingsActivity.class);
 				startActivity(intent);
 				return true;
-
 		}
         return super.onOptionsItemSelected(item);
     }
