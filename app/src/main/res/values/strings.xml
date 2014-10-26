@@ -36,9 +36,12 @@
         The board is initialized with four pieces in the center four squares, alternating light and dark.
     </string>
 
-    <string name="how_to_play_p2">
+    <string name="how_to_play_p2_1">
         On each move, a player must claim an empty space, so that there is at least one of their opponent\'s spaces in between the claimed space and one of their own spaces.
         After claiming a space, all of the opponent\'s spaces in between the claimed space and one of their own spaces are claimed by the player.
+    </string>
+
+    <string name="how_to_play_p2_2">
         If at any point in the game a player has no valid moves, the turn will be passed back to the other player.
         The game continues until neither player has any valid moves, or all spaces on the game board are claimed.
     </string>
