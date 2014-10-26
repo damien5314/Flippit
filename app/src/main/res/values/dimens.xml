@@ -13,4 +13,6 @@
     <integer name="fadeOutDuration">150</integer>
     <integer name="fadeInDuration">150</integer>
 
+    <dimen name="how_to_play_header_size">36dp</dimen>
+
 </resources>

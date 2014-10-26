@@ -29,8 +29,6 @@ public class HowToPlayActivity extends FragmentActivity {
         pageAdapter = new MyPageAdapter(getSupportFragmentManager(), fragments);
         ViewPager pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pageAdapter);
-//        getFragmentManager().beginTransaction()
-//                .replace(android.R.id.content, new HowToPlayFragment()).commit();
     }
 
     private List<Fragment> getFragments() {

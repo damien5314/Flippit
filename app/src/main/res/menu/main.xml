@@ -15,6 +15,6 @@
     <item android:id="@+id/action_howtoplay"
         android:title="@string/action_howtoplay"
         android:orderInCategory="300"
-        android:showAsAction="never" />
+        android:showAsAction="ifRoom" />
 
 </menu>

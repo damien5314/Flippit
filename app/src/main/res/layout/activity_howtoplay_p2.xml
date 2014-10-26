@@ -5,7 +5,7 @@
 
     <TextView
         style="@style/HowToPlayText"
-        android:text="@string/how_to_play_p2_1"/>
+        android:text="@string/how_to_play_p2"/>
 
     <ImageView
         style="@style/HowToPlayImage"
