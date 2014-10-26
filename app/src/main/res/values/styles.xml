@@ -39,4 +39,12 @@
         <item name="android:gravity">center</item>
     </style>
 
+    <style name="HowToPlayLayout">
+
+    </style>
+
+    <style name="HowToPlayText">
+
+    </style>
+
 </resources>
