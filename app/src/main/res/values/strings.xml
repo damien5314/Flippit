@@ -4,7 +4,7 @@
     <string name="app_name">Flippit</string>
     <string name="activity_launcher_title">Flippit</string>
     <string name="activity_settings_title">Settings</string>
-    <string name="activity_howToPlay_title">How To Play</string>
+    <string name="activity_howToPlay_title">How to Play</string>
     <string name="action_new_game">New Game</string>
     <string name="action_settings">Settings</string>
     <string name="action_howtoplay">How to Play</string>

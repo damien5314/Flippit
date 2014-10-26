@@ -9,6 +9,6 @@
 
     <ImageView
         style="@style/HowToPlayImage"
-        android:src="@drawable/winning_scenario" />
+        android:src="@drawable/possible_moves" />
 
 </LinearLayout>
