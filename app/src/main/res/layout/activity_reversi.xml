@@ -20,6 +20,7 @@
 		<TextView
 			style="@style/ScoreLabel"
 			android:id="@+id/p1_label"
+            android:gravity="left|center"
 			android:text="@string/player1_label_default"/>
 
 		<TextView
@@ -48,6 +49,7 @@
 		<TextView
 			style="@style/ScoreLabel"
 			android:id="@+id/p2_label"
+            android:gravity="right|center"
 			android:text="@string/player2_label"/>
 
         <ImageView

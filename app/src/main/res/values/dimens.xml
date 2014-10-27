@@ -5,6 +5,7 @@
 
     <dimen name="playerIcon_width">20dp</dimen>
     <dimen name="playerIcon_height">20dp</dimen>
+    <dimen name="playerName_width">90dp</dimen>
 
 	<integer name="cpu_turn_delay">1000</integer>
 
