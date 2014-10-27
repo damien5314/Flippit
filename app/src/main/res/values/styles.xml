@@ -18,9 +18,10 @@
         <item name="android:layout_height">@dimen/playerIcon_height</item>
         <item name="android:layout_marginLeft">10dp</item>
         <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_gravity">center</item>
     </style>
 
-    <style name="ScoreLabel">
+    <style name="PlayerLabel">
         <item name="android:layout_width">@dimen/playerName_width</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:textSize">16sp</item>
@@ -28,7 +29,7 @@
     </style>
 
     <style name="ScoreValue">
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_width">50dp</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:paddingLeft">15dp</item>
         <item name="android:paddingRight">15dp</item>
