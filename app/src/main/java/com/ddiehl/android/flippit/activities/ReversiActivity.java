@@ -175,6 +175,7 @@ public class ReversiActivity extends Activity {
         } else if (b.hasMove(currentPlayer)) { // Opponent has no move, keep turn
             Toast.makeText(this, getString(R.string.no_moves) + opponent.getName(), Toast.LENGTH_SHORT).show();
         } else { // No moves remaining, end of game
+            updateScoreDisplay();
             endGame();
             return;
         }
@@ -254,7 +255,6 @@ public class ReversiActivity extends Activity {
 		if (p1.getScore() != p2.getScore())
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
 		showWinningToast(winner);
-        updateScoreDisplay();
 		int diff = 64 - p1.getScore() - p2.getScore();
 		winner.setScore(winner.getScore() + diff);
 		updateScoreForPlayer(winner);
