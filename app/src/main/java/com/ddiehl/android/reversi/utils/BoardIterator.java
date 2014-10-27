@@ -1,7 +1,7 @@
-package com.ddiehl.android.flippit.utils;
+package com.ddiehl.android.reversi.utils;
 
-import com.ddiehl.android.flippit.game.Board;
-import com.ddiehl.android.flippit.game.BoardSpace;
+import com.ddiehl.android.reversi.game.Board;
+import com.ddiehl.android.reversi.game.BoardSpace;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.activities;
+package com.ddiehl.android.reversi.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
-import com.ddiehl.android.flippit.R;
+import com.ddiehl.android.reversi.R;
 
 public class LauncherActivity extends Activity {
 

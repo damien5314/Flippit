@@ -1,9 +1,9 @@
-package com.ddiehl.android.flippit.game;
+package com.ddiehl.android.reversi.game;
 
 
 import android.content.Context;
 
-import com.ddiehl.android.flippit.utils.BoardIterator;
+import com.ddiehl.android.reversi.utils.BoardIterator;
 
 public class Board {
     private static final String TAG = Board.class.getSimpleName();

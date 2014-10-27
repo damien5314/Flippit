@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.activities;
+package com.ddiehl.android.reversi.activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -19,13 +19,13 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ddiehl.android.flippit.R;
-import com.ddiehl.android.flippit.game.Board;
-import com.ddiehl.android.flippit.game.BoardSpace;
-import com.ddiehl.android.flippit.game.ComputerAI;
-import com.ddiehl.android.flippit.game.Player;
-import com.ddiehl.android.flippit.game.ReversiColor;
-import com.ddiehl.android.flippit.utils.BoardIterator;
+import com.ddiehl.android.reversi.R;
+import com.ddiehl.android.reversi.game.Board;
+import com.ddiehl.android.reversi.game.BoardSpace;
+import com.ddiehl.android.reversi.game.ComputerAI;
+import com.ddiehl.android.reversi.game.Player;
+import com.ddiehl.android.reversi.game.ReversiColor;
+import com.ddiehl.android.reversi.utils.BoardIterator;
 
 
 public class ReversiActivity extends Activity {

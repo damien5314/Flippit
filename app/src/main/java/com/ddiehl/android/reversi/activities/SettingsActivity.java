@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.activities;
+package com.ddiehl.android.reversi.activities;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -12,7 +12,7 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
 
-import com.ddiehl.android.flippit.R;
+import com.ddiehl.android.reversi.R;
 
 /**
  * Adapted to PreferenceFragment from http://stackoverflow.com/a/4325239/3238938

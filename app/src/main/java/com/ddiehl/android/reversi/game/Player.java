@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.game;
+package com.ddiehl.android.reversi.game;
 
 public class Player {
 	private static final String TAG = Player.class.getSimpleName();

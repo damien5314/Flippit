@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.game;
+package com.ddiehl.android.reversi.game;
 
 
 public enum ReversiColor {

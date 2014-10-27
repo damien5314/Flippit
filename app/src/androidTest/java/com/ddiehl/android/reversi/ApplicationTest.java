@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit;
+package com.ddiehl.android.reversi;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

@@ -1,7 +1,7 @@
-package com.ddiehl.android.flippit.game;
+package com.ddiehl.android.reversi.game;
 
 
-import com.ddiehl.android.flippit.utils.BoardIterator;
+import com.ddiehl.android.reversi.utils.BoardIterator;
 
 import java.util.HashMap;
 import java.util.HashSet;

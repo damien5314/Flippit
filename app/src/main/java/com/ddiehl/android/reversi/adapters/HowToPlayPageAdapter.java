@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.adapters;
+package com.ddiehl.android.reversi.adapters;
 
 
 import android.support.v4.app.Fragment;

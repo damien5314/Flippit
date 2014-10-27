@@ -1,12 +1,12 @@
-package com.ddiehl.android.flippit.activities;
+package com.ddiehl.android.reversi.activities;
 
 
 import android.content.Context;
 
-import com.ddiehl.android.flippit.game.Board;
-import com.ddiehl.android.flippit.game.BoardSpace;
-import com.ddiehl.android.flippit.game.ReversiColor;
-import com.ddiehl.android.flippit.utils.BoardIterator;
+import com.ddiehl.android.reversi.game.Board;
+import com.ddiehl.android.reversi.game.BoardSpace;
+import com.ddiehl.android.reversi.game.ReversiColor;
+import com.ddiehl.android.reversi.utils.BoardIterator;
 
 public class GameStorage {
     private static final String TAG = GameStorage.class.getSimpleName();

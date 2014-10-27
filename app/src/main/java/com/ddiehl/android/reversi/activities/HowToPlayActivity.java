@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.activities;
+package com.ddiehl.android.reversi.activities;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.ddiehl.android.flippit.R;
-import com.ddiehl.android.flippit.adapters.HowToPlayPageAdapter;
+import com.ddiehl.android.reversi.R;
+import com.ddiehl.android.reversi.adapters.HowToPlayPageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;

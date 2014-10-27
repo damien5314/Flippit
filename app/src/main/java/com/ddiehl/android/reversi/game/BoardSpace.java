@@ -1,4 +1,4 @@
-package com.ddiehl.android.flippit.game;
+package com.ddiehl.android.reversi.game;
 
 
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 
-import com.ddiehl.android.flippit.R;
+import com.ddiehl.android.reversi.R;
 
 public class BoardSpace extends Button {
     private Context ctx;
