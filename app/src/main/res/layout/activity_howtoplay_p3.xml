@@ -4,11 +4,11 @@
     style="@style/HowToPlayLayout">
 
     <TextView
-        style="@style/HowToPlayHeader"
-        android:text="@string/how_to_play_p4_header"/>
-
-    <TextView
         style="@style/HowToPlayText"
-        android:text="@string/how_to_play_p4"/>
+        android:text="@string/how_to_play_p3"/>
+
+    <ImageView
+        style="@style/HowToPlayImage"
+        android:src="@drawable/no_move_scenario" />
 
 </LinearLayout>

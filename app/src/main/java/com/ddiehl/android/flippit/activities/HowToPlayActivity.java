@@ -39,7 +39,8 @@ public class HowToPlayActivity extends FragmentActivity {
         final int[] FRAGMENT_LAYOUT_ID = new int[] {
                 R.layout.activity_howtoplay_p1,
                 R.layout.activity_howtoplay_p2,
-                R.layout.activity_howtoplay_p3
+                R.layout.activity_howtoplay_p3,
+                R.layout.activity_howtoplay_p4
         };
 
         for (int id : FRAGMENT_LAYOUT_ID) {
