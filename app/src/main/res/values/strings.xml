@@ -11,7 +11,7 @@
     <string name="player1_label_default">Player 1</string>
     <string name="player2_label">Computer</string>
     <string name="bad_move">Error: Invalid Move</string>
-    <string name="no_moves">No moves for </string>
+    <string name="no_moves">No moves for\u0020</string> <!-- Use \u0020 to add a space at end -->
 	<string name="winner_p1">You win.</string>
 	<string name="winner_cpu">CPU wins.</string>
 	<string name="winner_none">No winner.</string>
@@ -42,9 +42,8 @@
 
     <string name="how_to_play_p4_header">Strategy</string>
     <string name="how_to_play_p4">
-        A good starting strategy for Reversi is to focus on claiming "stable" spaces, for which all of the connected spaces are of the same color,
-        and therefore unable to be flanked for the rest of the game.
-        Because of this, the four corner spaces are considered to be the most valuable, followed by spaces along the edges.
+        A good starting strategy for Reversi is to focus on claiming "stable" spaces which are unable to be flanked regardless of moves later in the game.
+        The four corner spaces are considered to be the most valuable, followed by spaces along the edges.
         Spaces immediately adjacent to the corners and edges should be avoided as these provide an opportunity for the opponent to claim stable spaces.
     </string>
 
