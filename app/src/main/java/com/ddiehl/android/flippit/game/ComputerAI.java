@@ -1,8 +1,6 @@
 package com.ddiehl.android.flippit.game;
 
 
-import android.util.Log;
-
 import com.ddiehl.android.flippit.utils.BoardIterator;
 
 import java.util.HashMap;
@@ -40,8 +38,8 @@ public class ComputerAI {
             }
         }
 
-        if (best != null)
-            Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") has value of " + bestVal);
+//        if (best != null)
+//            Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") has value of " + bestVal);
 
         return best;
     }
@@ -72,9 +70,9 @@ public class ComputerAI {
             }
         }
 
-        if (best != null)
-            Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") reduces "
-                    + o.getName() + " to " + bestVal + " moves");
+//        if (best != null)
+//            Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") reduces "
+//                    + o.getName() + " to " + bestVal + " moves");
 
         return best;
     }
@@ -103,11 +101,11 @@ public class ComputerAI {
                     else
                         moveValue = getSpaceValue(space) * spaceValue_weight
                                 + board.spacesCapturedWithMove(space, p.getColor()) * spacesCaptured_weight;
-                    // Store value of BoardSpace against weighting for that space
                     moveValues.put(space, moveValue);
                 }
             }
         }
+
         // Add all of the moves with the best value to a HashSet
         int bestValue = Integer.MIN_VALUE;
         HashSet<BoardSpace> bestMoves = new HashSet<BoardSpace>();
@@ -121,6 +119,7 @@ public class ComputerAI {
                 bestMoves.add(s);
             }
         }
+
         // Select a move out of the spaces with the best calculated value
         BoardSpace best = null;
         for (BoardSpace s : bestMoves) {
@@ -131,8 +130,10 @@ public class ComputerAI {
                     best = s;
             }
         }
-        if (best != null)
-            Log.i(TAG, p.getName() + ": " + "Best move @(" + best.x + "," + best.y + "); Value = " + moveValues.get(best));
+
+//        if (best != null)
+//            Log.i(TAG, p.getName() + ": " + "Best move @(" + best.x + "," + best.y + "); Value = " + moveValues.get(best));
+
         return best;
     }
 

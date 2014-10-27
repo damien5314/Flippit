@@ -7,10 +7,10 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.List;
 
-public class MyPageAdapter extends FragmentPagerAdapter{
+public class HowToPlayPageAdapter extends FragmentPagerAdapter{
     private List<Fragment> fragments;
 
-    public MyPageAdapter(FragmentManager fm, List<Fragment> fragments) {
+    public HowToPlayPageAdapter(FragmentManager fm, List<Fragment> fragments) {
         super(fm);
         this.fragments = fragments;
     }

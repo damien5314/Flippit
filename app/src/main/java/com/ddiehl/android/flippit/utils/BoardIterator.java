@@ -17,7 +17,7 @@ public class BoardIterator implements Iterator<BoardSpace> {
 
 	@Override
 	public boolean hasNext() {
-		if (x >= b.width() || y >= b.height())
+		if (y == b.height())
 			return false;
 
 		return true;

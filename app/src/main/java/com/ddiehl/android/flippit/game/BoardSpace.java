@@ -13,10 +13,6 @@ public class BoardSpace extends Button {
     private ReversiColor color;
 	public int x, y;
 
-	private BoardSpace(Context c) {
-        super(c);
-    }
-
     public BoardSpace(Context c, int x, int y) {
 		super(c);
         ctx = c;

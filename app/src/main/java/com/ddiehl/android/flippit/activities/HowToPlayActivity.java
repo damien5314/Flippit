@@ -12,7 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.ddiehl.android.flippit.R;
-import com.ddiehl.android.flippit.adapters.MyPageAdapter;
+import com.ddiehl.android.flippit.adapters.HowToPlayPageAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
 public class HowToPlayActivity extends FragmentActivity {
     private static final String TAG = HowToPlayActivity.class.getSimpleName();
     ViewPager pager;
-    MyPageAdapter pageAdapter;
+    HowToPlayPageAdapter pageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +31,7 @@ public class HowToPlayActivity extends FragmentActivity {
         setContentView(R.layout.activity_howtoplay);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         List<Fragment> fragments = getFragments();
-        pageAdapter = new MyPageAdapter(getSupportFragmentManager(), fragments);
+        pageAdapter = new HowToPlayPageAdapter(getSupportFragmentManager(), fragments);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pageAdapter);
     }

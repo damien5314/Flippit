@@ -32,10 +32,10 @@ public class ReversiActivity extends Activity {
 	private static final String TAG = ReversiActivity.class.getSimpleName();
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
-    private static final String KEY_GAME_STATE = "key_gamePrefs";
-    private static final String KEY_CURRENT_PLAYER = "pref_currentPlayer";
-    private static final String KEY_FIRST_TURN = "pref_firstTurn";
-    private static final String KEY_BOARD_STATE = "pref_boardState";
+    private static final String PREF_GAME_STATE = "key_gamePrefs";
+    private static final String PREF_CURRENT_PLAYER = "pref_currentPlayer";
+    private static final String PREF_FIRST_TURN = "pref_firstTurn";
+    private static final String PREF_BOARD_STATE = "pref_boardState";
     private Context ctx;
 	protected Player p1, p2, currentPlayer;
     protected Player firstTurn;
@@ -51,8 +51,8 @@ public class ReversiActivity extends Activity {
         ctx = this;
 
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label_default));
-		p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
+        p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
         p2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
 		b = Board.getInstance(this);
@@ -83,24 +83,24 @@ public class ReversiActivity extends Activity {
     }
 
     public boolean getSavedGame() {
-        SharedPreferences sp = getSharedPreferences(KEY_GAME_STATE, 0);
-        if (sp.contains(KEY_CURRENT_PLAYER)
-                && sp.contains(KEY_FIRST_TURN)
-                && sp.contains(KEY_BOARD_STATE)) {
-            currentPlayer = (sp.getBoolean(KEY_CURRENT_PLAYER, true) ? p1 : p2);
-            firstTurn = (sp.getBoolean(KEY_FIRST_TURN, true) ? p1 : p2);
-            GameStorage.deserialize(this, sp.getString(KEY_BOARD_STATE, ""));
+        SharedPreferences sp = getSharedPreferences(PREF_GAME_STATE, 0);
+        if (sp.contains(PREF_CURRENT_PLAYER)
+                && sp.contains(PREF_FIRST_TURN)
+                && sp.contains(PREF_BOARD_STATE)) {
+            currentPlayer = (sp.getBoolean(PREF_CURRENT_PLAYER, true) ? p1 : p2);
+            firstTurn = (sp.getBoolean(PREF_FIRST_TURN, true) ? p1 : p2);
+            GameStorage.deserialize(this, sp.getString(PREF_BOARD_STATE, ""));
             return true;
         }
         return false;
     }
 
     public void saveGameToPrefs() {
-        SharedPreferences sp = getSharedPreferences(KEY_GAME_STATE, 0);
+        SharedPreferences sp = getSharedPreferences(PREF_GAME_STATE, 0);
         SharedPreferences.Editor e = sp.edit();
-        e.putBoolean(KEY_CURRENT_PLAYER, (currentPlayer == p1));
-        e.putBoolean(KEY_FIRST_TURN, (firstTurn == p1));
-        e.putString(KEY_BOARD_STATE, GameStorage.serialize(b));
+        e.putBoolean(PREF_CURRENT_PLAYER, (currentPlayer == p1));
+        e.putBoolean(PREF_FIRST_TURN, (firstTurn == p1));
+        e.putString(PREF_BOARD_STATE, GameStorage.serialize(b));
         e.apply();
     }
 
@@ -116,7 +116,7 @@ public class ReversiActivity extends Activity {
         updateScoreDisplay();
         gameInProgress = true;
 
-        // CPU takes first move if has turn
+        // CPU takes first move if it has turn
         if (currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
@@ -161,9 +161,8 @@ public class ReversiActivity extends Activity {
 				if (b.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
 					b.commitPiece(s, currentPlayer.getColor());
                     calculateGameState();
-                } else {
+                } else
                     Toast.makeText(ctx, R.string.bad_move, Toast.LENGTH_SHORT).show();
-                }
             }
         };
     }
@@ -223,7 +222,6 @@ public class ReversiActivity extends Activity {
     public void updateScoreDisplay() {
         int p1c = 0;
         int p2c = 0;
-
 		BoardIterator i = new BoardIterator(b);
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
@@ -234,7 +232,6 @@ public class ReversiActivity extends Activity {
 					p2c++;
 			}
 		}
-
         p1.setScore(p1c);
         p2.setScore(p2c);
 		updateScoreForPlayer(p1);
@@ -259,7 +256,7 @@ public class ReversiActivity extends Activity {
 		winner.setScore(winner.getScore() + diff);
 		updateScoreForPlayer(winner);
         switchFirstTurn();
-        getSharedPreferences(KEY_GAME_STATE, 0).edit().clear().apply();
+        getSharedPreferences(PREF_GAME_STATE, 0).edit().clear().apply();
         gameInProgress = false;
 	}
 
