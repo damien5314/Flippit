@@ -254,6 +254,7 @@ public class ReversiActivity extends Activity {
 		if (p1.getScore() != p2.getScore())
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
 		showWinningToast(winner);
+        updateScoreDisplay();
 		int diff = 64 - p1.getScore() - p2.getScore();
 		winner.setScore(winner.getScore() + diff);
 		updateScoreForPlayer(winner);
