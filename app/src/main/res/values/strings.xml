@@ -5,9 +5,13 @@
     <string name="activity_launcher_title">Flippit</string>
     <string name="activity_settings_title">Settings</string>
     <string name="activity_howToPlay_title">How to Play</string>
+
     <string name="action_new_game">New Game</string>
     <string name="action_settings">Settings</string>
     <string name="action_howtoplay">How to Play</string>
+    <string name="action_htp_previous">Prev</string>
+    <string name="action_htp_next">Next</string>
+
     <string name="player1_label_default">Player 1</string>
     <string name="player2_label">Computer</string>
     <string name="bad_move">Error: Invalid Move</string>

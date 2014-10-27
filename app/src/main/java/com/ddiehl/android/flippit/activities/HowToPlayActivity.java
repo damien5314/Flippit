@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -19,6 +21,7 @@ import java.util.List;
  */
 public class HowToPlayActivity extends FragmentActivity {
     private static final String TAG = HowToPlayActivity.class.getSimpleName();
+    ViewPager pager;
     MyPageAdapter pageAdapter;
 
     @Override
@@ -27,7 +30,7 @@ public class HowToPlayActivity extends FragmentActivity {
         setContentView(R.layout.activity_howtoplay);
         List<Fragment> fragments = getFragments();
         pageAdapter = new MyPageAdapter(getSupportFragmentManager(), fragments);
-        ViewPager pager = (ViewPager) findViewById(R.id.pager);
+        pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pageAdapter);
     }
 
@@ -65,4 +68,24 @@ public class HowToPlayActivity extends FragmentActivity {
         }
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.how_to_play, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.previous:
+                if (pager.getCurrentItem() > 0)
+                    pager.setCurrentItem(pager.getCurrentItem()-1);
+                return true;
+            case R.id.next:
+                if (pager.getCurrentItem() < pager.getChildCount())
+                    pager.setCurrentItem(pager.getCurrentItem()+1);
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 }
