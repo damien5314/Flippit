@@ -53,7 +53,7 @@ public class ReversiActivity extends Activity {
 		p1 = new Player(ReversiColor.White, getString(R.string.player1_label_default));
 		p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
 		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
-		p2.isCPU(true);
+        p2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
 		b = Board.getInstance(this);
 
