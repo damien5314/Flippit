@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
@@ -47,11 +47,11 @@
     </style>
 
     <style name="ScoreValue">
-        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_width">@dimen/scoreValue_width</item>
         <item name="android:layout_height">fill_parent</item>
-        <item name="android:paddingLeft">15dp</item>
-        <item name="android:paddingRight">15dp</item>
-        <item name="android:textSize">16sp</item>
+        <item name="android:paddingLeft">@dimen/scoreValue_padding</item>
+        <item name="android:paddingRight">@dimen/scoreValue_padding</item>
+        <item name="android:textSize">@dimen/scoreValue_size</item>
         <item name="android:gravity">center</item>
     </style>
 
@@ -82,7 +82,7 @@
     <style name="HowToPlayHeader">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingBottom">@dimen/how_to_play_header_padding</item>
         <item name="android:textSize">@dimen/how_to_play_header_size</item>
     </style>
 
@@ -90,13 +90,14 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-thin</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+		<item name="android:textSize">@dimen/how_to_play_text_size</item>
+        <!--<item name="android:textAppearance">?android:attr/textAppearanceLarge</item>-->
     </style>
 
     <style name="HowToPlayImage">
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingTop">@dimen/how_to_play_image_padding</item>
         <item name="android:adjustViewBounds">true</item>
     </style>
 
