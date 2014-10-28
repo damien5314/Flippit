@@ -6,10 +6,20 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <style name="ApplicationTitle">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">4</item>
+        <item name="android:gravity">center</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-thin</item>
+        <item name="android:textSize">@dimen/app_title_size</item>
+    </style>
+
     <style name="CallToActionButton">
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">80dp</item>
-        <item name="android:textSize">22sp</item>
+        <item name="android:layout_height">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:textSize">@dimen/start_button_size</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 

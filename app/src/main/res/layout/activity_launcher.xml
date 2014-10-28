@@ -10,13 +10,8 @@
     tools:context="com.ddiehl.android.reversi.activities.LauncherActivity">
 
     <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:gravity="center"
-        android:text="@string/activity_launcher_title"
-        android:fontFamily="sans-serif-thin" tools:targetApi="16"
-        android:textSize="60sp"/>
+        style="@style/ApplicationTitle"
+        android:text="@string/activity_launcher_title"/>
 
     <Button
         style="@style/CallToActionButton"
