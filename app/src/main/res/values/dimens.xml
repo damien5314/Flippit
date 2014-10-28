@@ -7,9 +7,16 @@
     <dimen name="app_title_size">60sp</dimen>
     <dimen name="start_button_size">22sp</dimen>
 
+	<dimen name="scoreOverlay_height">50dp</dimen>
+
     <dimen name="playerIcon_width">20dp</dimen>
     <dimen name="playerIcon_height">20dp</dimen>
-    <dimen name="playerName_width">75dp</dimen>
+	<dimen name="playerIcon_margin">10dp</dimen>
+
+	<dimen name="playerLabel_size">16sp</dimen>
+    <dimen name="playerLabel_width">75dp</dimen>
+
+	<color name="gameBoard_color">#42A321</color>
 
 	<integer name="cpu_turn_delay">1000</integer>
 

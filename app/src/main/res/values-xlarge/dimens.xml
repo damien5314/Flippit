@@ -7,4 +7,6 @@
     <dimen name="app_title_size">136sp</dimen>
     <dimen name="start_button_size">56sp</dimen>
 
+	<dimen name="scoreOverlay_height">100dp</dimen>
+
 </resources>

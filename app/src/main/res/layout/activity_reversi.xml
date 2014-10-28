@@ -7,18 +7,16 @@
 
 	<LinearLayout
 		android:id="@+id/ScoreOverlay"
-		android:orientation="horizontal"
-		android:background="@drawable/border"
-		android:layout_width="fill_parent"
-		android:layout_height="50dp">
+		style="@style/ScoreOverlay"
+		android:background="@drawable/border">
 
         <ImageView
             style="@style/PlayerIcon"
             android:background="@drawable/board_space_p1" />
 
 		<TextView
-			style="@style/PlayerLabel"
 			android:id="@+id/p1_label"
+			style="@style/PlayerLabel"
             android:gravity="left|center"
 			android:text="@string/player1_label_default"/>
 
@@ -28,18 +26,15 @@
 
         <ImageView
             android:id="@+id/turnIndicator"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_gravity="center"/>
+			style="@style/TurnIndicator"/>
 
 		<TextView
             android:id="@+id/p2score"
 			style="@style/ScoreValue"/>
 
 		<TextView
-			style="@style/PlayerLabel"
 			android:id="@+id/p2_label"
+			style="@style/PlayerLabel"
             android:gravity="right|center"
 			android:text="@string/player2_label"/>
 
@@ -51,8 +46,6 @@
 
 	<TableLayout
 		android:id="@+id/GameGrid"
-		android:layout_width="fill_parent"
-		android:layout_height="fill_parent"
-        android:background="#42A321"/>
+		style="@style/GameBoardTable"/>
 
 </LinearLayout>
