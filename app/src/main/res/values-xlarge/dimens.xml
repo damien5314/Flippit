@@ -20,4 +20,9 @@
 	<dimen name="scoreValue_padding">30dp</dimen>
 	<dimen name="scoreValue_size">32sp</dimen>
 
+    <dimen name="space_border_width">3dp</dimen>
+    <dimen name="space_corner_radius">12dp</dimen>
+    <dimen name="space_row_height">112dp</dimen>
+    <dimen name="space_margin">4dp</dimen>
+
 </resources>

@@ -136,18 +136,17 @@ public class ReversiActivity extends Activity {
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         l.removeAllViews();
 
-		int buttonHeightDp = 85;
 		// Calculate required height of the buttons based on screen dimensions
 		int buttonHeightScaled = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-				buttonHeightDp, getResources().getDisplayMetrics());
+				60, getResources().getDisplayMetrics());
+        int rowHeight = (int) getResources().getDimension(R.dimen.space_row_height);
 
         for (int y = 0; y < b.height(); y++) {
 			TableRow r = new TableRow(this);
             r.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
                 BoardSpace s = b.getSpaceAt(x, y);
-                TableRow.LayoutParams p = new TableRow.LayoutParams(
-                        TableRow.LayoutParams.WRAP_CONTENT, buttonHeightScaled, 1.0f);
+                TableRow.LayoutParams p = new TableRow.LayoutParams(0, rowHeight, 1.0f);
                 p.setMargins(5, 5, 5, 5);
                 s.setLayoutParams(p);
                 s.setOnClickListener(claim(s));
