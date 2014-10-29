@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -131,29 +130,29 @@ public class ReversiActivity extends Activity {
 	}
 
     private void displayBoard() {
-		TableLayout l = (TableLayout) findViewById(R.id.GameGrid);
-        l.setLayoutParams(new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        l.removeAllViews();
+		TableLayout grid = (TableLayout) findViewById(R.id.GameGrid);
+		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
+        grid.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        grid.removeAllViews();
 
-		// Calculate required height of the buttons based on screen dimensions
-		int buttonHeightScaled = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-				60, getResources().getDisplayMetrics());
-        int rowHeight = (int) getResources().getDimension(R.dimen.space_row_height);
+		int bMargin = (int) getResources().getDimension(R.dimen.space_margin);
 
         for (int y = 0; y < b.height(); y++) {
-			TableRow r = new TableRow(this);
-            r.setWeightSum(b.width());
+			TableRow row = new TableRow(this);
+            row.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
-                BoardSpace s = b.getSpaceAt(x, y);
-                TableRow.LayoutParams p = new TableRow.LayoutParams(0, rowHeight, 1.0f);
-                p.setMargins(5, 5, 5, 5);
-                s.setLayoutParams(p);
-                s.setOnClickListener(claim(s));
-                r.addView(s);
+                BoardSpace space = b.getSpaceAt(x, y);
+                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+                params.setMargins(bMargin, bMargin, bMargin, bMargin);
+                space.setLayoutParams(params);
+                space.setOnClickListener(claim(space));
+                row.addView(space);
             }
-			l.addView(r);
+			grid.addView(row);
         }
+
+		grid.setVisibility(View.VISIBLE);
     }
 
     public View.OnClickListener claim(final BoardSpace s) {
