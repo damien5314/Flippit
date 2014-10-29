@@ -25,4 +25,11 @@
     <dimen name="space_row_height">80dp</dimen>
     <dimen name="space_margin">3dp</dimen>
 
+	<dimen name="how_to_play_header_size">54dp</dimen>
+	<dimen name="how_to_play_header_padding">15dp</dimen>
+
+	<dimen name="how_to_play_text_size">36sp</dimen>
+
+	<dimen name="how_to_play_image_padding">15dp</dimen>
+
 </resources>
