@@ -22,7 +22,7 @@
 
     <dimen name="space_border_width">2dp</dimen>
     <dimen name="space_corner_radius">9dp</dimen>
-    <dimen name="space_row_height">84dp</dimen>
+    <dimen name="space_row_height">80dp</dimen>
     <dimen name="space_margin">3dp</dimen>
 
 </resources>

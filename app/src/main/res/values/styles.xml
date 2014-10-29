@@ -39,14 +39,14 @@
     </style>
 
     <style name="PlayerLabel">
-        <item name="android:layout_width">@dimen/playerLabel_width</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:textSize">@dimen/playerLabel_size</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="ScoreValue">
-        <item name="android:layout_width">@dimen/scoreValue_width</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:paddingLeft">@dimen/scoreValue_padding</item>
         <item name="android:paddingRight">@dimen/scoreValue_padding</item>

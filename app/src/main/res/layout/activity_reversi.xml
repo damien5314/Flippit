@@ -24,33 +24,33 @@
 			android:layout_toRightOf="@id/turnIndicator"
 			style="@style/ScoreValue"/>
 
+        <ImageView
+            android:id="@+id/p1_icon"
+            style="@style/PlayerIcon"
+            android:background="@drawable/board_space_p1"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"/>
+
+        <ImageView
+            android:id="@+id/p2_icon"
+            style="@style/PlayerIcon"
+            android:background="@drawable/board_space_p2"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"/>
+
 		<TextView
 			android:id="@+id/p1_label"
-			android:layout_toLeftOf="@id/p1score"
+			android:layout_toRightOf="@id/p1_icon"
 			style="@style/PlayerLabel"
 			android:gravity="left|center"
 			android:text="@string/player1_label_default"/>
 
 		<TextView
 			android:id="@+id/p2_label"
-			android:layout_toRightOf="@id/p2score"
+			android:layout_toLeftOf="@id/p2_icon"
 			style="@style/PlayerLabel"
 			android:gravity="right|center"
 			android:text="@string/player2_label"/>
-
-        <ImageView
-            style="@style/PlayerIcon"
-			android:background="@drawable/board_space_p1"
-			android:layout_toStartOf="@+id/p1_label"
-			android:layout_centerVertical="true"
-			android:layout_toLeftOf="@+id/p1_label"/>
-
-        <ImageView
-            style="@style/PlayerIcon"
-			android:background="@drawable/board_space_p2"
-			android:layout_toEndOf="@+id/p2_label"
-			android:layout_centerVertical="true"
-			android:layout_toRightOf="@+id/p2_label"/>
 
 	</RelativeLayout>
 
