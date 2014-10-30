@@ -136,6 +136,7 @@ public class ReversiActivity extends Activity {
 				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         grid.removeAllViews();
 
+        int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
 		int bMargin = (int) getResources().getDimension(R.dimen.space_margin);
 
         for (int y = 0; y < b.height(); y++) {
@@ -143,7 +144,8 @@ public class ReversiActivity extends Activity {
             row.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
                 BoardSpace space = b.getSpaceAt(x, y);
-                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+//                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+                TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
                 params.setMargins(bMargin, bMargin, bMargin, bMargin);
                 space.setLayoutParams(params);
                 space.setOnClickListener(claim(space));
