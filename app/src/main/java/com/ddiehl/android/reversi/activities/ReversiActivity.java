@@ -13,6 +13,7 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -137,7 +138,7 @@ public class ReversiActivity extends Activity {
         grid.removeAllViews();
 
         int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
-		int bMargin = (int) getResources().getDimension(R.dimen.space_margin);
+		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
 
 //        grid.setWeightSum(b.height()); // Attempting to scale board to all screens
         for (int y = 0; y < b.height(); y++) {
@@ -244,7 +245,7 @@ public class ReversiActivity extends Activity {
         p2.setScore(p2c);
 		updateScoreForPlayer(p1);
 		updateScoreForPlayer(p2);
-        findViewById(R.id.turnIndicator).setBackgroundResource(
+        ((ImageView)findViewById(R.id.turnIndicator)).setImageResource(
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
     }
 
