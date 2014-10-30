@@ -58,13 +58,13 @@
 
 	</RelativeLayout>
 
-	<TableLayout
-		android:id="@+id/GameGrid"
-		style="@style/GameBoardTable"/>
+	<!--<TableLayout-->
+		<!--android:id="@+id/GameGrid"-->
+		<!--style="@style/GameBoardTable"/>-->
 
 	<!--<LinearLayout-->
 		<!--style="@style/GameBoardBottomMargin"/>-->
-<!--
+
 	<TableLayout
 		android:id="@+id/GameGrid"
 		style="@style/GameBoardTable">
@@ -478,5 +478,5 @@
 		</TableRow>
 
 	</TableLayout>
--->
+
 </LinearLayout>
