@@ -11,7 +11,7 @@
     <dimen name="playerIcon_width">20dp</dimen>
     <dimen name="playerIcon_height">20dp</dimen>
     <dimen name="playerIcon_margin">10dp</dimen>
-    <dimen name="playerLabel_width">75dp</dimen>
+    <dimen name="playerLabel_size">16sp</dimen>
     <dimen name="scoreValue_padding">15dp</dimen>
     <dimen name="scoreValue_size">16sp</dimen>
 
@@ -24,12 +24,5 @@
     <dimen name="how_to_play_header_padding">10dp</dimen>
     <dimen name="how_to_play_text_size">24sp</dimen>
     <dimen name="how_to_play_image_padding">10dp</dimen>
-
-    <color name="gameBoard_color">#42A321</color>
-    <integer name="cpu_turn_delay">1000</integer>
-    <bool name="p1_cpu">false</bool>
-    <bool name="p2_cpu">true</bool>
-    <integer name="fadeOutDuration">150</integer>
-    <integer name="fadeInDuration">150</integer>
 
 </resources>

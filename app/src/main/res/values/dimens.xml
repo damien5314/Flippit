@@ -11,7 +11,6 @@
     <dimen name="playerIcon_width">20dp</dimen>
     <dimen name="playerIcon_height">20dp</dimen>
 	<dimen name="playerIcon_margin">10dp</dimen>
-    <dimen name="playerLabel_width">75dp</dimen>
 	<dimen name="scoreValue_padding">15dp</dimen>
 	<dimen name="scoreValue_size">16sp</dimen>
 

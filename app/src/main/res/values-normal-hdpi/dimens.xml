@@ -7,16 +7,11 @@
     <dimen name="app_title_size">60sp</dimen>
     <dimen name="start_button_size">22sp</dimen>
 
-	<dimen name="scoreOverlay_height">40dp</dimen>
-
+	<dimen name="scoreOverlay_height">42dp</dimen>
     <dimen name="playerIcon_width">18dp</dimen>
     <dimen name="playerIcon_height">18dp</dimen>
 	<dimen name="playerIcon_margin">8dp</dimen>
-
 	<dimen name="playerLabel_size">14sp</dimen>
-    <dimen name="playerLabel_width">65dp</dimen>
-
-	<dimen name="scoreValue_width">40dp</dimen>
 	<dimen name="scoreValue_padding">12dp</dimen>
 	<dimen name="scoreValue_size">14sp</dimen>
 
@@ -27,16 +22,7 @@
 
     <dimen name="how_to_play_header_size">32dp</dimen>
 	<dimen name="how_to_play_header_padding">8dp</dimen>
-
 	<dimen name="how_to_play_text_size">22sp</dimen>
-
 	<dimen name="how_to_play_image_padding">10dp</dimen>
-
-    <color name="gameBoard_color">#42A321</color>
-    <integer name="cpu_turn_delay">1000</integer>
-    <bool name="p1_cpu">false</bool>
-    <bool name="p2_cpu">true</bool>
-    <integer name="fadeOutDuration">150</integer>
-    <integer name="fadeInDuration">150</integer>
 
 </resources>
