@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <dimen name="app_title_size">60sp</dimen>
+    <dimen name="start_button_size">22sp</dimen>
+
+    <dimen name="scoreOverlay_height">65dp</dimen>
+    <dimen name="playerIcon_width">24dp</dimen>
+    <dimen name="playerIcon_height">24dp</dimen>
+    <dimen name="playerIcon_margin">12dp</dimen>
+    <dimen name="playerLabel_size">20sp</dimen>
+    <dimen name="scoreValue_padding">16dp</dimen>
+    <dimen name="scoreValue_size">20sp</dimen>
+
+    <dimen name="space_border_width">2dp</dimen>
+    <dimen name="space_corner_radius">8dp</dimen>
+    <dimen name="space_row_height">64dp</dimen>
+    <dimen name="space_margin">3dp</dimen>
+
+    <dimen name="how_to_play_header_size">36dp</dimen>
+    <dimen name="how_to_play_header_padding">10dp</dimen>
+    <dimen name="how_to_play_text_size">24sp</dimen>
+    <dimen name="how_to_play_image_padding">10dp</dimen>
+
+</resources>
