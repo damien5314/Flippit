@@ -8,17 +8,17 @@
     <dimen name="start_button_size">22sp</dimen>
 
 	<dimen name="scoreOverlay_height">42dp</dimen>
-    <dimen name="playerIcon_width">18dp</dimen>
-    <dimen name="playerIcon_height">18dp</dimen>
+    <dimen name="playerIcon_width">14dp</dimen>
+    <dimen name="playerIcon_height">14dp</dimen>
 	<dimen name="playerIcon_margin">8dp</dimen>
-	<dimen name="playerLabel_size">14sp</dimen>
-	<dimen name="scoreValue_padding">12dp</dimen>
-	<dimen name="scoreValue_size">14sp</dimen>
+	<dimen name="playerLabel_size">18sp</dimen>
+	<dimen name="scoreValue_padding">9dp</dimen>
+	<dimen name="scoreValue_size">18sp</dimen>
 
     <dimen name="space_border_width">1dp</dimen>
     <dimen name="space_corner_radius">6dp</dimen>
-    <dimen name="space_row_height">42dp</dimen>
-    <dimen name="space_margin">2dp</dimen>
+    <dimen name="space_row_height">46dp</dimen>
+    <dimen name="space_margin">1dp</dimen>
 
     <dimen name="how_to_play_header_size">32dp</dimen>
 	<dimen name="how_to_play_header_padding">8dp</dimen>

@@ -7,18 +7,18 @@
     <dimen name="app_title_size">60sp</dimen>
     <dimen name="start_button_size">22sp</dimen>
 
-	<dimen name="scoreOverlay_height">45dp</dimen>
-    <dimen name="playerIcon_width">20dp</dimen>
-    <dimen name="playerIcon_height">20dp</dimen>
+	<dimen name="scoreOverlay_height">55dp</dimen>
+    <dimen name="playerIcon_width">16dp</dimen>
+    <dimen name="playerIcon_height">16dp</dimen>
 	<dimen name="playerIcon_margin">9dp</dimen>
-	<dimen name="playerLabel_size">16sp</dimen>
-	<dimen name="scoreValue_padding">12dp</dimen>
-	<dimen name="scoreValue_size">16sp</dimen>
+	<dimen name="playerLabel_size">20sp</dimen>
+	<dimen name="scoreValue_padding">9dp</dimen>
+	<dimen name="scoreValue_size">20sp</dimen>
 
     <dimen name="space_border_width">1dp</dimen>
     <dimen name="space_corner_radius">6dp</dimen>
     <dimen name="space_row_height">48dp</dimen>
-    <dimen name="space_margin">3dp</dimen>
+    <dimen name="space_margin">2dp</dimen>
 
     <dimen name="how_to_play_header_size">36dp</dimen>
 	<dimen name="how_to_play_header_padding">9dp</dimen>
