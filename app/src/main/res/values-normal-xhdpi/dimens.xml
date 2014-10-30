@@ -9,11 +9,9 @@
 
 	<dimen name="scoreOverlay_height">55dp</dimen>
     <dimen name="playerIcon_width">16dp</dimen>
-    <dimen name="playerIcon_height">16dp</dimen>
+	<dimen name="scoreOverlay_text_size">20sp</dimen>
 	<dimen name="playerIcon_margin">9dp</dimen>
-	<dimen name="playerLabel_size">20sp</dimen>
 	<dimen name="scoreValue_padding">9dp</dimen>
-	<dimen name="scoreValue_size">20sp</dimen>
 
     <dimen name="space_border_width">1dp</dimen>
     <dimen name="space_corner_radius">6dp</dimen>
