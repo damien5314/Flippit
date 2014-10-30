@@ -4,8 +4,8 @@
     <dimen name="activity_horizontal_margin">32dp</dimen>
     <dimen name="activity_vertical_margin">32dp</dimen>
 
-    <dimen name="app_title_size">60sp</dimen>
-    <dimen name="start_button_size">22sp</dimen>
+    <dimen name="app_title_size">120sp</dimen>
+    <dimen name="start_button_size">44sp</dimen>
 
 	<dimen name="scoreOverlay_height">96dp</dimen>
 	<dimen name="playerIcon_width">24dp</dimen>
