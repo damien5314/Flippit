@@ -75,49 +75,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 		<TableRow>
@@ -126,49 +126,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 		<TableRow>
@@ -177,49 +177,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 		<TableRow>
@@ -228,49 +228,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 		<TableRow>
@@ -279,49 +279,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 		<TableRow>
@@ -330,49 +330,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 		<TableRow>
@@ -381,49 +381,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 		<TableRow>
@@ -432,49 +432,49 @@
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 			<Button
 				android:layout_height="@dimen/space_row_height"
 				android:layout_width="0dp"
 				android:layout_weight="1"
 				android:background="@drawable/board_space_neutral"
-				android:layout_margin="@dimen/space_margin"/>
+				android:layout_margin="@dimen/space_padding"/>
 		</TableRow>
 
 	</TableLayout>

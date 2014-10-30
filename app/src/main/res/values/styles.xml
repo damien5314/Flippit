@@ -33,8 +33,8 @@
     <style name="PlayerIcon">
         <item name="android:layout_width">@dimen/playerIcon_width</item>
         <item name="android:layout_height">@dimen/playerIcon_width</item>
-        <item name="android:layout_marginLeft">@dimen/playerIcon_margin</item>
-        <item name="android:layout_marginRight">@dimen/playerIcon_margin</item>
+        <item name="android:layout_marginLeft">@dimen/playerIcon_padding</item>
+        <item name="android:layout_marginRight">@dimen/playerIcon_padding</item>
         <item name="android:layout_gravity">center</item>
     </style>
 
