@@ -139,8 +139,11 @@ public class ReversiActivity extends Activity {
         int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
 		int bMargin = (int) getResources().getDimension(R.dimen.space_margin);
 
+//        grid.setWeightSum(b.height()); // Attempting to scale board to all screens
         for (int y = 0; y < b.height(); y++) {
 			TableRow row = new TableRow(this);
+//            TableLayout.LayoutParams tParams = new TableLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
+//            row.setLayoutParams(tParams);
             row.setWeightSum(b.width());
             for (int x = 0; x < b.width(); x++) {
                 BoardSpace space = b.getSpaceAt(x, y);
@@ -153,7 +156,6 @@ public class ReversiActivity extends Activity {
             }
 			grid.addView(row);
         }
-
 		grid.setVisibility(View.VISIBLE);
     }
 
