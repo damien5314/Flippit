@@ -13,15 +13,18 @@
 
 		<ImageView
 			android:id="@+id/turnIndicator"
+            android:src="@drawable/ic_turn_indicator_p1"
 			style="@style/TurnIndicator"/>
 
 		<TextView
 			android:id="@+id/p1score"
+            android:text="88"
 			android:layout_toLeftOf="@id/turnIndicator"
 			style="@style/ScoreValue"/>
 
 		<TextView
 			android:id="@+id/p2score"
+            android:text="88"
 			android:layout_toRightOf="@id/turnIndicator"
 			style="@style/ScoreValue"/>
 

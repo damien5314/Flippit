@@ -20,20 +20,10 @@
 	<dimen name="scoreValue_padding">15dp</dimen>
 	<dimen name="scoreValue_size">16sp</dimen>
 
-	<color name="gameBoard_color">#42A321</color>
-
     <dimen name="space_border_width">1dp</dimen>
     <dimen name="space_corner_radius">6dp</dimen>
     <dimen name="space_row_height">48dp</dimen>
     <dimen name="space_margin">2dp</dimen>
-
-	<integer name="cpu_turn_delay">1000</integer>
-
-    <bool name="p1_cpu">false</bool>
-    <bool name="p2_cpu">true</bool>
-
-    <integer name="fadeOutDuration">150</integer>
-    <integer name="fadeInDuration">150</integer>
 
     <dimen name="how_to_play_header_size">36dp</dimen>
 	<dimen name="how_to_play_header_padding">10dp</dimen>
@@ -41,5 +31,12 @@
 	<dimen name="how_to_play_text_size">24sp</dimen>
 
 	<dimen name="how_to_play_image_padding">10dp</dimen>
+
+    <color name="gameBoard_color">#42A321</color>
+    <integer name="cpu_turn_delay">1000</integer>
+    <bool name="p1_cpu">false</bool>
+    <bool name="p2_cpu">true</bool>
+    <integer name="fadeOutDuration">150</integer>
+    <integer name="fadeInDuration">150</integer>
 
 </resources>
