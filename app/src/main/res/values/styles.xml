@@ -35,6 +35,7 @@
         <item name="android:layout_height">@dimen/playerIcon_width</item>
         <item name="android:layout_marginLeft">@dimen/playerIcon_padding</item>
         <item name="android:layout_marginRight">@dimen/playerIcon_padding</item>
+		<item name="android:radius">@dimen/playerIcon_corner_radius</item>
         <item name="android:layout_gravity">center</item>
     </style>
 
