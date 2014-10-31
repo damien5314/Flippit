@@ -32,14 +32,12 @@
             android:id="@+id/p1_icon"
             style="@style/PlayerIcon"
             android:background="@drawable/player_icon_p1"
-            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"/>
 
         <ImageView
             android:id="@+id/p2_icon"
             style="@style/PlayerIcon"
             android:background="@drawable/player_icon_p2"
-            android:layout_centerVertical="true"
             android:layout_alignParentRight="true"/>
 
 		<TextView
@@ -58,13 +56,13 @@
 
 	</RelativeLayout>
 
-	<!--<TableLayout-->
-		<!--android:id="@+id/GameGrid"-->
-		<!--style="@style/GameBoardTable"/>-->
+	<TableLayout
+		android:id="@+id/GameGrid"
+		style="@style/GameBoardTable"/>
 
 	<!--<LinearLayout-->
 		<!--style="@style/GameBoardBottomMargin"/>-->
-
+<!--
 	<TableLayout
 		android:id="@+id/GameGrid"
 		style="@style/GameBoardTable">
@@ -478,5 +476,5 @@
 		</TableRow>
 
 	</TableLayout>
-
+-->
 </LinearLayout>
