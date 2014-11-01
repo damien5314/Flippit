@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,6 +25,12 @@ public class HowToPlayActivity extends FragmentActivity {
     private static final String TAG = HowToPlayActivity.class.getSimpleName();
     ViewPager pager;
     HowToPlayPageAdapter pageAdapter;
+	final int[] FRAGMENT_LAYOUT_ID = new int[] {
+			R.layout.activity_howtoplay_p1,
+			R.layout.activity_howtoplay_p2,
+			R.layout.activity_howtoplay_p3,
+			R.layout.activity_howtoplay_p4
+	};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,17 +45,9 @@ public class HowToPlayActivity extends FragmentActivity {
 
     private List<Fragment> getFragments() {
         List<Fragment> flist = new ArrayList<Fragment>();
-        final int[] FRAGMENT_LAYOUT_ID = new int[] {
-                R.layout.activity_howtoplay_p1,
-                R.layout.activity_howtoplay_p2,
-                R.layout.activity_howtoplay_p3,
-                R.layout.activity_howtoplay_p4
-        };
-
         for (int id : FRAGMENT_LAYOUT_ID) {
             flist.add(HowToPlayFragment.newInstance(id));
         }
-
         return flist;
     }
 
@@ -71,9 +70,14 @@ public class HowToPlayActivity extends FragmentActivity {
         }
     }
 
+	MenuItem previous, next;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.how_to_play, menu);
+		previous = menu.getItem(0);
+		next = menu.getItem(1);
+		updateMenuItemState();
         return true;
     }
 
@@ -81,14 +85,27 @@ public class HowToPlayActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.previous:
-                if (pager.getCurrentItem() > 0)
-                    pager.setCurrentItem(pager.getCurrentItem()-1);
-                return true;
+				pager.setCurrentItem(pager.getCurrentItem()-1);
+				break;
             case R.id.next:
-                if (pager.getCurrentItem() < pager.getChildCount())
-                    pager.setCurrentItem(pager.getCurrentItem()+1);
-                return true;
+				pager.setCurrentItem(pager.getCurrentItem()+1);
+				break;
         }
-        return super.onOptionsItemSelected(item);
+		updateMenuItemState();
+        return true;
     }
+
+	private void updateMenuItemState() {
+		Log.d(TAG, "Child Count: " + pager.getChildCount());
+		Log.d(TAG, "Current Item: " + pager.getCurrentItem());
+		if (pager.getCurrentItem() == 0)
+			previous.setEnabled(false);
+		else
+			previous.setEnabled(true);
+
+		if (pager.getCurrentItem() == FRAGMENT_LAYOUT_ID.length - 1)
+			next.setEnabled(false);
+		else
+			next.setEnabled(true);
+	}
 }
