@@ -27,6 +27,7 @@ import com.ddiehl.android.reversi.game.ComputerAI;
 import com.ddiehl.android.reversi.game.Player;
 import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.utils.BoardIterator;
+import com.ddiehl.android.reversi.utils.GameStorage;
 
 
 public class ReversiActivity extends Activity {

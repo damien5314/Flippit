@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.activities;
+package com.ddiehl.android.reversi.utils;
 
 
 import android.content.Context;
@@ -6,7 +6,6 @@ import android.content.Context;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ReversiColor;
-import com.ddiehl.android.reversi.utils.BoardIterator;
 
 public class GameStorage {
     private static final String TAG = GameStorage.class.getSimpleName();
