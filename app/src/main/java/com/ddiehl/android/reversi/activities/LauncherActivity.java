@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
 
@@ -23,11 +22,10 @@ public class LauncherActivity extends Activity {
     }
 
     public void start1p(View view) {
-        Intent i = new Intent(this, ReversiActivity.class);
-        startActivity(i);
+        startActivity(new Intent(this, ReversiActivity.class));
     }
 
     public void startMultiplayer(View view) {
-        Toast.makeText(this, getString(R.string.coming_soon), Toast.LENGTH_SHORT).show();
+		startActivity(new Intent(this, MultiplayerGameSelectionActivity.class));
     }
 }

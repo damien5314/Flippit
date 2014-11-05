@@ -22,7 +22,6 @@
     <Button
         style="@style/CallToActionButton"
         android:id="@+id/button_start_mp"
-        android:textStyle="italic"
         android:text="@string/button_start_mp"
         android:onClick="startMultiplayer" />
 

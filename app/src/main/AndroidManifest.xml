@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ddiehl.android.reversi" >
 
@@ -8,36 +7,38 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <meta-data
+            android:name="com.google.android.gms.games.APP_ID"
+            android:value="@string/app_id" />
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
 
-		<meta-data android:name="com.google.android.gms.games.APP_ID"
-				   android:value="@string/app_id" />
-
-		<meta-data android:name="com.google.android.gms.version"
-				   android:value="@integer/google_play_services_version" />
-
-        <activity android:name="com.ddiehl.android.reversi.activities.LauncherActivity"
+        <activity
+            android:name=".activities.LauncherActivity"
             android:label="@string/activity_launcher_title" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.ddiehl.android.reversi.activities.ReversiActivity"
+            android:name=".activities.ReversiActivity"
             android:label="@string/app_name" >
         </activity>
-
         <activity
-            android:name="com.ddiehl.android.reversi.activities.SettingsActivity"
+            android:name=".activities.SettingsActivity"
             android:label="@string/activity_settings_title" >
         </activity>
-
         <activity
-            android:name="com.ddiehl.android.reversi.activities.HowToPlayActivity"
+            android:name=".activities.HowToPlayActivity"
             android:label="@string/activity_howToPlay_title" >
         </activity>
-
+        <activity
+            android:name=".activities.MultiplayerGameSelectionActivity"
+            android:label="@string/title_activity_multiplayer_game_selection" >
+        </activity>
     </application>
 
 </manifest>

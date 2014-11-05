@@ -5,50 +5,52 @@
     <string name="activity_launcher_title">Flippit</string>
     <string name="activity_settings_title">Settings</string>
     <string name="activity_howToPlay_title">How to Play</string>
-
     <string name="action_new_game">New Game</string>
     <string name="action_settings">Settings</string>
     <string name="action_howtoplay">How to Play</string>
     <string name="action_htp_previous">Prev</string>
     <string name="action_htp_next">Next</string>
-
     <string name="player1_label_default">Player 1</string>
     <string name="player2_label">Computer</string>
     <string name="bad_move">Error: Invalid Move</string>
     <string name="no_moves">No moves for\u0020</string> <!-- Use \u0020 to add a space at end -->
-	<string name="winner_p1">You win</string>
-	<string name="winner_cpu">CPU wins</string>
-	<string name="winner_none">No winner</string>
+    <string name="winner_p1">You win</string>
+    <string name="winner_cpu">CPU wins</string>
+    <string name="winner_none">No winner</string>
     <string name="button_start_1p">Single Player</string>
     <string name="button_start_mp">Multiplayer</string>
     <string name="coming_soon">Coming Soon</string>
-
-	<string name="pref_player_name_title">Player Name</string>
-	<string name="pref_cat_ai">Computer AI</string>
-	<string name="pref_ComputerAI_label">Enabled</string>
-	<string name="pref_ai_difficulty">Difficulty</string>
-	<string name="pref_ai_difficulty_def">Easy</string>
+    <string name="pref_player_name_title">Player Name</string>
+    <string name="pref_cat_ai">Computer AI</string>
+    <string name="pref_ComputerAI_label">Enabled</string>
+    <string name="pref_ai_difficulty">Difficulty</string>
+    <string name="pref_ai_difficulty_def">Easy</string>
 
     <string name="how_to_play_p1">
-        In Reversi there are two players, each represented by light or dark spaces on the game board.
+		In Reversi there are two players, each represented by light or dark spaces on the game board.
         The objective is to capture more spaces on the game board than your opponent.
-    </string>
+	</string>
 
     <string name="how_to_play_p2">
-        Players take turns claiming spaces with at least one of their opponent\'s pieces in between the claimed space and one of their own spaces.
+		Players take turns claiming spaces with at least one of their opponent\'s pieces in between the claimed space and one of their own spaces.
         After claiming a space, all of the opponent\'s spaces in between the claimed space and one of their own spaces are claimed by the player.
-    </string>
+	</string>
 
     <string name="how_to_play_p3">
-        If at any point in the game a player has no valid moves, the turn will be passed back to the other player.
+		If at any point in the game a player has no valid moves, the turn will be passed back to the other player.
         The game continues until neither player has any valid moves, or all spaces on the game board are claimed.
-    </string>
+	</string>
 
     <string name="how_to_play_p4_header">Strategy</string>
     <string name="how_to_play_p4">
-        A good starting strategy for Reversi is to focus on claiming "stable" spaces which are unable to be flanked by your opponent later in the game.
+		A good starting strategy for Reversi is to focus on claiming "stable" spaces which are unable to be flanked by your opponent later in the game.
         The four corner spaces are considered to be the most valuable, followed by spaces along the edges.
         Spaces immediately adjacent to the corners and edges should be avoided as these provide an opportunity for your opponent to claim stable spaces.
-    </string>
+	</string>
+
+    <string name="title_activity_multiplayer_game_selection">Multiplayer</string>
+	<string name="match_selection_item_default">Unknown Opponent</string>
+	<string name="menu_multiplayer_new_match">Find New Match</string>
+	<string name="menu_multiplayer_new_match_condensed">Find New Match</string>
 
 </resources>
