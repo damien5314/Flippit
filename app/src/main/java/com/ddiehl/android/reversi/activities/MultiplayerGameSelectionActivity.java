@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
@@ -22,6 +23,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 import com.google.android.gms.plus.Plus;
@@ -36,7 +38,10 @@ public class MultiplayerGameSelectionActivity extends Activity
 	private ArrayList<String> mMatchList;
 
     private static final int REQUEST_RESOLVE_ERROR = 1001;
-    private static final String STATE_RESOLVING_ERROR = "resolving_error";
+	private static final int REQUEST_LOOK_AT_MATCHES = 1002;
+	private static final int RC_SELECT_PLAYERS = 1003;
+
+	private static final String STATE_RESOLVING_ERROR = "resolving_error";
     private static final String DIALOG_ERROR = "dialog_error";
 
     // Client used to interact with Google APIs
@@ -48,7 +53,12 @@ public class MultiplayerGameSelectionActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_multiplayer_game_selection);
+//		setContentView(R.layout.activity_multiplayer_game_selection);
+		setContentView(R.layout.activity_reversi);
+
+		// Clear player names in score overlay
+		((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
+		((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
 
         // Create the Google API Client with access to Plus and Games
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -58,11 +68,11 @@ public class MultiplayerGameSelectionActivity extends Activity
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
 
-		mMatchList = new ArrayList<String>();
-
-		mListView = (ListView) findViewById(R.id.matchList);
-		mListAdapter = new MatchSelectionAdapter(this, R.layout.activity_multiplayer_game_selection_item, mMatchList);
-		mListView.setAdapter(mListAdapter);
+//		mMatchList = new ArrayList<String>();
+//
+//		mListView = (ListView) findViewById(R.id.matchList);
+//		mListAdapter = new MatchSelectionAdapter(this, R.layout.activity_multiplayer_game_selection_item, mMatchList);
+//		mListView.setAdapter(mListAdapter);
     }
 
     @Override
@@ -84,6 +94,12 @@ public class MultiplayerGameSelectionActivity extends Activity
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "Connected to Google Play Services");
+
+		((TextView) findViewById(R.id.p1_label)).setText(
+				Games.Players.getCurrentPlayer(mGoogleApiClient).getDisplayName());
+
+//		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
+//		startActivityForResult(intent, REQUEST_LOOK_AT_MATCHES);
     }
 
     @Override
@@ -95,19 +111,21 @@ public class MultiplayerGameSelectionActivity extends Activity
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "Failed to connect to Google Play services.");
-		Log.d(TAG, "ErrorCode: " + result.getErrorCode());
         if (mResolvingError) {
             // Already attempting to resolve an error.
             return;
         } else if (result.hasResolution()) {
+			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
                 mResolvingError = true;
                 result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
+				Log.e(TAG, "Unable to start resolution intent; Exception: " + e.getMessage());
                 // There was an error with the resolution intent. Try again.
                 mGoogleApiClient.connect();
             }
         } else {
+			Log.d(TAG, "Unresolvable error (ErrorCode: " + result.getErrorCode() + ")");
             showErrorDialog(result.getErrorCode());
             mResolvingError = true;
         }
@@ -167,7 +185,6 @@ public class MultiplayerGameSelectionActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-	private final static int RC_SELECT_PLAYERS = 1002;
 	public void findNewMatch() {
 		if (mGoogleApiClient.isConnected()) {
 			Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
@@ -190,6 +207,17 @@ public class MultiplayerGameSelectionActivity extends Activity
 						}
 						break;
 				}
+				break;
+
+			case REQUEST_LOOK_AT_MATCHES: // Returned from the 'Select Match' dialog
+				if (resultCode != Activity.RESULT_OK)// User canceled
+					break;
+
+				TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+				if (match != null) {
+					updateMatch(match);
+				}
+				Log.d(TAG, "Match: " + match.getMatchId());
 				break;
 
 			case RC_SELECT_PLAYERS: // Returned from 'Select players to Invite' dialog
@@ -233,6 +261,59 @@ public class MultiplayerGameSelectionActivity extends Activity
 //				showSpinner();
 				break;
 		}
+	}
+
+	// This is the main function that gets called when players choose a match
+	// from the inbox, or else create a match and want to start it.
+	public void updateMatch(TurnBasedMatch match) {
+		/*mMatch = match;
+
+		int status = match.getStatus();
+		int turnStatus = match.getTurnStatus();
+
+		switch (status) {
+			case TurnBasedMatch.MATCH_STATUS_CANCELED:
+				showWarning("Canceled!", "This game was canceled!");
+				return;
+			case TurnBasedMatch.MATCH_STATUS_EXPIRED:
+				showWarning("Expired!", "This game is expired.  So sad!");
+				return;
+			case TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING:
+				showWarning("Waiting for auto-match...",
+						"We're still waiting for an automatch partner.");
+				return;
+			case TurnBasedMatch.MATCH_STATUS_COMPLETE:
+				if (turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE) {
+					showWarning(
+							"Complete!",
+							"This game is over; someone finished it, and so did you!  There is nothing to be done.");
+					break;
+				}
+
+				// Note that in this state, you must still call "Finish" yourself,
+				// so we allow this to continue.
+				showWarning("Complete!",
+						"This game is over; someone finished it!  You can only finish it now.");
+		}
+
+		// OK, it's active. Check on turn status.
+		switch (turnStatus) {
+			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
+				mTurnData = SkeletonTurn.unpersist(mMatch.getData());
+				setGameplayUI();
+				return;
+			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
+				// Should return results.
+				showWarning("Alas...", "It's not your turn.");
+				break;
+			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
+				showWarning("Good inititative!",
+						"Still waiting for invitations.\n\nBe patient!");
+		}
+
+		mTurnData = null;
+
+		setViewVisibility();*/
 	}
 
 }
