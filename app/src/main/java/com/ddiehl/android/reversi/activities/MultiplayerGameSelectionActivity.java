@@ -11,13 +11,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.adapters.MatchSelectionAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 import com.google.android.gms.plus.Plus;
 
 import java.util.ArrayList;
@@ -89,6 +95,7 @@ public class MultiplayerGameSelectionActivity extends Activity
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "Failed to connect to Google Play services.");
+		Log.d(TAG, "ErrorCode: " + result.getErrorCode());
         if (mResolvingError) {
             // Already attempting to resolve an error.
             return;
@@ -141,21 +148,6 @@ public class MultiplayerGameSelectionActivity extends Activity
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case REQUEST_RESOLVE_ERROR:
-                mResolvingError = false;
-                switch (resultCode) {
-                    case RESULT_OK:
-                        if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
-                            mGoogleApiClient.connect();
-                        }
-                        break;
-                }
-                break;
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -175,12 +167,72 @@ public class MultiplayerGameSelectionActivity extends Activity
         return super.onOptionsItemSelected(item);
     }
 
-	private final static int RC_SELECT_PLAYERS = 1001;
+	private final static int RC_SELECT_PLAYERS = 1002;
 	public void findNewMatch() {
-		Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
-		startActivityForResult(intent, RC_SELECT_PLAYERS);
+		if (mGoogleApiClient.isConnected()) {
+			Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
+			startActivityForResult(intent, RC_SELECT_PLAYERS);
+		} else
+			Toast.makeText(this, "Error: GoogleApiClient not connected", Toast.LENGTH_SHORT).show();
 	}
 
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+
+			case REQUEST_RESOLVE_ERROR:
+				mResolvingError = false;
+				switch (resultCode) {
+					case RESULT_OK:
+						if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
+							mGoogleApiClient.connect();
+						}
+						break;
+				}
+				break;
+
+			case RC_SELECT_PLAYERS: // Returned from 'Select players to Invite' dialog
+				if (resultCode != Activity.RESULT_OK) {
+					// user canceled
+					return;
+				}
+
+				// Get the invitee list
+				final ArrayList<String> invitees = data
+						.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+
+				// Get automatch criteria
+				Bundle autoMatchCriteria = null;
+
+				int minAutoMatchPlayers = data.getIntExtra(
+						Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
+				int maxAutoMatchPlayers = data.getIntExtra(
+						Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
+
+				if (minAutoMatchPlayers > 0) {
+					autoMatchCriteria = RoomConfig.createAutoMatchCriteria(
+							minAutoMatchPlayers, maxAutoMatchPlayers, 0);
+				} else {
+					autoMatchCriteria = null;
+				}
+
+				TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
+						.addInvitedPlayers(invitees)
+						.setAutoMatchCriteria(autoMatchCriteria).build();
+
+				// Start the match
+				Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback(
+						new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
+							@Override
+							public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
+								Log.d(TAG, "TurnBasedMultiplayer match created");
+//								processResult(result);
+							}
+						});
+//				showSpinner();
+				break;
+		}
+	}
 
 }
