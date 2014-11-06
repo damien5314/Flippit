@@ -56,4 +56,14 @@
 	<string name="menu_select_match">Select Match</string>
 	<string name="menu_select_match_condensed">Select</string>
 
+	<!-- Game status errors -->
+	<string name="status_multiplayer_error_not_trusted_tester">Untrusted test account</string>
+	<string name="match_error_already_rematched">Already rematched</string>
+	<string name="network_error_operation_failed">Network operation failed</string>
+	<string name="client_reconnect_required">Client reconnect required</string>
+	<string name="internal_error">Internal error</string>
+	<string name="match_error_inactive_match">Inactive match</string>
+	<string name="match_error_locally_modified">Match locally modified</string>
+	<string name="unexpected_status">Unexpected match status</string>
+
 </resources>

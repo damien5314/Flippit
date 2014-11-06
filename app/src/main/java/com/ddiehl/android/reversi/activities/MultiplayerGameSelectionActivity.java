@@ -1,6 +1,7 @@
 package com.ddiehl.android.reversi.activities;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
@@ -10,17 +11,25 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.adapters.MatchSelectionAdapter;
+import com.ddiehl.android.reversi.game.Board;
+import com.ddiehl.android.reversi.game.BoardSpace;
+import com.ddiehl.android.reversi.utils.GameStorage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
@@ -41,17 +50,25 @@ public class MultiplayerGameSelectionActivity extends Activity
 	private static final int REQUEST_LOOK_AT_MATCHES = 1002;
 	private static final int RC_SELECT_PLAYERS = 1003;
 
+	private AlertDialog mAlertDialog;
+
 	private static final String STATE_RESOLVING_ERROR = "resolving_error";
     private static final String DIALOG_ERROR = "dialog_error";
 
     // Client used to interact with Google APIs
     private GoogleApiClient mGoogleApiClient;
 
+	private TurnBasedMatch mMatch;
+	private Board mGameData;
+
     // Are we currently resolving a connection failure?
     private boolean mResolvingError = false;
 
 	// Is there a match already loaded?
 	private boolean mMatchLoaded = false;
+
+	// Should I be showing the turn API?
+	public boolean isDoingTurn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -263,18 +280,83 @@ public class MultiplayerGameSelectionActivity extends Activity
 							@Override
 							public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 								Log.d(TAG, "TurnBasedMultiplayer match created");
-//								processResult(result);
+								processResult(result);
 							}
 						});
-//				showSpinner();
+				showSpinner();
 				break;
 		}
+	}
+
+	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
+		TurnBasedMatch match = result.getMatch();
+		dismissSpinner();
+
+		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
+			return;
+		}
+
+		if (match.getData() != null) {
+			// This is a game that has already started, so I'll just start
+			updateMatch(match);
+			return;
+		}
+
+		startMatch(match);
+	}
+
+	public void processResult(TurnBasedMultiplayer.UpdateMatchResult result) {
+		TurnBasedMatch match = result.getMatch();
+		dismissSpinner();
+		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
+			return;
+		}
+		if (match.canRematch()) {
+//			askForRematch();
+		}
+
+		isDoingTurn = (match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
+
+		if (isDoingTurn) {
+			updateMatch(match);
+			return;
+		}
+
+//		setViewVisibility();
+	}
+
+	// startMatch() happens in response to the createTurnBasedMatch()
+	// above. This is only called on success, so we should have a
+	// valid match object. We're taking this opportunity to setup the
+	// game, saving our initial state. Calling takeTurn() will
+	// callback to OnTurnBasedMatchUpdated(), which will show the game
+	// UI.
+	public void startMatch(TurnBasedMatch match) {
+		mGameData = Board.getInstance(this);
+		// Some basic turn data
+//		mGameData.data = "First turn";
+
+		mMatch = match;
+
+		String playerId = Games.Players.getCurrentPlayerId(mGoogleApiClient);
+		String myParticipantId = mMatch.getParticipantId(playerId);
+
+		showSpinner();
+
+		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
+				GameStorage.serialize(mGameData).getBytes(), myParticipantId).setResultCallback(
+				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+					@Override
+					public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
+						processResult(result);
+					}
+				});
 	}
 
 	// This is the main function that gets called when players choose a match
 	// from the inbox, or else create a match and want to start it.
 	public void updateMatch(TurnBasedMatch match) {
-		/*mMatch = match;
+		mMatch = match;
 
 		int status = match.getStatus();
 		int turnStatus = match.getTurnStatus();
@@ -307,8 +389,8 @@ public class MultiplayerGameSelectionActivity extends Activity
 		// OK, it's active. Check on turn status.
 		switch (turnStatus) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-				mTurnData = SkeletonTurn.unpersist(mMatch.getData());
-				setGameplayUI();
+				GameStorage.deserialize(this, mMatch.getData().toString());
+				displayBoard();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
 				// Should return results.
@@ -319,9 +401,128 @@ public class MultiplayerGameSelectionActivity extends Activity
 						"Still waiting for invitations.\n\nBe patient!");
 		}
 
-		mTurnData = null;
+		mGameData = null;
 
-		setViewVisibility();*/
+//		setViewVisibility();
 	}
 
+	public void showSpinner() {
+		findViewById(R.id.progressLayout).setVisibility(View.VISIBLE);
+	}
+
+	public void dismissSpinner() {
+		findViewById(R.id.progressLayout).setVisibility(View.GONE);
+	}
+
+	// Generic warning/info dialog
+	public void showWarning(String title, String message) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+		// set title
+		alertDialogBuilder.setTitle(title).setMessage(message);
+
+		// set dialog message
+		alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						// if this button is clicked, close
+						// current activity
+					}
+				});
+
+		// create alert dialog
+		mAlertDialog = alertDialogBuilder.create();
+
+		// show it
+		mAlertDialog.show();
+	}
+
+	public void showErrorMessage(TurnBasedMatch match, int statusCode, int stringId) {
+		showWarning("Warning", getResources().getString(stringId));
+	}
+
+	// Returns false if something went wrong, probably. This should handle
+	// more cases, and probably report more accurate results.
+	private boolean checkStatusCode(TurnBasedMatch match, int statusCode) {
+		switch (statusCode) {
+			case GamesStatusCodes.STATUS_OK:
+				return true;
+			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED:
+				// This is OK; the action is stored by Google Play Services and will
+				// be dealt with later.
+				Toast.makeText(
+						this,
+						"Stored action for later. (Please remove this toast before release.)",
+						Toast.LENGTH_SHORT).show();
+				// NOTE: This toast is for informative reasons only; please remove
+				// it from your final application.
+				return true;
+			case GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
+				showErrorMessage(match, statusCode,
+						R.string.status_multiplayer_error_not_trusted_tester);
+				break;
+			case GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED:
+				showErrorMessage(match, statusCode,
+						R.string.match_error_already_rematched);
+				break;
+			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED:
+				showErrorMessage(match, statusCode,
+						R.string.network_error_operation_failed);
+				break;
+			case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
+				showErrorMessage(match, statusCode,
+						R.string.client_reconnect_required);
+				break;
+			case GamesStatusCodes.STATUS_INTERNAL_ERROR:
+				showErrorMessage(match, statusCode, R.string.internal_error);
+				break;
+			case GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH:
+				showErrorMessage(match, statusCode,
+						R.string.match_error_inactive_match);
+				break;
+			case GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED:
+				showErrorMessage(match, statusCode,
+						R.string.match_error_locally_modified);
+				break;
+			default:
+				showErrorMessage(match, statusCode, R.string.unexpected_status);
+				Log.d(TAG, "Did not have warning or string to deal with: "
+						+ statusCode);
+		}
+
+		return false;
+	}
+
+	// This is duplicated between the single player activity and multiplayer activity
+	// Consider refactoring this to a static method in another class to decrease code duplication
+	private void displayBoard() {
+		TableLayout grid = (TableLayout) findViewById(R.id.GameGrid);
+		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
+		grid.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+		grid.removeAllViews();
+
+		int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
+		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
+
+//        grid.setWeightSum(b.height()); // Attempting to scale board to all screens
+		for (int y = 0; y < mGameData.height(); y++) {
+			TableRow row = new TableRow(this);
+//            TableLayout.LayoutParams tParams = new TableLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
+//            row.setLayoutParams(tParams);
+			row.setWeightSum(mGameData.width());
+			for (int x = 0; x < mGameData.width(); x++) {
+				BoardSpace space = mGameData.getSpaceAt(x, y);
+//                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
+				params.setMargins(bMargin, bMargin, bMargin, bMargin);
+				space.setLayoutParams(params);
+//				space.setOnClickListener(claim(space)); // Need to change this to a method for multiplayer turn taking
+				row.addView(space);
+			}
+			grid.addView(row);
+		}
+		grid.setVisibility(View.VISIBLE);
+	}
 }
