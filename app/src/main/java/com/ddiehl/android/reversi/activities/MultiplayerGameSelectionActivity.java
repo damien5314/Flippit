@@ -1,6 +1,6 @@
 package com.ddiehl.android.reversi.activities;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -8,10 +8,11 @@ import android.widget.ListView;
 
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.adapters.MatchSelectionAdapter;
+import com.google.android.gms.games.Games;
 
 import java.util.ArrayList;
 
-public class MultiplayerGameSelectionActivity extends Activity {
+public class MultiplayerGameSelectionActivity extends GooglePlayConnectedActivity {
 	private final static String TAG = MultiplayerGameSelectionActivity.class.getSimpleName();
 	private ListView mListView;
 	private MatchSelectionAdapter mListAdapter;
@@ -41,11 +42,17 @@ public class MultiplayerGameSelectionActivity extends Activity {
         int id = item.getItemId();
 		switch(id) {
 			case R.id.findNewMatch:
+				findNewMatch();
 				return true;
 		}
         return super.onOptionsItemSelected(item);
     }
 
+	private final static int RC_SELECT_PLAYERS = 1001;
+	public void findNewMatch() {
+		Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mClient, 1, 1, true);
+		startActivityForResult(intent, RC_SELECT_PLAYERS);
+	}
 
 
 
