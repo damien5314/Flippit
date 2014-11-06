@@ -52,6 +52,8 @@
     <string name="title_activity_multiplayer_game_selection">Multiplayer</string>
 	<string name="match_selection_item_default">Unknown Match</string>
 	<string name="menu_multiplayer_new_match">New Match</string>
-	<string name="menu_multiplayer_new_match_condensed">New Match</string>
+	<string name="menu_multiplayer_new_match_condensed">New</string>
+	<string name="menu_select_match">Select Match</string>
+	<string name="menu_select_match_condensed">Select</string>
 
 </resources>

@@ -50,6 +50,9 @@ public class MultiplayerGameSelectionActivity extends Activity
     // Are we currently resolving a connection failure?
     private boolean mResolvingError = false;
 
+	// Is there a match already loaded?
+	private boolean mMatchLoaded = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,8 +101,6 @@ public class MultiplayerGameSelectionActivity extends Activity
 		((TextView) findViewById(R.id.p1_label)).setText(
 				Games.Players.getCurrentPlayer(mGoogleApiClient).getDisplayName());
 
-//		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
-//		startActivityForResult(intent, REQUEST_LOOK_AT_MATCHES);
     }
 
     @Override
@@ -181,6 +182,9 @@ public class MultiplayerGameSelectionActivity extends Activity
 			case R.id.findNewMatch:
 				findNewMatch();
 				return true;
+			case R.id.selectMatch:
+				selectMatch();
+				return true;
 		}
         return super.onOptionsItemSelected(item);
     }
@@ -193,6 +197,10 @@ public class MultiplayerGameSelectionActivity extends Activity
 			Toast.makeText(this, "Error: GoogleApiClient not connected", Toast.LENGTH_SHORT).show();
 	}
 
+	public void selectMatch() {
+		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
+		startActivityForResult(intent, REQUEST_LOOK_AT_MATCHES);
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -215,9 +223,9 @@ public class MultiplayerGameSelectionActivity extends Activity
 
 				TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
 				if (match != null) {
+					Log.d(TAG, "Selected match: " + match.getMatchId());
 					updateMatch(match);
 				}
-				Log.d(TAG, "Match: " + match.getMatchId());
 				break;
 
 			case RC_SELECT_PLAYERS: // Returned from 'Select players to Invite' dialog
