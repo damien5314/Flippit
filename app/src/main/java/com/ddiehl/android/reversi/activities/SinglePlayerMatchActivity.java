@@ -29,8 +29,8 @@ import com.ddiehl.android.reversi.utils.BoardIterator;
 import com.ddiehl.android.reversi.utils.GameStorage;
 
 
-public class ReversiActivity extends Activity {
-	private static final String TAG = ReversiActivity.class.getSimpleName();
+public class SinglePlayerMatchActivity extends Activity {
+	private static final String TAG = SinglePlayerMatchActivity.class.getSimpleName();
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
     private static final String PREF_GAME_STATE = "key_gamePrefs";
@@ -89,7 +89,7 @@ public class ReversiActivity extends Activity {
                 && sp.contains(PREF_BOARD_STATE)) {
             currentPlayer = (sp.getBoolean(PREF_CURRENT_PLAYER, true) ? p1 : p2);
             firstTurn = (sp.getBoolean(PREF_FIRST_TURN, true) ? p1 : p2);
-            GameStorage.deserialize(this, sp.getString(PREF_BOARD_STATE, ""));
+            GameStorage.deserialize(this, sp.getString(PREF_BOARD_STATE, "").getBytes());
             return true;
         }
         return false;
@@ -100,7 +100,7 @@ public class ReversiActivity extends Activity {
         SharedPreferences.Editor e = sp.edit();
         e.putBoolean(PREF_CURRENT_PLAYER, (currentPlayer == p1));
         e.putBoolean(PREF_FIRST_TURN, (firstTurn == p1));
-        e.putString(PREF_BOARD_STATE, GameStorage.serialize(b));
+        e.putString(PREF_BOARD_STATE, GameStorage.serialize(b).toString());
         e.apply();
     }
 
@@ -286,7 +286,7 @@ public class ReversiActivity extends Activity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.single_player, menu);
         return true;
     }
 

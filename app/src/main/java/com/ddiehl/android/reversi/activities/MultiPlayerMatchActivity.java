@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
@@ -23,6 +24,8 @@ import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.adapters.MatchSelectionAdapter;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;
+import com.ddiehl.android.reversi.game.ReversiColor;
+import com.ddiehl.android.reversi.utils.BoardIterator;
 import com.ddiehl.android.reversi.utils.GameStorage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -31,6 +34,7 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.Participant;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig;
@@ -39,9 +43,9 @@ import com.google.android.gms.plus.Plus;
 
 import java.util.ArrayList;
 
-public class MultiplayerGameSelectionActivity extends Activity
+public class MultiPlayerMatchActivity extends Activity
             implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-	private final static String TAG = MultiplayerGameSelectionActivity.class.getSimpleName();
+	private final static String TAG = MultiPlayerMatchActivity.class.getSimpleName();
 	private ListView mListView;
 	private MatchSelectionAdapter mListAdapter;
 	private ArrayList<String> mMatchList;
@@ -59,7 +63,8 @@ public class MultiplayerGameSelectionActivity extends Activity
     private GoogleApiClient mGoogleApiClient;
 
 	private TurnBasedMatch mMatch;
-	private Board mGameData;
+	private Board board;
+	private byte[] mGameData;
 
     // Are we currently resolving a connection failure?
     private boolean mResolvingError = false;
@@ -75,6 +80,7 @@ public class MultiplayerGameSelectionActivity extends Activity
         super.onCreate(savedInstanceState);
 //		setContentView(R.layout.activity_multiplayer_game_selection);
 		setContentView(R.layout.activity_reversi);
+		board = Board.getInstance(this);
 
 		// Clear player names in score overlay
 		((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
@@ -114,10 +120,7 @@ public class MultiplayerGameSelectionActivity extends Activity
     @Override
     public void onConnected(Bundle bundle) {
         Log.d(TAG, "Connected to Google Play Services");
-
-		((TextView) findViewById(R.id.p1_label)).setText(
-				Games.Players.getCurrentPlayer(mGoogleApiClient).getDisplayName());
-
+		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -128,7 +131,7 @@ public class MultiplayerGameSelectionActivity extends Activity
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Failed to connect to Google Play services.");
+        Log.i(TAG, "Failed to connect to Google Play services");
         if (mResolvingError) {
             // Already attempting to resolve an error.
             return;
@@ -166,9 +169,7 @@ public class MultiplayerGameSelectionActivity extends Activity
 
     /* A fragment to display an error dialog */
     public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() {
-
-        }
+        public ErrorDialogFragment() { }
 
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -180,7 +181,7 @@ public class MultiplayerGameSelectionActivity extends Activity
 
         @Override
         public void onDismiss(DialogInterface dialog) {
-            ((MultiplayerGameSelectionActivity) getActivity()).onDialogDismissed();
+            ((MultiPlayerMatchActivity) getActivity()).onDialogDismissed();
         }
     }
 
@@ -188,7 +189,7 @@ public class MultiplayerGameSelectionActivity extends Activity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.multiplayer_game_selection, menu);
+        getMenuInflater().inflate(R.menu.multi_player, menu);
         return true;
     }
 
@@ -207,14 +208,19 @@ public class MultiplayerGameSelectionActivity extends Activity
     }
 
 	public void findNewMatch() {
-		if (mGoogleApiClient.isConnected()) {
-			Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
-			startActivityForResult(intent, RC_SELECT_PLAYERS);
-		} else
+		if (!mGoogleApiClient.isConnected()) {
 			Toast.makeText(this, "Error: GoogleApiClient not connected", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
+		startActivityForResult(intent, RC_SELECT_PLAYERS);
 	}
 
 	public void selectMatch() {
+		if (!mGoogleApiClient.isConnected()) {
+			Toast.makeText(this, "Error: GoogleApiClient not connected", Toast.LENGTH_SHORT).show();
+			return;
+		}
 		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
 		startActivityForResult(intent, REQUEST_LOOK_AT_MATCHES);
 	}
@@ -235,7 +241,7 @@ public class MultiplayerGameSelectionActivity extends Activity
 				break;
 
 			case REQUEST_LOOK_AT_MATCHES: // Returned from the 'Select Match' dialog
-				if (resultCode != Activity.RESULT_OK)// User canceled
+				if (resultCode != Activity.RESULT_OK) // User canceled
 					break;
 
 				TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
@@ -246,33 +252,27 @@ public class MultiplayerGameSelectionActivity extends Activity
 				break;
 
 			case RC_SELECT_PLAYERS: // Returned from 'Select players to Invite' dialog
-				if (resultCode != Activity.RESULT_OK) {
-					// user canceled
+				if (resultCode != Activity.RESULT_OK) // User canceled
 					return;
-				}
 
 				// Get the invitee list
-				final ArrayList<String> invitees = data
-						.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+				final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
 
 				// Get automatch criteria
 				Bundle autoMatchCriteria = null;
 
-				int minAutoMatchPlayers = data.getIntExtra(
-						Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
-				int maxAutoMatchPlayers = data.getIntExtra(
-						Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
+				int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
+				int maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
 
-				if (minAutoMatchPlayers > 0) {
-					autoMatchCriteria = RoomConfig.createAutoMatchCriteria(
-							minAutoMatchPlayers, maxAutoMatchPlayers, 0);
-				} else {
+				if (minAutoMatchPlayers > 0)
+					autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0);
+				else
 					autoMatchCriteria = null;
-				}
 
 				TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
 						.addInvitedPlayers(invitees)
-						.setAutoMatchCriteria(autoMatchCriteria).build();
+						.setAutoMatchCriteria(autoMatchCriteria)
+						.build();
 
 				// Start the match
 				Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback(
@@ -311,6 +311,7 @@ public class MultiplayerGameSelectionActivity extends Activity
 		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
 			return;
 		}
+
 		if (match.canRematch()) {
 //			askForRematch();
 		}
@@ -329,14 +330,12 @@ public class MultiplayerGameSelectionActivity extends Activity
 	// above. This is only called on success, so we should have a
 	// valid match object. We're taking this opportunity to setup the
 	// game, saving our initial state. Calling takeTurn() will
-	// callback to OnTurnBasedMatchUpdated(), which will show the game
-	// UI.
+	// callback to OnTurnBasedMatchUpdated(), which will show the game UI.
 	public void startMatch(TurnBasedMatch match) {
-		mGameData = Board.getInstance(this);
-		// Some basic turn data
-//		mGameData.data = "First turn";
-
 		mMatch = match;
+		board.reset();
+		displayBoard();
+		updateScoreDisplay();
 
 		String playerId = Games.Players.getCurrentPlayerId(mGoogleApiClient);
 		String myParticipantId = mMatch.getParticipantId(playerId);
@@ -344,7 +343,7 @@ public class MultiplayerGameSelectionActivity extends Activity
 		showSpinner();
 
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
-				GameStorage.serialize(mGameData).getBytes(), myParticipantId).setResultCallback(
+				GameStorage.serialize(board), myParticipantId).setResultCallback(
 				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 					@Override
 					public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
@@ -357,7 +356,9 @@ public class MultiplayerGameSelectionActivity extends Activity
 	// from the inbox, or else create a match and want to start it.
 	public void updateMatch(TurnBasedMatch match) {
 		mMatch = match;
-
+		mGameData = match.getData();
+		updateScoreDisplay();
+		updatePlayerNameDisplay();
 		int status = match.getStatus();
 		int turnStatus = match.getTurnStatus();
 
@@ -366,11 +367,10 @@ public class MultiplayerGameSelectionActivity extends Activity
 				showWarning("Canceled!", "This game was canceled!");
 				return;
 			case TurnBasedMatch.MATCH_STATUS_EXPIRED:
-				showWarning("Expired!", "This game is expired.  So sad!");
+				showWarning("Expired!", "This game is expired. So sad!");
 				return;
 			case TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING:
-				showWarning("Waiting for auto-match...",
-						"We're still waiting for an automatch partner.");
+				showWarning("Waiting for auto-match...", "We're still waiting for an automatch partner.");
 				return;
 			case TurnBasedMatch.MATCH_STATUS_COMPLETE:
 				if (turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE) {
@@ -389,7 +389,7 @@ public class MultiplayerGameSelectionActivity extends Activity
 		// OK, it's active. Check on turn status.
 		switch (turnStatus) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-				GameStorage.deserialize(this, mMatch.getData().toString());
+				GameStorage.deserialize(this, mMatch.getData());
 				displayBoard();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
@@ -397,13 +397,51 @@ public class MultiplayerGameSelectionActivity extends Activity
 				showWarning("Alas...", "It's not your turn.");
 				break;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-				showWarning("Good inititative!",
-						"Still waiting for invitations.\n\nBe patient!");
+				showWarning("Good inititative!", "Still waiting for invitations.\n\nBe patient!");
 		}
 
-		mGameData = null;
+//		board = null;
+	}
 
-//		setViewVisibility();
+	public void updatePlayerNameDisplay() {
+		((TextView) findViewById(R.id.p1_label)).setText(Games.Players.getCurrentPlayer(mGoogleApiClient).getDisplayName());
+		Participant opponent = mMatch.getDescriptionParticipant();
+		if (opponent != null)
+			((TextView) findViewById(R.id.p2_label)).setText(opponent.getDisplayName());
+		else
+			((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
+	}
+
+	public void updateScoreDisplay() {
+		int p1c = 0;
+		int p2c = 0;
+		BoardIterator i = new BoardIterator(board);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (s.isOwned()) {
+				if (s.getColor() == ReversiColor.White)
+					p1c++;
+				else
+					p2c++;
+			}
+		}
+		((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
+		((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
+		ImageView ti = (ImageView)findViewById(R.id.turnIndicator);
+		switch (mMatch.getTurnStatus()) {
+			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
+				ti.setImageResource(R.drawable.ic_turn_indicator_p1);
+				break;
+			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
+				ti.setImageResource(R.drawable.ic_turn_indicator_p2);
+				break;
+			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
+				ti.setImageResource(android.R.color.transparent);
+				break;
+			case TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE:
+				ti.setImageResource(android.R.color.transparent);
+				break;
+		}
 	}
 
 	public void showSpinner() {
@@ -418,10 +456,10 @@ public class MultiplayerGameSelectionActivity extends Activity
 	public void showWarning(String title, String message) {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
-		// set title
+		// Set title
 		alertDialogBuilder.setTitle(title).setMessage(message);
 
-		// set dialog message
+		// Set dialog message
 		alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
 				new DialogInterface.OnClickListener() {
 					@Override
@@ -431,10 +469,10 @@ public class MultiplayerGameSelectionActivity extends Activity
 					}
 				});
 
-		// create alert dialog
+		// Create alert dialog
 		mAlertDialog = alertDialogBuilder.create();
 
-		// show it
+		// Show it
 		mAlertDialog.show();
 	}
 
@@ -459,36 +497,29 @@ public class MultiplayerGameSelectionActivity extends Activity
 				// it from your final application.
 				return true;
 			case GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
-				showErrorMessage(match, statusCode,
-						R.string.status_multiplayer_error_not_trusted_tester);
+				showErrorMessage(match, statusCode, R.string.status_multiplayer_error_not_trusted_tester);
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED:
-				showErrorMessage(match, statusCode,
-						R.string.match_error_already_rematched);
+				showErrorMessage(match, statusCode, R.string.match_error_already_rematched);
 				break;
 			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED:
-				showErrorMessage(match, statusCode,
-						R.string.network_error_operation_failed);
+				showErrorMessage(match, statusCode, R.string.network_error_operation_failed);
 				break;
 			case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
-				showErrorMessage(match, statusCode,
-						R.string.client_reconnect_required);
+				showErrorMessage(match, statusCode, R.string.client_reconnect_required);
 				break;
 			case GamesStatusCodes.STATUS_INTERNAL_ERROR:
 				showErrorMessage(match, statusCode, R.string.internal_error);
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH:
-				showErrorMessage(match, statusCode,
-						R.string.match_error_inactive_match);
+				showErrorMessage(match, statusCode, R.string.match_error_inactive_match);
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED:
-				showErrorMessage(match, statusCode,
-						R.string.match_error_locally_modified);
+				showErrorMessage(match, statusCode, R.string.match_error_locally_modified);
 				break;
 			default:
 				showErrorMessage(match, statusCode, R.string.unexpected_status);
-				Log.d(TAG, "Did not have warning or string to deal with: "
-						+ statusCode);
+				Log.d(TAG, "Did not have warning or string to deal with: " + statusCode);
 		}
 
 		return false;
@@ -507,13 +538,13 @@ public class MultiplayerGameSelectionActivity extends Activity
 		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
 
 //        grid.setWeightSum(b.height()); // Attempting to scale board to all screens
-		for (int y = 0; y < mGameData.height(); y++) {
+		for (int y = 0; y < board.height(); y++) {
 			TableRow row = new TableRow(this);
 //            TableLayout.LayoutParams tParams = new TableLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
 //            row.setLayoutParams(tParams);
-			row.setWeightSum(mGameData.width());
-			for (int x = 0; x < mGameData.width(); x++) {
-				BoardSpace space = mGameData.getSpaceAt(x, y);
+			row.setWeightSum(board.width());
+			for (int x = 0; x < board.width(); x++) {
+				BoardSpace space = board.getSpaceAt(x, y);
 //                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
 				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);

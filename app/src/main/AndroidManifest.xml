@@ -24,7 +24,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.ReversiActivity"
+            android:name=".activities.SinglePlayerMatchActivity"
             android:label="@string/app_name"
 			android:screenOrientation="portrait">
         </activity>
@@ -39,7 +39,7 @@
 			android:screenOrientation="portrait">
         </activity>
         <activity
-            android:name=".activities.MultiplayerGameSelectionActivity"
+            android:name=".activities.MultiPlayerMatchActivity"
             android:label="@string/title_activity_multiplayer_game_selection"
 			android:screenOrientation="portrait">
         </activity>

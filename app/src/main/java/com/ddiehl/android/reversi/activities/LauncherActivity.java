@@ -2,7 +2,6 @@ package com.ddiehl.android.reversi.activities;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -21,10 +20,10 @@ public class LauncherActivity extends Activity {
     }
 
     public void start1p(View view) {
-        startActivity(new Intent(this, ReversiActivity.class));
+        startActivity(new Intent(this, SinglePlayerMatchActivity.class));
     }
 
     public void startMultiplayer(View view) {
-		startActivity(new Intent(this, MultiplayerGameSelectionActivity.class));
+		startActivity(new Intent(this, MultiPlayerMatchActivity.class));
     }
 }

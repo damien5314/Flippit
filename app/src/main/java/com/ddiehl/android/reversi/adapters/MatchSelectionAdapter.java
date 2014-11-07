@@ -7,19 +7,19 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.ddiehl.android.reversi.R;
-import com.ddiehl.android.reversi.activities.MultiplayerGameSelectionActivity;
+import com.ddiehl.android.reversi.activities.MultiPlayerMatchActivity;
 
 import java.util.ArrayList;
 
 
 public class MatchSelectionAdapter extends ArrayAdapter<String> {
-	private MultiplayerGameSelectionActivity ctx;
+	private MultiPlayerMatchActivity ctx;
 	private int layoutResourceId;
 	private ArrayList<String> mList;
 
 	public MatchSelectionAdapter(Context c, int resource, ArrayList<String> list) {
 		super(c, resource, list);
-		ctx = (MultiplayerGameSelectionActivity) c;
+		ctx = (MultiPlayerMatchActivity) c;
 		layoutResourceId = resource;
 		mList = list;
 	}
