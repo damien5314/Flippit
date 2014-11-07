@@ -4,24 +4,25 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
-import com.ddiehl.android.reversi.adapters.MatchSelectionAdapter;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ReversiColor;
@@ -46,17 +47,14 @@ import java.util.ArrayList;
 public class MultiPlayerMatchActivity extends Activity
             implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 	private final static String TAG = MultiPlayerMatchActivity.class.getSimpleName();
-	private ListView mListView;
-	private MatchSelectionAdapter mListAdapter;
-	private ArrayList<String> mMatchList;
 
-    private static final int REQUEST_RESOLVE_ERROR = 1001;
-	private static final int REQUEST_LOOK_AT_MATCHES = 1002;
+    private static final int RC_RESOLVE_ERROR = 1001;
+	private static final int RC_VIEW_MATCHES = 1002;
 	private static final int RC_SELECT_PLAYERS = 1003;
 
 	private AlertDialog mAlertDialog;
 
-	private static final String STATE_RESOLVING_ERROR = "resolving_error";
+	private static final String KEY_RESOLVING_ERROR = "resolving_error";
     private static final String DIALOG_ERROR = "dialog_error";
 
     // Client used to interact with Google APIs
@@ -139,7 +137,7 @@ public class MultiPlayerMatchActivity extends Activity
 			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
                 mResolvingError = true;
-                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+                result.startResolutionForResult(this, RC_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
 				Log.e(TAG, "Unable to start resolution intent; Exception: " + e.getMessage());
                 // There was an error with the resolution intent. Try again.
@@ -160,11 +158,11 @@ public class MultiPlayerMatchActivity extends Activity
         Bundle args = new Bundle();
         args.putInt(DIALOG_ERROR, errorCode);
         dialogFragment.setArguments(args);
-        dialogFragment.show(getFragmentManager(), "errordialog");
+        dialogFragment.show(getFragmentManager(), DIALOG_ERROR);
     }
 
     public void onDialogDismissed() {
-        mResolvingError = false;
+		mResolvingError = false;
     }
 
     /* A fragment to display an error dialog */
@@ -174,9 +172,9 @@ public class MultiPlayerMatchActivity extends Activity
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
+            int errorCode = this.getArguments().getInt(KEY_RESOLVING_ERROR);
             return GooglePlayServicesUtil.getErrorDialog(errorCode,
-                    this.getActivity(), REQUEST_RESOLVE_ERROR);
+                    this.getActivity(), RC_RESOLVE_ERROR);
         }
 
         @Override
@@ -184,7 +182,6 @@ public class MultiPlayerMatchActivity extends Activity
             ((MultiPlayerMatchActivity) getActivity()).onDialogDismissed();
         }
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -222,14 +219,14 @@ public class MultiPlayerMatchActivity extends Activity
 			return;
 		}
 		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
-		startActivityForResult(intent, REQUEST_LOOK_AT_MATCHES);
+		startActivityForResult(intent, RC_VIEW_MATCHES);
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		switch (requestCode) {
 
-			case REQUEST_RESOLVE_ERROR:
+			case RC_RESOLVE_ERROR:
 				mResolvingError = false;
 				switch (resultCode) {
 					case RESULT_OK:
@@ -240,7 +237,7 @@ public class MultiPlayerMatchActivity extends Activity
 				}
 				break;
 
-			case REQUEST_LOOK_AT_MATCHES: // Returned from the 'Select Match' dialog
+			case RC_VIEW_MATCHES: // Returned from the 'Select Match' dialog
 				if (resultCode != Activity.RESULT_OK) // User canceled
 					break;
 
@@ -382,8 +379,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 				// Note that in this state, you must still call "Finish" yourself,
 				// so we allow this to continue.
-				showWarning("Complete!",
-						"This game is over; someone finished it!  You can only finish it now.");
+				showWarning("Complete!", "This game is over; someone finished it!  You can only finish it now.");
 		}
 
 		// OK, it's active. Check on turn status.
@@ -408,7 +404,7 @@ public class MultiPlayerMatchActivity extends Activity
 		Participant opponent = mMatch.getDescriptionParticipant();
 		if (opponent != null)
 			((TextView) findViewById(R.id.p2_label)).setText(opponent.getDisplayName());
-		else
+		else // Autopick player has not yet been found
 			((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
 	}
 
@@ -444,12 +440,78 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 	}
 
+	private ProgressDialog progressBar;
+	ProgressBarFragment progressBarFragment;
+	private static final String PROGRESS_DIALOG = "progress_dialog";
 	public void showSpinner() {
-		findViewById(R.id.progressLayout).setVisibility(View.VISIBLE);
+//		findViewById(R.id.progressLayout).setVisibility(View.VISIBLE);
+
+		if (progressBar == null) {
+			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
+			progressBar.setCancelable(false);
+			progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progressBar.setMessage("Loading match...");
+		}
+		progressBar.show();
+
+//		FragmentTransaction ft = getFragmentManager().beginTransaction();
+//		Fragment prev = getFragmentManager().findFragmentByTag(PROGRESS_DIALOG);
+//		if (prev != null)
+//			ft.remove(prev);
+////		ft.addToBackStack(null);
+//		if (progressBarFragment == null)
+//			progressBarFragment = ProgressBarFragment.newInstance();
+//		progressBarFragment.show(ft, PROGRESS_DIALOG);
 	}
 
 	public void dismissSpinner() {
-		findViewById(R.id.progressLayout).setVisibility(View.GONE);
+//		findViewById(R.id.progressLayout).setVisibility(View.GONE);
+		progressBar.dismiss();
+//		getFragmentManager().beginTransaction()
+//				.remove(getFragmentManager().findFragmentByTag(PROGRESS_DIALOG));
+	}
+
+	/* A fragment to display a progress bar */
+	public static class ProgressBarFragment extends DialogFragment {
+//		int mNum;
+
+		static ProgressBarFragment newInstance() {
+			ProgressBarFragment f = new ProgressBarFragment();
+			f.setStyle(DialogFragment.STYLE_NO_TITLE, android.R.style.Theme_Holo_Dialog);
+			return f;
+		}
+
+//		@Override
+//		public void onCreate(Bundle savedInstanceState) {
+//			super.onCreate(savedInstanceState);
+//			mNum = getArguments().getInt("num");
+//
+//			// Pick a style based on the num.
+//			int style = DialogFragment.STYLE_NORMAL, theme = 0;
+//			switch ((mNum-1)%6) {
+//				case 1: style = DialogFragment.STYLE_NO_TITLE; break;
+//				case 2: style = DialogFragment.STYLE_NO_FRAME; break;
+//				case 3: style = DialogFragment.STYLE_NO_INPUT; break;
+//				case 4: style = DialogFragment.STYLE_NORMAL; break;
+//				case 5: style = DialogFragment.STYLE_NORMAL; break;
+//				case 6: style = DialogFragment.STYLE_NO_TITLE; break;
+//				case 7: style = DialogFragment.STYLE_NO_FRAME; break;
+//				case 8: style = DialogFragment.STYLE_NORMAL; break;
+//			}
+//			switch ((mNum-1)%6) {
+//				case 4: theme = android.R.style.Theme_Holo; break;
+//				case 5: theme = android.R.style.Theme_Holo_Light_Dialog; break;
+//				case 6: theme = android.R.style.Theme_Holo_Light; break;
+//				case 7: theme = android.R.style.Theme_Holo_Light_Panel; break;
+//				case 8: theme = android.R.style.Theme_Holo_Light; break;
+//			}
+//			setStyle(style, theme);
+//		}
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			return inflater.inflate(R.layout.progress_dialog, container, false);
+		}
 	}
 
 	// Generic warning/info dialog
@@ -537,15 +599,11 @@ public class MultiPlayerMatchActivity extends Activity
 		int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
 		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
 
-//        grid.setWeightSum(b.height()); // Attempting to scale board to all screens
 		for (int y = 0; y < board.height(); y++) {
 			TableRow row = new TableRow(this);
-//            TableLayout.LayoutParams tParams = new TableLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
-//            row.setLayoutParams(tParams);
 			row.setWeightSum(board.width());
 			for (int x = 0; x < board.width(); x++) {
 				BoardSpace space = board.getSpaceAt(x, y);
-//                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
 				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);
 				space.setLayoutParams(params);
