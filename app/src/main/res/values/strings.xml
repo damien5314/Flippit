@@ -66,6 +66,7 @@
 	<string name="match_error_locally_modified">Match locally modified</string>
 	<string name="unexpected_status">Unexpected match status</string>
 
-	<string name="loading_match">Loading match&#8230;</string>
+    <string name="loading_match">Loading match&#8230;</string>
+    <string name="submitting_move">Submitting move&#8230;</string>
 
 </resources>

@@ -268,7 +268,7 @@ public class MultiPlayerMatchActivity extends Activity
 								processResult(result);
 							}
 						});
-				showSpinner();
+				showSpinner(1);
 				break;
 		}
 	}
@@ -325,7 +325,7 @@ public class MultiPlayerMatchActivity extends Activity
 		String playerId = Games.Players.getCurrentPlayerId(mGoogleApiClient);
 		String myParticipantId = mMatch.getParticipantId(playerId);
 
-		showSpinner();
+		showSpinner(1);
 
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
 				GameStorage.serialize(board), myParticipantId).setResultCallback(
@@ -429,13 +429,17 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private ProgressDialog progressBar;
-	public void showSpinner() {
+	public void showSpinner(int spinnerMsg) {
 		if (progressBar == null) {
 			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
 			progressBar.setCancelable(false);
 			progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			progressBar.setMessage(getString(R.string.loading_match));
 		}
+        switch (spinnerMsg) {
+            case 1: progressBar.setMessage(getString(R.string.loading_match)); break;
+            case 2: progressBar.setMessage(getString(R.string.submitting_move)); break;
+        }
 		progressBar.show();
 	}
 
@@ -568,6 +572,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 					if (board.spacesCapturedWithMove(s, playerColor) > 0) {
                         evaluatingMove = true;
+                        showSpinner(2);
 						board.commitPiece(s, playerColor);
 						calculateGameState();
 					} else {
@@ -594,6 +599,7 @@ public class MultiPlayerMatchActivity extends Activity
 					Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
                     mMatch = updateMatchResult.getMatch();
                     evaluatingMove = false;
+                    dismissSpinner();
 				}
 			});
 		} else if (board.hasMove(ReversiColor.White)) { // Opponent has no move, keep turn
@@ -606,10 +612,12 @@ public class MultiPlayerMatchActivity extends Activity
 					Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
                     mMatch = updateMatchResult.getMatch();
                     evaluatingMove = false;
+                    dismissSpinner();
 				}
 			});
 		} else { // No moves remaining, end of game
             evaluatingMove = false;
+            dismissSpinner();
 			updateScoreDisplay();
 			endGame();
 			return;
