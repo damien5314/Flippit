@@ -615,15 +615,21 @@ public class MultiPlayerMatchActivity extends Activity
 		grid.setVisibility(View.VISIBLE);
 	}
 
+    boolean evaluatingMove = false;
 	public View.OnClickListener claim(final BoardSpace s) {
 		return new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
 				if (mGoogleApiClient.isConnected()) {
+                    if (evaluatingMove) {
+                        Log.d(TAG, "Error: Still evaluating last move");
+                        return;
+                    }
 
 					if (s.isOwned())
 						return;
 
+                    Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus() + " (My Turn Status = " + TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN + ")");
 					if (mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
 						Toast.makeText(view.getContext(), "Not your turn!", Toast.LENGTH_SHORT).show();
 						return;
@@ -632,12 +638,15 @@ public class MultiPlayerMatchActivity extends Activity
 					ReversiColor playerColor = ReversiColor.White; // Player is always White for now
 
 					if (board.spacesCapturedWithMove(s, playerColor) > 0) {
+                        evaluatingMove = true;
 						board.commitPiece(s, playerColor);
 						calculateGameState();
 					} else {
 						Toast.makeText(view.getContext(), R.string.bad_move, Toast.LENGTH_SHORT).show();
 					}
 				}
+                else
+                    Log.d(TAG, "GoogleApiClient not connected");
 			}
 		};
 	}
@@ -654,6 +663,8 @@ public class MultiPlayerMatchActivity extends Activity
 				@Override
 				public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
 					Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
+                    mMatch = updateMatchResult.getMatch();
+                    evaluatingMove = false;
 				}
 			});
 		} else if (board.hasMove(ReversiColor.White)) { // Opponent has no move, keep turn
@@ -664,9 +675,12 @@ public class MultiPlayerMatchActivity extends Activity
 				@Override
 				public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
 					Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
+                    mMatch = updateMatchResult.getMatch();
+                    evaluatingMove = false;
 				}
 			});
 		} else { // No moves remaining, end of game
+            evaluatingMove = false;
 			updateScoreDisplay();
 			endGame();
 			return;
