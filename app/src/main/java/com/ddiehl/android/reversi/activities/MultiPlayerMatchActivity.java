@@ -10,11 +10,9 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -67,9 +65,6 @@ public class MultiPlayerMatchActivity extends Activity
     // Are we currently resolving a connection failure?
     private boolean mResolvingError = false;
 
-	// Is there a match already loaded?
-	private boolean mMatchLoaded = false;
-
 	// Should I be showing the turn API?
 	public boolean isDoingTurn = false;
 
@@ -91,12 +86,6 @@ public class MultiPlayerMatchActivity extends Activity
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
-
-//		mMatchList = new ArrayList<String>();
-//
-//		mListView = (ListView) findViewById(R.id.matchList);
-//		mListAdapter = new MatchSelectionAdapter(this, R.layout.activity_multiplayer_game_selection_item, mMatchList);
-//		mListView.setAdapter(mListAdapter);
     }
 
     @Override
@@ -131,8 +120,7 @@ public class MultiPlayerMatchActivity extends Activity
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "Failed to connect to Google Play services");
         if (mResolvingError) {
-            // Already attempting to resolve an error.
-            return;
+            return; // Already attempting to resolve an error.
         } else if (result.hasResolution()) {
 			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
@@ -294,7 +282,7 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 
 		if (match.getData() != null) {
-			// This is a game that has already started, so I'll just start
+			// This is a game that has already started, just update
 			updateMatch(match);
 			return;
 		}
@@ -441,11 +429,7 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private ProgressDialog progressBar;
-	ProgressBarFragment progressBarFragment;
-	private static final String PROGRESS_DIALOG = "progress_dialog";
 	public void showSpinner() {
-//		findViewById(R.id.progressLayout).setVisibility(View.VISIBLE);
-
 		if (progressBar == null) {
 			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
 			progressBar.setCancelable(false);
@@ -453,65 +437,10 @@ public class MultiPlayerMatchActivity extends Activity
 			progressBar.setMessage(getString(R.string.loading_match));
 		}
 		progressBar.show();
-
-//		FragmentTransaction ft = getFragmentManager().beginTransaction();
-//		Fragment prev = getFragmentManager().findFragmentByTag(PROGRESS_DIALOG);
-//		if (prev != null)
-//			ft.remove(prev);
-////		ft.addToBackStack(null);
-//		if (progressBarFragment == null)
-//			progressBarFragment = ProgressBarFragment.newInstance();
-//		progressBarFragment.show(ft, PROGRESS_DIALOG);
 	}
 
 	public void dismissSpinner() {
-//		findViewById(R.id.progressLayout).setVisibility(View.GONE);
 		progressBar.dismiss();
-//		getFragmentManager().beginTransaction()
-//				.remove(getFragmentManager().findFragmentByTag(PROGRESS_DIALOG));
-	}
-
-	/* A fragment to display a progress bar */
-	public static class ProgressBarFragment extends DialogFragment {
-//		int mNum;
-
-		static ProgressBarFragment newInstance() {
-			ProgressBarFragment f = new ProgressBarFragment();
-			f.setStyle(DialogFragment.STYLE_NO_TITLE, android.R.style.Theme_Holo_Dialog);
-			return f;
-		}
-
-//		@Override
-//		public void onCreate(Bundle savedInstanceState) {
-//			super.onCreate(savedInstanceState);
-//			mNum = getArguments().getInt("num");
-//
-//			// Pick a style based on the num.
-//			int style = DialogFragment.STYLE_NORMAL, theme = 0;
-//			switch ((mNum-1)%6) {
-//				case 1: style = DialogFragment.STYLE_NO_TITLE; break;
-//				case 2: style = DialogFragment.STYLE_NO_FRAME; break;
-//				case 3: style = DialogFragment.STYLE_NO_INPUT; break;
-//				case 4: style = DialogFragment.STYLE_NORMAL; break;
-//				case 5: style = DialogFragment.STYLE_NORMAL; break;
-//				case 6: style = DialogFragment.STYLE_NO_TITLE; break;
-//				case 7: style = DialogFragment.STYLE_NO_FRAME; break;
-//				case 8: style = DialogFragment.STYLE_NORMAL; break;
-//			}
-//			switch ((mNum-1)%6) {
-//				case 4: theme = android.R.style.Theme_Holo; break;
-//				case 5: theme = android.R.style.Theme_Holo_Light_Dialog; break;
-//				case 6: theme = android.R.style.Theme_Holo_Light; break;
-//				case 7: theme = android.R.style.Theme_Holo_Light_Panel; break;
-//				case 8: theme = android.R.style.Theme_Holo_Light; break;
-//			}
-//			setStyle(style, theme);
-//		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-			return inflater.inflate(R.layout.progress_dialog, container, false);
-		}
 	}
 
 	// Generic warning/info dialog
