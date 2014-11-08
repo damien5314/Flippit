@@ -644,12 +644,13 @@ public class MultiPlayerMatchActivity extends Activity
 
 	Participant player, opponent;
 	public void calculateGameState() {
-		player = mMatch.getParticipant(Games.Players.getCurrentPlayerId(mGoogleApiClient));
+		player = mMatch.getParticipant(mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient)));
 		opponent = mMatch.getDescriptionParticipant();
 		if (board.hasMove(ReversiColor.Black)) { // If opponent can make a move, it's his turn
 			// TakeTurn for opponent
+            String pId = (opponent == null) ? null : opponent.getParticipantId();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), GameStorage.serialize(board),
-					opponent.getParticipantId()).setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+					pId).setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 				@Override
 				public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
 					Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
