@@ -25,8 +25,8 @@ import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ComputerAI;
 import com.ddiehl.android.reversi.game.Player;
 import com.ddiehl.android.reversi.game.ReversiColor;
-import com.ddiehl.android.reversi.utils.BoardIterator;
-import com.ddiehl.android.reversi.utils.GameStorage;
+import com.ddiehl.android.reversi.game.BoardIterator;
+import com.ddiehl.android.reversi.game.GameStorage;
 
 
 public class SinglePlayerMatchActivity extends Activity {
@@ -177,9 +177,9 @@ public class SinglePlayerMatchActivity extends Activity {
 
     public void calculateGameState() {
 		Player opponent = (currentPlayer == p1) ? p2 : p1;
-		if (b.hasMove(opponent)) { // If opponent can make a move, it's his turn
+		if (b.hasMove(opponent.getColor())) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
-        } else if (b.hasMove(currentPlayer)) { // Opponent has no move, keep turn
+        } else if (b.hasMove(currentPlayer.getColor())) { // Opponent has no move, keep turn
             Toast.makeText(this, getString(R.string.no_moves) + opponent.getName(), Toast.LENGTH_SHORT).show();
         } else { // No moves remaining, end of game
             updateScoreDisplay();

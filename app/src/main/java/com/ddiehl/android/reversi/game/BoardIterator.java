@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.utils;
+package com.ddiehl.android.reversi.game;
 
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;

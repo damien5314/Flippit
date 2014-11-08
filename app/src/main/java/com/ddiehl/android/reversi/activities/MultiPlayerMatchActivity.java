@@ -24,10 +24,10 @@ import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.game.Board;
+import com.ddiehl.android.reversi.game.BoardIterator;
 import com.ddiehl.android.reversi.game.BoardSpace;
+import com.ddiehl.android.reversi.game.GameStorage;
 import com.ddiehl.android.reversi.game.ReversiColor;
-import com.ddiehl.android.reversi.utils.BoardIterator;
-import com.ddiehl.android.reversi.utils.GameStorage;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -450,7 +450,7 @@ public class MultiPlayerMatchActivity extends Activity
 			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
 			progressBar.setCancelable(false);
 			progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			progressBar.setMessage("Loading match...");
+			progressBar.setMessage(getString(R.string.loading_match));
 		}
 		progressBar.show();
 
@@ -607,11 +607,96 @@ public class MultiPlayerMatchActivity extends Activity
 				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);
 				space.setLayoutParams(params);
-//				space.setOnClickListener(claim(space)); // Need to change this to a method for multiplayer turn taking
+				space.setOnClickListener(claim(space)); // Need to change this to a method for multiplayer turn taking
 				row.addView(space);
 			}
 			grid.addView(row);
 		}
 		grid.setVisibility(View.VISIBLE);
+	}
+
+	public View.OnClickListener claim(final BoardSpace s) {
+		return new View.OnClickListener() {
+			@Override
+			public void onClick(View view) {
+				if (mGoogleApiClient.isConnected()) {
+
+					if (s.isOwned())
+						return;
+
+					if (mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+						Toast.makeText(view.getContext(), "Not your turn!", Toast.LENGTH_SHORT).show();
+						return;
+					}
+
+					ReversiColor playerColor = ReversiColor.White; // Player is always White for now
+
+					if (board.spacesCapturedWithMove(s, playerColor) > 0) {
+						board.commitPiece(s, playerColor);
+						calculateGameState();
+					} else {
+						Toast.makeText(view.getContext(), R.string.bad_move, Toast.LENGTH_SHORT).show();
+					}
+				}
+			}
+		};
+	}
+
+	Participant player, opponent;
+	public void calculateGameState() {
+		player = mMatch.getParticipant(Games.Players.getCurrentPlayerId(mGoogleApiClient));
+		opponent = mMatch.getDescriptionParticipant();
+		if (board.hasMove(ReversiColor.Black)) { // If opponent can make a move, it's his turn
+			// TakeTurn for opponent
+			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), GameStorage.serialize(board),
+					opponent.getParticipantId()).setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+				@Override
+				public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
+					Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
+				}
+			});
+		} else if (board.hasMove(ReversiColor.White)) { // Opponent has no move, keep turn
+			Toast.makeText(this, getString(R.string.no_moves) + opponent.getDisplayName(), Toast.LENGTH_SHORT).show();
+			// TakeTurn for player
+			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), GameStorage.serialize(board),
+					player.getParticipantId()).setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+				@Override
+				public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
+					Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
+				}
+			});
+		} else { // No moves remaining, end of game
+			updateScoreDisplay();
+			endGame();
+			return;
+		}
+		updateScoreDisplay();
+	}
+
+	public void endGame() {
+		int lightCount = 0;
+		int darkCount = 0;
+		BoardIterator i = new BoardIterator(board);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (s.isOwned()) {
+				if (s.getColor() == ReversiColor.White)
+					lightCount++;
+				else
+					darkCount++;
+			}
+		}
+		Participant winner = null;
+		if (lightCount != darkCount)
+			winner = (lightCount > darkCount) ? player : opponent;
+		submitWinner(winner);
+//		int diff = 64 - lightCount - darkCount;
+//		winner.setScore(winner.getScore() + diff);
+//		updateScoreForPlayer(winner);
+//		gameInProgress = false;
+	}
+
+	private void submitWinner(Participant player) {
+
 	}
 }

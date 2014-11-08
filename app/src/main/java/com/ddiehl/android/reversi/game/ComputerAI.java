@@ -1,8 +1,6 @@
 package com.ddiehl.android.reversi.game;
 
 
-import com.ddiehl.android.reversi.utils.BoardIterator;
-
 import java.util.HashMap;
 import java.util.HashSet;
 

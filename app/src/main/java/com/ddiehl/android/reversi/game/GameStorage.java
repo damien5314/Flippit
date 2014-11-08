@@ -1,30 +1,26 @@
-package com.ddiehl.android.reversi.utils;
+package com.ddiehl.android.reversi.game;
 
 
 import android.content.Context;
-
-import com.ddiehl.android.reversi.game.Board;
-import com.ddiehl.android.reversi.game.BoardSpace;
-import com.ddiehl.android.reversi.game.ReversiColor;
 
 public class GameStorage {
     private static final String TAG = GameStorage.class.getSimpleName();
 
     public static void deserialize(Context ctx, byte[] in) {
-        Board _instance = Board.getInstance(ctx);
+        Board board = Board.getInstance(ctx);
         int index = 0;
-        for (int y = 0; y < _instance.height(); y++) {
-            for (int x = 0; x < _instance.width(); x++) {
+        for (int y = 0; y < board.height(); y++) {
+            for (int x = 0; x < board.width(); x++) {
                 byte c = in[index++];
-                _instance.setSpace(x, y, new BoardSpace(ctx, x, y));
+                board.setSpace(x, y, new BoardSpace(ctx, x, y));
                 switch (c) {
                     case 0:
                         break;
                     case 1:
-                        _instance.getSpaceAt(x, y).setColorNoAnimation(ReversiColor.White);
+                        board.getSpaceAt(x, y).setColorNoAnimation(ReversiColor.White);
                         break;
                     case 2:
-                        _instance.getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Black);
+                        board.getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Black);
                 }
             }
         }

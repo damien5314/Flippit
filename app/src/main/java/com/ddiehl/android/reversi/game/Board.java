@@ -3,8 +3,6 @@ package com.ddiehl.android.reversi.game;
 
 import android.content.Context;
 
-import com.ddiehl.android.reversi.utils.BoardIterator;
-
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
 	private static Board _instance = null;
@@ -54,14 +52,14 @@ public class Board {
 		spaces[4][3].setColorNoAnimation(ReversiColor.Black);
 	}
 
-	public boolean hasMove(Player p) {
+	public boolean hasMove(ReversiColor c) {
 		BoardIterator i = new BoardIterator(this);
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
 			if (s.isOwned())
 				continue;
 			for (int[] move : moveDirections) {
-				int value = moveValueInDirection(s, move[0], move[1], p.getColor());
+				int value = moveValueInDirection(s, move[0], move[1], c);
 				if (value != 0) {
 					return true;
 				}
