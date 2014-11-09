@@ -23,7 +23,7 @@ import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ComputerAI;
-import com.ddiehl.android.reversi.game.Player;
+import com.ddiehl.android.reversi.game.ReversiPlayer;
 import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.game.BoardIterator;
 import com.ddiehl.android.reversi.game.GameStorage;
@@ -38,8 +38,8 @@ public class SinglePlayerMatchActivity extends Activity {
     private static final String PREF_FIRST_TURN = "pref_firstTurn";
     private static final String PREF_BOARD_STATE = "pref_boardState";
     private Context ctx;
-	protected Player p1, p2, currentPlayer;
-    protected Player firstTurn;
+	protected ReversiPlayer p1, p2, currentPlayer;
+    protected ReversiPlayer firstTurn;
     protected Board b;
     protected boolean gameInProgress;
 
@@ -50,8 +50,8 @@ public class SinglePlayerMatchActivity extends Activity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         ctx = this;
 
-		p1 = new Player(ReversiColor.White, getString(R.string.player1_label_default));
-		p2 = new Player(ReversiColor.Black, getString(R.string.player2_label));
+		p1 = new ReversiPlayer(ReversiColor.White, getString(R.string.player1_label_default));
+		p2 = new ReversiPlayer(ReversiColor.Black, getString(R.string.player2_label));
         p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
         p2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
@@ -176,7 +176,7 @@ public class SinglePlayerMatchActivity extends Activity {
     }
 
     public void calculateGameState() {
-		Player opponent = (currentPlayer == p1) ? p2 : p1;
+		ReversiPlayer opponent = (currentPlayer == p1) ? p2 : p1;
 		if (b.hasMove(opponent.getColor())) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
         } else if (b.hasMove(currentPlayer.getColor())) { // Opponent has no move, keep turn
@@ -248,7 +248,7 @@ public class SinglePlayerMatchActivity extends Activity {
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
     }
 
-	public void updateScoreForPlayer(Player p) {
+	public void updateScoreForPlayer(ReversiPlayer p) {
 		TextView vScore;
 		if (p == p1) vScore = (TextView) findViewById(R.id.p1score);
 		else vScore = (TextView) findViewById(R.id.p2score);
@@ -256,7 +256,7 @@ public class SinglePlayerMatchActivity extends Activity {
 	}
 
 	public void endGame() {
-		Player winner = null;
+		ReversiPlayer winner = null;
 		if (p1.getScore() != p2.getScore())
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
 		showWinningToast(winner);
@@ -268,7 +268,7 @@ public class SinglePlayerMatchActivity extends Activity {
         gameInProgress = false;
 	}
 
-	public void showWinningToast(Player winner) {
+	public void showWinningToast(ReversiPlayer winner) {
 		if (winner != null) {
 			Toast t;
 			if (winner == p1)

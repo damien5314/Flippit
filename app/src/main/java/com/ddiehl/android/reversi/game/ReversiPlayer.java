@@ -1,13 +1,13 @@
 package com.ddiehl.android.reversi.game;
 
-public class Player {
-	private static final String TAG = Player.class.getSimpleName();
+public class ReversiPlayer {
+	private static final String TAG = ReversiPlayer.class.getSimpleName();
 	private ReversiColor color;
 	private String name;
 	private int score;
 	private boolean isCPU;
 
-	public Player(ReversiColor c, String n) {
+	public ReversiPlayer(ReversiColor c, String n) {
 		color = c;
 		name = n;
 		isCPU = false;

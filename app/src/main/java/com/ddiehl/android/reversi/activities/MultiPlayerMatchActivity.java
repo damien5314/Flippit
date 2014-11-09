@@ -342,6 +342,8 @@ public class MultiPlayerMatchActivity extends Activity
 	public void updateMatch(TurnBasedMatch match) {
 		mMatch = match;
 		mGameData = match.getData();
+        GameStorage.deserialize(this, mMatch.getData());
+        displayBoard();
 		updateScoreDisplay();
 		updatePlayerNameDisplay();
 		int status = match.getStatus();
@@ -373,8 +375,6 @@ public class MultiPlayerMatchActivity extends Activity
 		// OK, it's active. Check on turn status.
 		switch (turnStatus) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-				GameStorage.deserialize(this, mMatch.getData());
-				displayBoard();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
 				// Should return results.
@@ -388,6 +388,7 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	public void updatePlayerNameDisplay() {
+        String lightName = mMatch.getParticipant(mMatch.getCreatorId()).getDisplayName();
 		((TextView) findViewById(R.id.p1_label)).setText(Games.Players.getCurrentPlayer(mGoogleApiClient).getDisplayName());
 		Participant opponent = mMatch.getDescriptionParticipant();
 		if (opponent != null)

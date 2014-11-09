@@ -21,7 +21,7 @@ public class ComputerAI {
     /**
      * Finds the space on the board which would capture the most spaces for Player p.
      */
-    public static BoardSpace getBestMove_d1(Board board, Player p) {
+    public static BoardSpace getBestMove_d1(Board board, ReversiPlayer p) {
         BoardSpace best = null;
         int bestVal = 0;
         BoardIterator i = new BoardIterator(board);
@@ -46,7 +46,7 @@ public class ComputerAI {
      * Finds the space on the board which would result in a board configuration leaving the
      * opposing player with the least choices.
      */
-    public static BoardSpace getBestMove_d2(Board board, Player p, Player o) {
+    public static BoardSpace getBestMove_d2(Board board, ReversiPlayer p, ReversiPlayer o) {
         BoardSpace best = null;
         int bestVal = 999;
         BoardIterator i = new BoardIterator(board);
@@ -78,7 +78,7 @@ public class ComputerAI {
     /**
      * Finds space which maximizes space value * number of spaces obtained
      */
-    public static BoardSpace getBestMove_d3(Board board, Player p, Player o) {
+    public static BoardSpace getBestMove_d3(Board board, ReversiPlayer p, ReversiPlayer o) {
         HashMap<BoardSpace, Integer> moveValues = new HashMap<BoardSpace, Integer>();
         final int spaceValue_weight = 1;
         final int spacesCaptured_weight = 0;
@@ -135,7 +135,7 @@ public class ComputerAI {
         return best;
     }
 
-    public static int getPossibleMoves(Board board, Player p) {
+    public static int getPossibleMoves(Board board, ReversiPlayer p) {
         int possible = 0;
         BoardIterator i = new BoardIterator(board);
         while (i.hasNext()) {
