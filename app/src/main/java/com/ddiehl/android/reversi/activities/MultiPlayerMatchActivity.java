@@ -52,6 +52,7 @@ public class MultiPlayerMatchActivity extends Activity
 	private static final int RC_VIEW_MATCHES = 1002;
 	private static final int RC_SELECT_PLAYERS = 1003;
 
+    private ProgressDialog progressBar;
 	private AlertDialog mAlertDialog;
 
 	private static final String KEY_RESOLVING_ERROR = "resolving_error";
@@ -89,12 +90,18 @@ public class MultiPlayerMatchActivity extends Activity
                 .build();
     }
 
+    private void connectGoogleApiClient() {
+        if (progressBar != null && progressBar.isShowing())
+            dismissSpinner();
+        showSpinner(3);
+        mGoogleApiClient.connect();
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
-        showSpinner(3);
         Log.d(TAG, "onStart(): connecting");
-        mGoogleApiClient.connect();
+        connectGoogleApiClient();
     }
 
     @Override
@@ -119,7 +126,7 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     public void onConnectionSuspended(int i) {
         Log.d(TAG, "onConnectionSuspended(): attempting to connect");
-        mGoogleApiClient.connect();
+        connectGoogleApiClient();
     }
 
     @Override
@@ -135,7 +142,7 @@ public class MultiPlayerMatchActivity extends Activity
             } catch (IntentSender.SendIntentException e) {
 				Log.e(TAG, "Unable to start resolution intent; Exception: " + e.getMessage());
                 // There was an error with the resolution intent. Try again.
-                mGoogleApiClient.connect();
+                connectGoogleApiClient();
             }
         } else {
 			Log.d(TAG, "Unresolvable error (ErrorCode: " + result.getErrorCode() + ")");
@@ -235,7 +242,7 @@ public class MultiPlayerMatchActivity extends Activity
 				switch (resultCode) {
 					case RESULT_OK:
 						if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
-							mGoogleApiClient.connect();
+                            connectGoogleApiClient();
 						}
 						break;
 				}
@@ -496,7 +503,6 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 	}
 
-	private ProgressDialog progressBar;
 	public void showSpinner(int spinnerMsg) {
 		if (progressBar == null) {
 			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
