@@ -57,6 +57,7 @@
 	<string name="menu_select_match_condensed">Select</string>
 
 	<!-- Game status errors -->
+	<string name="google_play_not_connected">Not connected to Play Services</string>
 	<string name="status_multiplayer_error_not_trusted_tester">Untrusted test account</string>
 	<string name="match_error_already_rematched">Already rematched</string>
 	<string name="network_error_operation_failed">Network operation failed</string>

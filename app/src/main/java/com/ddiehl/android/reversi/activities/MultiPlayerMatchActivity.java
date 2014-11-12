@@ -101,17 +101,13 @@ public class MultiPlayerMatchActivity extends Activity
     protected void onStart() {
         super.onStart();
         Log.d(TAG, "onStart(): connecting");
-        connectGoogleApiClient();
-    }
-
-	@Override
-	protected void onResume() {
-		super.onResume();
 		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
-		if (result != ConnectionResult.SUCCESS)
+		if (result != ConnectionResult.SUCCESS) {
 			GooglePlayServicesUtil.getErrorDialog(result, this, RC_RESOLVE_ERROR).show();
-	}
+			return;
+		} else connectGoogleApiClient();
+    }
 
     @Override
     protected void onStop() {
@@ -141,6 +137,7 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     public void onConnectionFailed(ConnectionResult result) {
         Log.i(TAG, "Failed to connect to Google Play services");
+		dismissSpinner();
         if (mResolvingError) {
             return; // Already attempting to resolve an error.
         } else if (result.hasResolution()) {
@@ -224,7 +221,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void findNewMatch() {
 		if (!mGoogleApiClient.isConnected()) {
-			Toast.makeText(this, "Error: GoogleApiClient not connected", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
 			return;
 		}
 		Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
@@ -233,7 +230,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void selectMatch() {
 		if (!mGoogleApiClient.isConnected()) {
-			Toast.makeText(this, "Error: GoogleApiClient not connected", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
 			return;
 		}
 		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
@@ -288,6 +285,7 @@ public class MultiPlayerMatchActivity extends Activity
 						.setAutoMatchCriteria(autoMatchCriteria)
 						.build();
 
+				showSpinner(1);
 				// Start the match
 				Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback(
 						new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
@@ -297,7 +295,6 @@ public class MultiPlayerMatchActivity extends Activity
 								processResult(result);
 							}
 						});
-				showSpinner(1);
 				break;
 		}
 	}
@@ -329,7 +326,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 		TurnBasedMatch match = result.getMatch();
-		dismissSpinner();
+//		dismissSpinner();
 
 		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
 			return;
