@@ -104,6 +104,15 @@ public class MultiPlayerMatchActivity extends Activity
         connectGoogleApiClient();
     }
 
+	@Override
+	protected void onResume() {
+		super.onResume();
+		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+		Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
+		if (result != ConnectionResult.SUCCESS)
+			GooglePlayServicesUtil.getErrorDialog(result, this, RC_RESOLVE_ERROR).show();
+	}
+
     @Override
     protected void onStop() {
         super.onStop();
@@ -409,12 +418,14 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
         Log.d(TAG, "Match update received for match: " + match.getMatchId());
-		updateMatch(match);
+		if (mMatch.getMatchId() == match.getMatchId())
+			updateMatch(match);
     }
 
     @Override
     public void onTurnBasedMatchRemoved(String matchId) {
         // Don't think I actually need to implement this
+		Log.d(TAG, "Match removed: " + matchId);
     }
 
 	private Participant getCurrentPlayer() {
@@ -456,10 +467,10 @@ public class MultiPlayerMatchActivity extends Activity
 	private void updatePlayerNameDisplay() {
         Participant light = getLightPlayer();
         Participant dark = getDarkPlayer();
-        if (light != null)
-            ((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
-        if (dark != null)
-            ((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
+        if (light != null) ((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
+		else ((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
+        if (dark != null) ((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
+		else ((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
 	}
 
 	private void updateScoreDisplay() {
