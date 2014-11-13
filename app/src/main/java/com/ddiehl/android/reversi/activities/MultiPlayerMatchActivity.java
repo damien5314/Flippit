@@ -126,6 +126,8 @@ public class MultiPlayerMatchActivity extends Activity
         Log.d(TAG, "Connected to Google Play Services");
 		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
         registerMatchUpdateListener(true);
+		if (mMatch != null)
+			updateMatch(mMatch);
     }
 
     @Override
@@ -309,10 +311,6 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void startMatch(TurnBasedMatch match) {
-		if (match == null)
-			Log.d(TAG, "startMatch; match == null");
-		else
-			Log.d(TAG, "startMatch; matchId = " + match.getMatchId());
 		mMatch = match;
 		board.reset();
 		displayBoard();
@@ -333,10 +331,6 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void processResult(TurnBasedMultiplayer.UpdateMatchResult result) {
-		if (result.getMatch() == null)
-			Log.d(TAG, "processResult(Update); result.getMatch() == null");
-		else
-			Log.d(TAG, "processResult(Update); matchId = " + result.getMatch().getMatchId());
 		mMatch = result.getMatch();
 		evaluatingMove = false;
 		dismissSpinner();
@@ -363,10 +357,6 @@ public class MultiPlayerMatchActivity extends Activity
 	// This is the main function that gets called when players choose a match
 	// from the inbox, or else create a match and want to start it.
 	private void updateMatch(TurnBasedMatch match) {
-		if (match == null)
-			Log.d(TAG, "updateMatch; match == null");
-		else
-			Log.d(TAG, "updateMatch; matchId = " + match.getMatchId());
 		mMatch = match;
 		mGameData = match.getData();
         GameStorage.deserialize(this, mMatch.getData());
@@ -611,7 +601,7 @@ public class MultiPlayerMatchActivity extends Activity
 		TableLayout grid = (TableLayout) findViewById(R.id.GameGrid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
 		grid.setLayoutParams(new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 		grid.removeAllViews();
 
 		int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);

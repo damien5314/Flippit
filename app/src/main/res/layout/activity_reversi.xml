@@ -53,8 +53,21 @@
 
 	</RelativeLayout>
 
-	<TableLayout
-		android:id="@+id/GameGrid"
-		style="@style/GameBoardTable"/>
+	<LinearLayout
+		android:id="@+id/gameSpace"
+		android:layout_width="match_parent"
+		android:layout_height="fill_parent"
+		android:orientation="vertical"
+		android:background="@color/gameBoard_color">
+
+		<TableLayout
+			android:id="@+id/GameGrid"
+			style="@style/GameBoardTable" />
+
+		<TextView
+			android:id="@+id/gameMessage"
+			style="@style/GameMessage"/>
+
+	</LinearLayout>
 
 </LinearLayout>
