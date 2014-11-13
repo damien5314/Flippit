@@ -208,34 +208,27 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+		Intent intent;
 		switch(id) {
 			case R.id.findNewMatch:
-				findNewMatch();
+				if (!mGoogleApiClient.isConnected()) {
+					Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+					return false;
+				}
+				intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
+				startActivityForResult(intent, RC_SELECT_PLAYERS);
 				return true;
 			case R.id.selectMatch:
-				selectMatch();
+				if (!mGoogleApiClient.isConnected()) {
+					Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+					return false;
+				}
+				intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
+				startActivityForResult(intent, RC_VIEW_MATCHES);
 				return true;
 		}
         return super.onOptionsItemSelected(item);
     }
-
-	private void findNewMatch() {
-		if (!mGoogleApiClient.isConnected()) {
-			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
-			return;
-		}
-		Intent intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
-		startActivityForResult(intent, RC_SELECT_PLAYERS);
-	}
-
-	private void selectMatch() {
-		if (!mGoogleApiClient.isConnected()) {
-			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
-			return;
-		}
-		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
-		startActivityForResult(intent, RC_VIEW_MATCHES);
-	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -299,12 +292,27 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 	}
 
-	// startMatch() happens in response to the createTurnBasedMatch()
-	// above. This is only called on success, so we should have a
-	// valid match object. We're taking this opportunity to setup the
-	// game, saving our initial state. Calling takeTurn() will
-	// callback to OnTurnBasedMatchUpdated(), which will show the game UI.
+	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
+		TurnBasedMatch match = result.getMatch();
+//		dismissSpinner();
+
+		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
+			return;
+		}
+
+		if (match.getData() != null) { // This is a game that has already started, just update
+			updateMatch(match);
+			return;
+		}
+
+		startMatch(match);
+	}
+
 	private void startMatch(TurnBasedMatch match) {
+		if (match == null)
+			Log.d(TAG, "startMatch; match == null");
+		else
+			Log.d(TAG, "startMatch; matchId = " + match.getMatchId());
 		mMatch = match;
 		board.reset();
 		displayBoard();
@@ -313,7 +321,7 @@ public class MultiPlayerMatchActivity extends Activity
 		String playerId = Games.Players.getCurrentPlayerId(mGoogleApiClient);
 		String myParticipantId = mMatch.getParticipantId(playerId);
 
-		showSpinner(1);
+//		showSpinner(1);
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
 				GameStorage.serialize(board), myParticipantId).setResultCallback(
 				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
@@ -324,28 +332,15 @@ public class MultiPlayerMatchActivity extends Activity
 				});
 	}
 
-	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
-		TurnBasedMatch match = result.getMatch();
-//		dismissSpinner();
-
-		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
-			return;
-		}
-
-		if (match.getData() != null) {
-			// This is a game that has already started, just update
-			updateMatch(match);
-			return;
-		}
-
-		startMatch(match);
-	}
-
 	private void processResult(TurnBasedMultiplayer.UpdateMatchResult result) {
+		if (result.getMatch() == null)
+			Log.d(TAG, "processResult(Update); result.getMatch() == null");
+		else
+			Log.d(TAG, "processResult(Update); matchId = " + result.getMatch().getMatchId());
 		mMatch = result.getMatch();
 		evaluatingMove = false;
 		dismissSpinner();
-		updateScoreDisplay();
+//		updateScoreDisplay();
 
 		if (!checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
 			return;
@@ -354,6 +349,8 @@ public class MultiPlayerMatchActivity extends Activity
 		if (mMatch.canRematch()) {
 //			askForRematch();
 		}
+
+		updateMatch(mMatch);
 
 //		isDoingTurn = (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
 //		if (isDoingTurn) {
@@ -366,6 +363,10 @@ public class MultiPlayerMatchActivity extends Activity
 	// This is the main function that gets called when players choose a match
 	// from the inbox, or else create a match and want to start it.
 	private void updateMatch(TurnBasedMatch match) {
+		if (match == null)
+			Log.d(TAG, "updateMatch; match == null");
+		else
+			Log.d(TAG, "updateMatch; matchId = " + match.getMatchId());
 		mMatch = match;
 		mGameData = match.getData();
         GameStorage.deserialize(this, mMatch.getData());
@@ -406,7 +407,7 @@ public class MultiPlayerMatchActivity extends Activity
 				showWarning("Alas...", "It's not your turn.");
 				break;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-				showWarning("Good inititative!", "Still waiting for invitations.\n\nBe patient!");
+				showWarning("Good initiative!", "Still waiting for invitations.\n\nBe patient!");
 		}
 
 //		board = null;
@@ -428,7 +429,8 @@ public class MultiPlayerMatchActivity extends Activity
 	private Participant getCurrentPlayer() {
 		Participant lightPlayer = getLightPlayer();
 		Participant darkPlayer = getDarkPlayer();
-		if (mMatch.getParticipant(mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient))) == lightPlayer)
+		if (mMatch.getParticipant(mMatch.getParticipantId(
+				Games.Players.getCurrentPlayerId(mGoogleApiClient))) == lightPlayer)
 			return lightPlayer;
 		else return darkPlayer;
 	}
@@ -464,10 +466,22 @@ public class MultiPlayerMatchActivity extends Activity
 	private void updatePlayerNameDisplay() {
         Participant light = getLightPlayer();
         Participant dark = getDarkPlayer();
-        if (light != null) ((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
-		else ((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
-        if (dark != null) ((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
-		else ((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
+
+        if (light != null) {
+			Log.d(TAG, "Light's name: " + light.getDisplayName());
+			((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
+		} else {
+			Log.d(TAG, "Light's name: Unknown");
+			((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
+		}
+
+        if (dark != null) {
+			Log.d(TAG, "Dark's name: " + dark.getDisplayName());
+			((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
+		} else {
+			Log.d(TAG, "Dark's name: Unknown");
+			((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
+		}
 	}
 
 	private void updateScoreDisplay() {
