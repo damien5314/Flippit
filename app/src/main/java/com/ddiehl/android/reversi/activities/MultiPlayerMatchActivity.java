@@ -368,19 +368,17 @@ public class MultiPlayerMatchActivity extends Activity
 
 		switch (status) {
 			case TurnBasedMatch.MATCH_STATUS_CANCELED:
-				showWarning("Canceled!", "This game was canceled!");
+				displayMessage(getString(R.string.game_canceled));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_EXPIRED:
-				showWarning("Expired!", "This game is expired. So sad!");
+				displayMessage(getString(R.string.game_expired));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING:
-				showWarning("Waiting for auto-match...", "We're still waiting for an automatch partner.");
+				displayMessage(getString(R.string.game_finding_partner));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_COMPLETE:
 				if (turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE) {
-					showWarning(
-							"Complete!",
-							"This game is over; someone finished it, and so did you!  There is nothing to be done.");
+					displayMessage(getString(R.string.game_complete));
 					break;
 				}
 
@@ -392,15 +390,15 @@ public class MultiPlayerMatchActivity extends Activity
 		// OK, it's active. Check on turn status.
 		switch (turnStatus) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
+				dismissMessage();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN: // Should return results.
-				showWarning("Alas...", "It's not your turn.");
+				displayMessage(getString(R.string.game_opponent_turn));
 				break;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-				showWarning("Good initiative!", "Still waiting for invitations.\n\nBe patient!");
+				displayMessage(getString(R.string.game_invite_pending));
 		}
 
-//		board = null;
 	}
 
     @Override
@@ -509,6 +507,14 @@ public class MultiPlayerMatchActivity extends Activity
 				turnIndicator.setImageResource(android.R.color.transparent);
 				break;
 		}
+	}
+
+	private void displayMessage(String gameMsg) {
+		((TextView) findViewById(R.id.gameMessage)).setText(gameMsg);
+	}
+
+	private void dismissMessage() {
+		((TextView) findViewById(R.id.gameMessage)).setText("");
 	}
 
 	private void showSpinner(int spinnerMsg) {

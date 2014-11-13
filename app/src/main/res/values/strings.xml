@@ -67,9 +67,18 @@
 	<string name="match_error_locally_modified">Match locally modified</string>
 	<string name="unexpected_status">Unexpected match status</string>
 
+	<!-- Spinner messages -->
     <string name="loading_match">Loading match&#8230;</string>
     <string name="submitting_move">Submitting move&#8230;</string>
     <string name="connecting">Connecting&#8230;</string>
     <string name="please_wait">Please wait&#8230;</string>
+
+	<!-- Game messages -->
+	<string name="game_canceled">Game Canceled</string>
+	<string name="game_expired">Game Expired</string>
+	<string name="game_finding_partner">Finding automatch opponent&#8230;</string>
+	<string name="game_complete">Game Complete</string>
+	<string name="game_opponent_turn">Waiting for opponent to play&#8230;</string>
+	<string name="game_invite_pending">Waiting for invitation, be patient!</string>
 
 </resources>
