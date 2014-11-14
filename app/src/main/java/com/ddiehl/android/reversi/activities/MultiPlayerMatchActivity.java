@@ -363,6 +363,8 @@ public class MultiPlayerMatchActivity extends Activity
         displayBoard();
 		updateScoreDisplay();
 		updatePlayerNameDisplay();
+		dismissSpinner();
+
 		int status = match.getStatus();
 		int turnStatus = match.getTurnStatus();
 
@@ -398,13 +400,12 @@ public class MultiPlayerMatchActivity extends Activity
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
 				displayMessage(getString(R.string.game_invite_pending));
 		}
-
 	}
 
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
         Log.d(TAG, "Match update received for match: " + match.getMatchId());
-		if (mMatch.getMatchId() == match.getMatchId())
+		if (mMatch.getMatchId().equals(match.getMatchId()))
 			updateMatch(match);
     }
 

@@ -72,7 +72,7 @@
 	<style name="GameMessage">
 		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">fill_parent</item>
-		<item name="android:gravity">center|bottom</item>
+		<item name="android:gravity">center|center</item>
 		<item name="android:textSize">@dimen/game_message_text_size</item>
 		<item name="android:textColor">@android:color/white</item>
 	</style>
