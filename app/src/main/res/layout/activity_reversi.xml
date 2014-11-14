@@ -64,13 +64,13 @@
 			<Button
 				android:id="@+id/board_panel_new_game"
 				style="@style/BoardActionPanel"
-				android:text="New Game"
+				android:text="@string/multiplayer_new_match"
 				android:onClick="startNewGame"/>
 
 			<Button
 				android:id="@+id/board_panel_select_game"
 				style="@style/BoardActionPanel"
-				android:text="Select Game"
+				android:text="@string/multiplayer_select_match"
 				android:onClick="selectGame"/>
 
 		</LinearLayout>

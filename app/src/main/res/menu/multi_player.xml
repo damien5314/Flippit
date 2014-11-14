@@ -4,14 +4,14 @@
 
 	<item
 		android:id="@+id/findNewMatch"
-		android:title="@string/menu_multiplayer_new_match"
-		android:titleCondensed="@string/menu_multiplayer_new_match_condensed"
+		android:title="@string/multiplayer_new_match"
+		android:titleCondensed="@string/multiplayer_new_match_condensed"
 		android:showAsAction="ifRoom"/>
 
 	<item
 		android:id="@+id/selectMatch"
-		android:title="@string/menu_select_match"
-		android:titleCondensed="@string/menu_select_match_condensed"
+		android:title="@string/multiplayer_select_match"
+		android:titleCondensed="@string/multiplayer_select_match_condensed"
 		android:showAsAction="ifRoom" />
 
 </menu>
