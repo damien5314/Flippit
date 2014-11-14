@@ -63,13 +63,14 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private TurnBasedMatch mMatch;
 	private Board board;
+	Participant player, opponent;
 	private byte[] mGameData;
 
     // Are we currently resolving a connection failure?
     private boolean mResolvingError = false;
 
-	// Should I be showing the turn API?
-	public boolean isDoingTurn = false;
+	// Is move currently being evaluated?
+	boolean evaluatingMove = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -365,6 +366,8 @@ public class MultiPlayerMatchActivity extends Activity
 	// from the inbox, or else create a match and want to start it.
 	private void updateMatch(TurnBasedMatch match) {
 		mMatch = match;
+		player = getCurrentPlayer();
+		opponent = getOpponent();
 		mGameData = match.getData();
         GameStorage.deserialize(this, mMatch.getData());
 		findViewById(R.id.board_panels).setVisibility(View.GONE);
@@ -430,6 +433,10 @@ public class MultiPlayerMatchActivity extends Activity
 				Games.Players.getCurrentPlayerId(mGoogleApiClient))) == lightPlayer)
 			return lightPlayer;
 		else return darkPlayer;
+	}
+
+	private Participant getOpponent() {
+		return mMatch.getDescriptionParticipant();
 	}
 
 	private ReversiColor getCurrentPlayerColor() {
@@ -638,7 +645,6 @@ public class MultiPlayerMatchActivity extends Activity
 		grid.setVisibility(View.VISIBLE);
 	}
 
-    boolean evaluatingMove = false;
 	private View.OnClickListener claim(final BoardSpace s) {
 		return new View.OnClickListener() {
 			@Override
@@ -675,10 +681,7 @@ public class MultiPlayerMatchActivity extends Activity
 		};
 	}
 
-	Participant player, opponent;
 	private void calculateGameState() {
-		player = mMatch.getParticipant(mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient)));
-		opponent = mMatch.getDescriptionParticipant();
         mGameData = GameStorage.serialize(board);
 		if (board.hasMove(ReversiColor.Black)) { // If opponent can make a move, it's his turn
             String pId = (opponent == null) ? null : opponent.getParticipantId();
@@ -686,7 +689,7 @@ public class MultiPlayerMatchActivity extends Activity
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-							Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
+							Log.d(TAG, "Turn updated, opponent receives turn. Result: " + updateMatchResult.getStatus());
 							processResult(updateMatchResult);
 						}
 					});
@@ -696,7 +699,7 @@ public class MultiPlayerMatchActivity extends Activity
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-							Log.d(TAG, "Turn updated, Next action for opponent. Result: " + updateMatchResult.getStatus());
+							Log.d(TAG, "Turn updated, player keeps turn. Result: " + updateMatchResult.getStatus());
 							processResult(updateMatchResult);
 						}
 					});
