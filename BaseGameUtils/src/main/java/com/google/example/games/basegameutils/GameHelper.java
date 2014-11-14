@@ -16,8 +16,6 @@
 
 package com.google.example.games.basegameutils;
 
-import java.util.ArrayList;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -45,6 +43,8 @@ import com.google.android.gms.games.request.GameRequest;
 import com.google.android.gms.plus.Plus;
 import com.google.android.gms.plus.Plus.PlusOptions;
 
+import java.util.ArrayList;
+
 public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
@@ -55,22 +55,12 @@ public class GameHelper implements GoogleApiClient.ConnectionCallbacks,
         /**
          * Called when sign-in fails. As a result, a "Sign-In" button can be
          * shown to the user; when that button is clicked, call
-         *
-         * @link{GamesHelper#beginUserInitiatedSignIn . Note that not all calls
-         *                                            to this method mean an
-         *                                            error; it may be a result
-         *                                            of the fact that automatic
-         *                                            sign-in could not proceed
-         *                                            because user interaction
-         *                                            was required (consent
-         *                                            dialogs). So
-         *                                            implementations of this
-         *                                            method should NOT display
-         *                                            an error message unless a
-         *                                            call to @link{GamesHelper#
-         *                                            hasSignInError} indicates
-         *                                            that an error indeed
-         *                                            occurred.
+		 * GamesHelper#beginUserInitiatedSignIn
+		 * Note that not all calls to this method mean an error; it may be a result
+         * of the fact that automatic sign-in could not proceed because user interaction
+		 * was required (consent dialogs). So implementations of this method should NOT
+		 * display an error message unless a call to @link{GamesHelper# hasSignInError}
+		 * indicates that an error indeed occurred.
          */
         void onSignInFailed();
 
