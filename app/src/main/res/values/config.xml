@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<integer name="cpu_turn_delay">1000</integer>
+	<bool name="p1_cpu">false</bool>
+	<bool name="p2_cpu">true</bool>
+	<integer name="fadeOutDuration">150</integer>
+	<integer name="fadeInDuration">150</integer>
+
+</resources>

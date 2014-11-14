@@ -210,27 +210,34 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-		Intent intent;
 		switch(id) {
 			case R.id.findNewMatch:
-				if (!mGoogleApiClient.isConnected()) {
-					Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
-					return false;
-				}
-				intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
-				startActivityForResult(intent, RC_SELECT_PLAYERS);
+				startNewGame(findViewById(id));
 				return true;
 			case R.id.selectMatch:
-				if (!mGoogleApiClient.isConnected()) {
-					Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
-					return false;
-				}
-				intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
-				startActivityForResult(intent, RC_VIEW_MATCHES);
+				selectGame(findViewById(id));
 				return true;
 		}
         return super.onOptionsItemSelected(item);
     }
+
+	public void startNewGame(View v) {
+		Intent intent;
+		if (!mGoogleApiClient.isConnected()) {
+			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+		}
+		intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
+		startActivityForResult(intent, RC_SELECT_PLAYERS);
+	}
+
+	public void selectGame(View v) {
+		Intent intent;
+		if (!mGoogleApiClient.isConnected()) {
+			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+		}
+		intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
+		startActivityForResult(intent, RC_VIEW_MATCHES);
+	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -360,6 +367,7 @@ public class MultiPlayerMatchActivity extends Activity
 		mMatch = match;
 		mGameData = match.getData();
         GameStorage.deserialize(this, mMatch.getData());
+		findViewById(R.id.board_panels).setVisibility(View.GONE);
         displayBoard();
 		updateScoreDisplay();
 		updatePlayerNameDisplay();
