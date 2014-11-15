@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -42,6 +43,8 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer;
 import com.google.android.gms.plus.Plus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MultiPlayerMatchActivity extends Activity
             implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -66,11 +69,11 @@ public class MultiPlayerMatchActivity extends Activity
 	Participant player, opponent;
 	private byte[] mGameData;
 
-    // Are we currently resolving a connection failure?
     private boolean mResolvingError = false;
-
-	// Is move currently being evaluated?
 	boolean evaluatingMove = false;
+
+	Handler mHandler;
+	List<BoardSpace> mQueuedMoves;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +92,8 @@ public class MultiPlayerMatchActivity extends Activity
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .build();
+		mHandler = new Handler();
+		mQueuedMoves = new ArrayList<BoardSpace>();
     }
 
     private void connectGoogleApiClient() {
@@ -142,7 +147,7 @@ public class MultiPlayerMatchActivity extends Activity
         Log.i(TAG, "Failed to connect to Google Play services");
 		dismissSpinner();
         if (mResolvingError) {
-            return; // Already attempting to resolve an error.
+            return; // Already attempting to resolve an error
         } else if (result.hasResolution()) {
 			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
@@ -311,6 +316,7 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 
 		if (match.getData() != null) { // This is a game that has already started, just update
+			Log.d(TAG, "Data received from new match: " + bytesToString(match.getData()));
 			updateMatch(match);
 			return;
 		}
@@ -321,6 +327,7 @@ public class MultiPlayerMatchActivity extends Activity
 	private void startMatch(TurnBasedMatch match) {
 		mMatch = match;
 		board.reset();
+		saveGameData();
 		displayBoard();
 		updateScoreDisplay();
 
@@ -329,7 +336,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 //		showSpinner(1);
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
-				GameStorage.serialize(board), myParticipantId).setResultCallback(
+				mGameData, myParticipantId).setResultCallback(
 				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 					@Override
 					public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
@@ -352,7 +359,8 @@ public class MultiPlayerMatchActivity extends Activity
 //			askForRematch();
 		}
 
-		updateMatch(mMatch);
+//		if (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN)
+			updateMatch(mMatch);
 
 //		isDoingTurn = (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
 //		if (isDoingTurn) {
@@ -369,12 +377,29 @@ public class MultiPlayerMatchActivity extends Activity
 		player = getCurrentPlayer();
 		opponent = getOpponent();
 		mGameData = match.getData();
-        GameStorage.deserialize(this, mMatch.getData());
+
+		// Grab the appropriate segment from mGameData based on player's color
+		int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
+		byte[] playerData = Arrays.copyOfRange(mGameData, startIndex, startIndex+64);
+
+        GameStorage.deserialize(this, playerData);
 		findViewById(R.id.board_panels).setVisibility(View.GONE);
         displayBoard();
 		updateScoreDisplay();
 		updatePlayerNameDisplay();
 		dismissSpinner();
+
+		// Commit opponent's moves to the deserialized Board object
+		// 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
+		startIndex += 64;
+		while (mGameData[startIndex] != 0) {
+			BoardSpace s = GameStorage.getBoardSpaceFromNum(board, mGameData[startIndex++]);
+			Log.d(TAG, "Opponent moved @(" + s.x + " " + s.y + ")");
+			mQueuedMoves.add(s);
+		}
+
+		if (!mQueuedMoves.isEmpty())
+			processReceivedTurns();
 
 		int status = match.getStatus();
 		int turnStatus = match.getTurnStatus();
@@ -413,6 +438,47 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 	}
 
+	private void processReceivedTurns() {
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				board.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
+				updateScoreDisplay();
+//				mGameData = GameStorage.serialize(board);
+				saveGameData();
+				if (!mQueuedMoves.isEmpty())
+					processReceivedTurns();
+			}
+		}, getResources().getInteger(R.integer.cpu_turn_delay));
+	}
+
+	private void saveGameData() {
+		byte[] playerBoard = GameStorage.serialize(board);
+
+		if (mGameData == null) {
+			mGameData = new byte[256];
+			System.arraycopy(playerBoard, 0, mGameData, 0, playerBoard.length);
+			System.arraycopy(playerBoard, 0, mGameData, 100, playerBoard.length);
+		} else {
+			int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
+			// Copy the serialized Board into the appropriate place in game data
+			System.arraycopy(playerBoard, 0, mGameData, startIndex, playerBoard.length);
+			// Clear out the first 20 nodes following (which were the other player's previous moves)
+			for (int clearIndex = startIndex+64; clearIndex < startIndex+64+16; clearIndex++)
+				mGameData[clearIndex] = 0;
+		}
+
+		Log.d(TAG, "Player's game data saved: " + bytesToString(mGameData));
+	}
+
+	private String bytesToString(byte[] in) {
+		// Converting mGameData to String for debugging
+		StringBuffer buf = new StringBuffer();
+		for (byte b : in)
+			buf.append(String.valueOf(b));
+		return buf.toString();
+	}
+
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
         Log.d(TAG, "Match update received for match: " + match.getMatchId());
@@ -441,6 +507,12 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private ReversiColor getCurrentPlayerColor() {
 		if (getCurrentPlayer() == getLightPlayer())
+			return ReversiColor.White;
+		else return ReversiColor.Black;
+	}
+
+	private ReversiColor getOpponentColor() {
+		if (getOpponent() == getLightPlayer())
 			return ReversiColor.White;
 		else return ReversiColor.Black;
 	}
@@ -562,8 +634,7 @@ public class MultiPlayerMatchActivity extends Activity
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
-						// if this button is clicked, close
-						// current activity
+						// if this button is clicked, close current activity
 					}
 				});
 		mAlertDialog = alertDialogBuilder.create();
@@ -637,7 +708,7 @@ public class MultiPlayerMatchActivity extends Activity
 				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);
 				space.setLayoutParams(params);
-				space.setOnClickListener(claim(space)); // Need to change this to a method for multiplayer turn taking
+				space.setOnClickListener(claim(space));
 				row.addView(space);
 			}
 			grid.addView(row);
@@ -650,7 +721,7 @@ public class MultiPlayerMatchActivity extends Activity
 			@Override
 			public void onClick(View view) {
 				if (mGoogleApiClient.isConnected()) {
-                    if (evaluatingMove) {
+                    if (evaluatingMove || !mQueuedMoves.isEmpty()) {
                         Log.d(TAG, "Error: Still evaluating last move");
                         return;
                     }
@@ -671,7 +742,18 @@ public class MultiPlayerMatchActivity extends Activity
                         evaluatingMove = true;
                         showSpinner(2);
 						board.commitPiece(s, playerColor);
-						calculateGameState();
+						saveGameData();
+
+						// Add selected piece to the end of mGameData array
+						// 0 [White's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [White's Moves]
+						int nextIndex = (getCurrentPlayer() == getLightPlayer()) ? 164 : 64;
+						while (mGameData[nextIndex] != 0)
+							nextIndex++; // Increase index til we run into an unfilled index
+						mGameData[nextIndex] = GameStorage.getSpaceNumber(s);
+						Log.d(TAG, "Queued move for opponent's Board");
+						Log.d(TAG, bytesToString(mGameData));
+
+						updateGameState();
 					} else {
 						Toast.makeText(view.getContext(), R.string.bad_move, Toast.LENGTH_SHORT).show();
 					}
@@ -681,8 +763,8 @@ public class MultiPlayerMatchActivity extends Activity
 		};
 	}
 
-	private void calculateGameState() {
-        mGameData = GameStorage.serialize(board);
+	private void updateGameState() {
+//        mGameData = GameStorage.serialize(board); // Commenting as we're going to pass a differential from now on
 		if (board.hasMove(ReversiColor.Black)) { // If opponent can make a move, it's his turn
             String pId = (opponent == null) ? null : opponent.getParticipantId();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, pId)

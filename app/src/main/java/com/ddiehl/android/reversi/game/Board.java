@@ -11,7 +11,7 @@ public class Board {
 	private int width;
 	private int height;
 
-    private final int[][] moveDirections = new int[][] {
+    private final byte[][] moveDirections = new byte[][] {
             {0,  -1}, // Down
             {1,  0}, // Right
             {-1, 0}, // Left
@@ -58,7 +58,7 @@ public class Board {
 			BoardSpace s = i.next();
 			if (s.isOwned())
 				continue;
-			for (int[] move : moveDirections) {
+			for (byte[] move : moveDirections) {
 				int value = moveValueInDirection(s, move[0], move[1], c);
 				if (value != 0) {
 					return true;
@@ -80,7 +80,7 @@ public class Board {
     }
 
 	public boolean commitPiece(BoardSpace space, ReversiColor playerColor) {
-		for (int[] move : moveDirections) {
+		for (byte[] move : moveDirections) {
 			if (moveValueInDirection(space, move[0], move[1], playerColor) != 0) {
 				flipInDirection(space, move[0], move[1], playerColor);
 			}
@@ -90,7 +90,7 @@ public class Board {
 
 	public int spacesCapturedWithMove(BoardSpace s, ReversiColor playerColor) {
 		int moveVal = 0;
-		for (int[] move : moveDirections)
+		for (byte[] move : moveDirections)
 			moveVal += moveValueInDirection(s, move[0], move[1], playerColor);
 		return moveVal;
 	}

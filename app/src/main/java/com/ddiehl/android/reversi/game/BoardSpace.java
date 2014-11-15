@@ -13,11 +13,18 @@ public class BoardSpace extends Button {
     private ReversiColor color;
 	public int x, y;
 
+	public BoardSpace(Context c) {
+		super(c);
+		ctx = c;
+		setBackgroundResource(R.drawable.board_space_neutral);
+		color = null;
+	}
+
     public BoardSpace(Context c, int x, int y) {
 		super(c);
-        ctx = c;
-        setBackgroundResource(R.drawable.board_space_neutral);
-        color = null;
+		ctx = c;
+		setBackgroundResource(R.drawable.board_space_neutral);
+		color = null;
         this.x = x;
         this.y = y;
     }
