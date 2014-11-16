@@ -175,17 +175,6 @@ public class MultiPlayerMatchActivity extends Activity
         }
     }
 
-    /* Creates a dialog for an error message */
-    private void showErrorDialog(int errorCode) {
-        // Create a fragment for the error dialog
-        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-        // Pass the error that should be displayed
-        Bundle args = new Bundle();
-        args.putInt(DIALOG_ERROR, errorCode);
-        dialogFragment.setArguments(args);
-        dialogFragment.show(getFragmentManager(), DIALOG_ERROR);
-    }
-
     public void onDialogDismissed() {
 		mResolvingError = false;
     }
@@ -205,26 +194,6 @@ public class MultiPlayerMatchActivity extends Activity
         public void onDismiss(DialogInterface dialog) {
             ((MultiPlayerMatchActivity) getActivity()).onDialogDismissed();
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.multi_player, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-		switch(id) {
-			case R.id.findNewMatch:
-				startNewGame(findViewById(id));
-				return true;
-			case R.id.selectMatch:
-				selectGame(findViewById(id));
-				return true;
-		}
-        return super.onOptionsItemSelected(item);
     }
 
 	public void startNewGame(View v) {
@@ -438,20 +407,6 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 	}
 
-	private void processReceivedTurns() {
-		mHandler.postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				board.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
-				updateScoreDisplay();
-//				mGameData = GameStorage.serialize(board);
-				saveGameData();
-				if (!mQueuedMoves.isEmpty())
-					processReceivedTurns();
-			}
-		}, getResources().getInteger(R.integer.cpu_turn_delay));
-	}
-
 	private void saveGameData() {
 		byte[] playerBoard = GameStorage.serialize(board);
 
@@ -471,12 +426,18 @@ public class MultiPlayerMatchActivity extends Activity
 		Log.d(TAG, "Player's game data saved: " + bytesToString(mGameData));
 	}
 
-	private String bytesToString(byte[] in) {
-		// Converting mGameData to String for debugging
-		StringBuffer buf = new StringBuffer();
-		for (byte b : in)
-			buf.append(String.valueOf(b));
-		return buf.toString();
+	private void processReceivedTurns() {
+		mHandler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				board.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
+				updateScoreDisplay();
+//				mGameData = GameStorage.serialize(board);
+				saveGameData();
+				if (!mQueuedMoves.isEmpty())
+					processReceivedTurns();
+			}
+		}, getResources().getInteger(R.integer.cpu_turn_delay));
 	}
 
     @Override
@@ -491,230 +452,6 @@ public class MultiPlayerMatchActivity extends Activity
         // Don't think I actually need to implement this
 		Log.d(TAG, "Match removed: " + matchId);
     }
-
-	private Participant getCurrentPlayer() {
-		Participant lightPlayer = getLightPlayer();
-		Participant darkPlayer = getDarkPlayer();
-		if (mMatch.getParticipant(mMatch.getParticipantId(
-				Games.Players.getCurrentPlayerId(mGoogleApiClient))) == lightPlayer)
-			return lightPlayer;
-		else return darkPlayer;
-	}
-
-	private Participant getOpponent() {
-		return mMatch.getDescriptionParticipant();
-	}
-
-	private ReversiColor getCurrentPlayerColor() {
-		if (getCurrentPlayer() == getLightPlayer())
-			return ReversiColor.White;
-		else return ReversiColor.Black;
-	}
-
-	private ReversiColor getOpponentColor() {
-		if (getOpponent() == getLightPlayer())
-			return ReversiColor.White;
-		else return ReversiColor.Black;
-	}
-
-    private Participant getLightPlayer() {
-        if (mMatch != null)
-            return mMatch.getParticipant(mMatch.getCreatorId());
-        return null;
-    }
-
-    private Participant getDarkPlayer() {
-        if (mMatch != null) {
-            ArrayList<String> participantIds = mMatch.getParticipantIds();
-            String lightId = mMatch.getCreatorId();
-            String darkId = null;
-            for (String id : participantIds) {
-                if (id.equals(lightId))
-                    continue;
-                darkId = id;
-            }
-            if (darkId != null)
-                return mMatch.getParticipant(darkId);
-        }
-        return null;
-    }
-
-	private void updatePlayerNameDisplay() {
-        Participant light = getLightPlayer();
-        Participant dark = getDarkPlayer();
-
-        if (light != null) {
-			Log.d(TAG, "Light's name: " + light.getDisplayName());
-			((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
-		} else {
-			Log.d(TAG, "Light's name: Unknown");
-			((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
-		}
-
-        if (dark != null) {
-			Log.d(TAG, "Dark's name: " + dark.getDisplayName());
-			((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
-		} else {
-			Log.d(TAG, "Dark's name: Unknown");
-			((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
-		}
-	}
-
-	private void updateScoreDisplay() {
-		int p1c = 0, p2c = 0;
-		BoardIterator i = new BoardIterator(board);
-		while (i.hasNext()) {
-			BoardSpace s = i.next();
-			if (s.isOwned()) {
-				if (s.getColor() == ReversiColor.White) p1c++;
-				else p2c++;
-			}
-		}
-		((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
-		((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
-		updateTurnIndicator();
-	}
-
-	private void updateTurnIndicator() {
-		ImageView turnIndicator = (ImageView) findViewById(R.id.turnIndicator);
-		int myTurnResource = (getCurrentPlayer() == getLightPlayer()) ?
-				R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2;
-		int oppTurnResource = (myTurnResource == R.drawable.ic_turn_indicator_p1) ?
-				R.drawable.ic_turn_indicator_p2 : R.drawable.ic_turn_indicator_p1;
-		switch (mMatch.getTurnStatus()) {
-			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-				turnIndicator.setImageResource(myTurnResource);
-				break;
-			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
-				turnIndicator.setImageResource(oppTurnResource);
-				break;
-			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-				turnIndicator.setImageResource(android.R.color.transparent);
-				break;
-			case TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE:
-				turnIndicator.setImageResource(android.R.color.transparent);
-				break;
-		}
-	}
-
-	private void displayMessage(String gameMsg) {
-		((TextView) findViewById(R.id.gameMessage)).setText(gameMsg);
-	}
-
-	private void dismissMessage() {
-		((TextView) findViewById(R.id.gameMessage)).setText("");
-	}
-
-	private void showSpinner(int spinnerMsg) {
-		if (progressBar == null) {
-			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
-			progressBar.setCancelable(false);
-			progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			progressBar.setMessage(getString(R.string.loading_match));
-		}
-        switch (spinnerMsg) {
-            case 1: progressBar.setMessage(getString(R.string.loading_match)); break;
-            case 2: progressBar.setMessage(getString(R.string.submitting_move)); break;
-            case 3: progressBar.setMessage(getString(R.string.connecting)); break;
-            default: progressBar.setMessage(getString(R.string.please_wait));
-        }
-		progressBar.show();
-	}
-
-	private void dismissSpinner() {
-		progressBar.dismiss();
-	}
-
-	// Generic warning/info dialog
-	private void showWarning(String title, String message) {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-		alertDialogBuilder.setTitle(title).setMessage(message);
-		alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						// if this button is clicked, close current activity
-					}
-				});
-		mAlertDialog = alertDialogBuilder.create();
-		mAlertDialog.show();
-	}
-
-	private void showErrorMessage(int stringId) { showWarning("Warning", getResources().getString(stringId)); }
-
-	// Returns false if something went wrong, probably. This should handle
-	// more cases, and probably report more accurate results.
-	private boolean checkStatusCode(TurnBasedMatch match, int statusCode) {
-		switch (statusCode) {
-			case GamesStatusCodes.STATUS_OK:
-				return true;
-			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED:
-				// This is OK; the action is stored by Google Play Services and will
-				// be dealt with later.
-				Toast.makeText(
-						this,
-						"Stored action for later. (Please remove this toast before release.)",
-						Toast.LENGTH_SHORT).show();
-				// NOTE: This toast is for informative reasons only; please remove
-				// it from your final application.
-				return true;
-			case GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
-				showErrorMessage(R.string.status_multiplayer_error_not_trusted_tester);
-				break;
-			case GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED:
-				showErrorMessage(R.string.match_error_already_rematched);
-				break;
-			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED:
-				showErrorMessage(R.string.network_error_operation_failed);
-				break;
-			case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
-				showErrorMessage(R.string.client_reconnect_required);
-				break;
-			case GamesStatusCodes.STATUS_INTERNAL_ERROR:
-				showErrorMessage(R.string.internal_error);
-				break;
-			case GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH:
-				showErrorMessage(R.string.match_error_inactive_match);
-				break;
-			case GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED:
-				showErrorMessage(R.string.match_error_locally_modified);
-				break;
-			default:
-				showErrorMessage(R.string.unexpected_status);
-				Log.d(TAG, "Did not have warning or string to deal with: " + statusCode);
-		}
-
-		return false;
-	}
-
-	// This is duplicated between the single player activity and multiplayer activity
-	// Consider refactoring this to a static method in another class to decrease code duplication
-	private void displayBoard() {
-		TableLayout grid = (TableLayout) findViewById(R.id.GameGrid);
-		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
-		grid.setLayoutParams(new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-		grid.removeAllViews();
-
-		int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
-		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
-
-		for (int y = 0; y < board.height(); y++) {
-			TableRow row = new TableRow(this);
-			row.setWeightSum(board.width());
-			for (int x = 0; x < board.width(); x++) {
-				BoardSpace space = board.getSpaceAt(x, y);
-				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
-				params.setMargins(bMargin, bMargin, bMargin, bMargin);
-				space.setLayoutParams(params);
-				space.setOnClickListener(claim(space));
-				row.addView(space);
-			}
-			grid.addView(row);
-		}
-		grid.setVisibility(View.VISIBLE);
-	}
 
 	private View.OnClickListener claim(final BoardSpace s) {
 		return new View.OnClickListener() {
@@ -764,7 +501,6 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void updateGameState() {
-//        mGameData = GameStorage.serialize(board); // Commenting as we're going to pass a differential from now on
 		if (board.hasMove(ReversiColor.Black)) { // If opponent can make a move, it's his turn
             String pId = (opponent == null) ? null : opponent.getParticipantId();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, pId)
@@ -820,5 +556,270 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void submitWinner(Participant player) {
 
+	}
+
+	private Participant getCurrentPlayer() {
+		Participant lightPlayer = getLightPlayer();
+		Participant darkPlayer = getDarkPlayer();
+		if (mMatch.getParticipant(mMatch.getParticipantId(
+				Games.Players.getCurrentPlayerId(mGoogleApiClient))) == lightPlayer)
+			return lightPlayer;
+		else return darkPlayer;
+	}
+
+	private Participant getOpponent() {
+		return mMatch.getDescriptionParticipant();
+	}
+
+	private ReversiColor getCurrentPlayerColor() {
+		if (getCurrentPlayer() == getLightPlayer())
+			return ReversiColor.White;
+		else return ReversiColor.Black;
+	}
+
+	private ReversiColor getOpponentColor() {
+		if (getOpponent() == getLightPlayer())
+			return ReversiColor.White;
+		else return ReversiColor.Black;
+	}
+
+	private Participant getLightPlayer() {
+		if (mMatch != null)
+			return mMatch.getParticipant(mMatch.getCreatorId());
+		return null;
+	}
+
+	private Participant getDarkPlayer() {
+		if (mMatch != null) {
+			ArrayList<String> participantIds = mMatch.getParticipantIds();
+			String lightId = mMatch.getCreatorId();
+			String darkId = null;
+			for (String id : participantIds) {
+				if (id.equals(lightId))
+					continue;
+				darkId = id;
+			}
+			if (darkId != null)
+				return mMatch.getParticipant(darkId);
+		}
+		return null;
+	}
+
+	// This is duplicated between the single player activity and multiplayer activity
+	// Consider refactoring this to a static method in another class to decrease code duplication
+	private void displayBoard() {
+		TableLayout grid = (TableLayout) findViewById(R.id.GameGrid);
+		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
+		grid.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+		grid.removeAllViews();
+
+		int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
+		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
+
+		for (int y = 0; y < board.height(); y++) {
+			TableRow row = new TableRow(this);
+			row.setWeightSum(board.width());
+			for (int x = 0; x < board.width(); x++) {
+				BoardSpace space = board.getSpaceAt(x, y);
+				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
+				params.setMargins(bMargin, bMargin, bMargin, bMargin);
+				space.setLayoutParams(params);
+				space.setOnClickListener(claim(space));
+				row.addView(space);
+			}
+			grid.addView(row);
+		}
+		grid.setVisibility(View.VISIBLE);
+	}
+
+	private void updatePlayerNameDisplay() {
+		Participant light = getLightPlayer();
+		Participant dark = getDarkPlayer();
+
+		if (light != null) {
+			Log.d(TAG, "Light's name: " + light.getDisplayName());
+			((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
+		} else {
+			Log.d(TAG, "Light's name: Unknown");
+			((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
+		}
+
+		if (dark != null) {
+			Log.d(TAG, "Dark's name: " + dark.getDisplayName());
+			((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
+		} else {
+			Log.d(TAG, "Dark's name: Unknown");
+			((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
+		}
+	}
+
+	private void updateScoreDisplay() {
+		int p1c = 0, p2c = 0;
+		BoardIterator i = new BoardIterator(board);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (s.isOwned()) {
+				if (s.getColor() == ReversiColor.White) p1c++;
+				else p2c++;
+			}
+		}
+		((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
+		((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
+		updateTurnIndicator();
+	}
+
+	private void updateTurnIndicator() {
+		ImageView turnIndicator = (ImageView) findViewById(R.id.turnIndicator);
+		int myTurnResource = (getCurrentPlayer() == getLightPlayer()) ?
+				R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2;
+		int oppTurnResource = (myTurnResource == R.drawable.ic_turn_indicator_p1) ?
+				R.drawable.ic_turn_indicator_p2 : R.drawable.ic_turn_indicator_p1;
+		switch (mMatch.getTurnStatus()) {
+			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
+				turnIndicator.setImageResource(myTurnResource);
+				break;
+			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
+				turnIndicator.setImageResource(oppTurnResource);
+				break;
+			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
+				turnIndicator.setImageResource(android.R.color.transparent);
+				break;
+			case TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE:
+				turnIndicator.setImageResource(android.R.color.transparent);
+				break;
+		}
+	}
+
+	// Returns false if something went wrong, probably. This should handle
+	// more cases, and probably report more accurate results.
+	private boolean checkStatusCode(TurnBasedMatch match, int statusCode) {
+		switch (statusCode) {
+			case GamesStatusCodes.STATUS_OK:
+				return true;
+			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED:
+				// This is OK; the action is stored by Google Play Services and will
+				// be dealt with later.
+				Toast.makeText(
+						this,
+						"Stored action for later. (Please remove this toast before release.)",
+						Toast.LENGTH_SHORT).show();
+				// NOTE: This toast is for informative reasons only; please remove
+				// it from your final application.
+				return true;
+			case GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
+				showErrorMessage(R.string.status_multiplayer_error_not_trusted_tester);
+				break;
+			case GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED:
+				showErrorMessage(R.string.match_error_already_rematched);
+				break;
+			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED:
+				showErrorMessage(R.string.network_error_operation_failed);
+				break;
+			case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
+				showErrorMessage(R.string.client_reconnect_required);
+				break;
+			case GamesStatusCodes.STATUS_INTERNAL_ERROR:
+				showErrorMessage(R.string.internal_error);
+				break;
+			case GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH:
+				showErrorMessage(R.string.match_error_inactive_match);
+				break;
+			case GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED:
+				showErrorMessage(R.string.match_error_locally_modified);
+				break;
+			default:
+				showErrorMessage(R.string.unexpected_status);
+				Log.d(TAG, "Did not have warning or string to deal with: " + statusCode);
+		}
+
+		return false;
+	}
+
+	private void displayMessage(String gameMsg) {
+		((TextView) findViewById(R.id.gameMessage)).setText(gameMsg);
+	}
+
+	private void dismissMessage() {
+		((TextView) findViewById(R.id.gameMessage)).setText("");
+	}
+
+	private void showSpinner(int spinnerMsg) {
+		if (progressBar == null) {
+			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
+			progressBar.setCancelable(false);
+			progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			progressBar.setMessage(getString(R.string.loading_match));
+		}
+		switch (spinnerMsg) {
+			case 1: progressBar.setMessage(getString(R.string.loading_match)); break;
+			case 2: progressBar.setMessage(getString(R.string.submitting_move)); break;
+			case 3: progressBar.setMessage(getString(R.string.connecting)); break;
+			default: progressBar.setMessage(getString(R.string.please_wait));
+		}
+		progressBar.show();
+	}
+
+	private void dismissSpinner() {
+		progressBar.dismiss();
+	}
+
+	// Generic warning/info dialog
+	private void showWarning(String title, String message) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+
+		alertDialogBuilder.setTitle(title).setMessage(message);
+		alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int id) {
+						// if this button is clicked, close current activity
+					}
+				});
+		mAlertDialog = alertDialogBuilder.create();
+		mAlertDialog.show();
+	}
+
+	private void showErrorMessage(int stringId) {
+		showWarning("Warning", getResources().getString(stringId));
+	}
+
+	/* Creates a dialog for an error message */
+	private void showErrorDialog(int errorCode) {
+		// Create a fragment for the error dialog
+		ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+		// Pass the error that should be displayed
+		Bundle args = new Bundle();
+		args.putInt(DIALOG_ERROR, errorCode);
+		dialogFragment.setArguments(args);
+		dialogFragment.show(getFragmentManager(), DIALOG_ERROR);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.multi_player, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		switch(id) {
+			case R.id.findNewMatch:
+				startNewGame(findViewById(id));
+				return true;
+			case R.id.selectMatch:
+				selectGame(findViewById(id));
+				return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	private String bytesToString(byte[] in) {
+		// Converting mGameData to String for debugging
+		StringBuffer buf = new StringBuffer();
+		for (byte b : in)
+			buf.append(String.valueOf(b));
+		return buf.toString();
 	}
 }
