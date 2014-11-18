@@ -43,10 +43,11 @@ public class GameStorage {
     }
 
 	public static byte getSpaceNumber(BoardSpace s) {
-		return (byte) (s.y * 8 + s.x);
+		return (byte) (s.y * 8 + s.x + 1);
 	}
 
 	public static BoardSpace getBoardSpaceFromNum(Board b, int n) {
+		n -= 1;
 		return b.getSpaceAt(n % 8, n / 8);
 	}
 }

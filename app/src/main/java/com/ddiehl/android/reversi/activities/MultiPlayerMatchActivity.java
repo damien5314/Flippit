@@ -35,6 +35,7 @@ import com.google.android.gms.games.Games;
 import com.google.android.gms.games.GamesStatusCodes;
 import com.google.android.gms.games.multiplayer.Multiplayer;
 import com.google.android.gms.games.multiplayer.Participant;
+import com.google.android.gms.games.multiplayer.ParticipantResult;
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig;
 import com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener;
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
@@ -278,6 +279,8 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 		TurnBasedMatch match = result.getMatch();
+		mGameData = null;
+		saveGameData();
 //		dismissSpinner();
 
 		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
@@ -389,9 +392,9 @@ public class MultiPlayerMatchActivity extends Activity
 					break;
 				}
 
-				// Note that in this state, you must still call "Finish" yourself,
-				// so we allow this to continue.
-				showWarning("Complete!", "This game is over; someone finished it!  You can only finish it now.");
+				// Call endGame() here to trigger finish() method and result display
+				endGame();
+//				showWarning("Complete!", "This game is over; someone finished it!  You can only finish it now.");
 		}
 
 		// OK, it's active. Check on turn status.
@@ -427,6 +430,7 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void processReceivedTurns() {
+		evaluatingMove = true;
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -436,6 +440,8 @@ public class MultiPlayerMatchActivity extends Activity
 				saveGameData();
 				if (!mQueuedMoves.isEmpty())
 					processReceivedTurns();
+				else
+					evaluatingMove = false;
 			}
 		}, getResources().getInteger(R.integer.cpu_turn_delay));
 	}
@@ -501,7 +507,7 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void updateGameState() {
-		if (board.hasMove(ReversiColor.Black)) { // If opponent can make a move, it's his turn
+		if (board.hasMove(getOpponentColor())) { // If opponent can make a move, it's his turn
             String pId = (opponent == null) ? null : opponent.getParticipantId();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, pId)
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
@@ -511,7 +517,7 @@ public class MultiPlayerMatchActivity extends Activity
 							processResult(updateMatchResult);
 						}
 					});
-		} else if (board.hasMove(ReversiColor.White)) { // Opponent has no move, keep turn
+		} else if (board.hasMove(getCurrentPlayerColor())) { // Opponent has no move, keep turn
 			Toast.makeText(this, getString(R.string.no_moves) + opponent.getDisplayName(), Toast.LENGTH_SHORT).show();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, player.getParticipantId())
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
@@ -535,6 +541,7 @@ public class MultiPlayerMatchActivity extends Activity
 		int lightCount = 0;
 		int darkCount = 0;
 		BoardIterator i = new BoardIterator(board);
+
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
 			if (s.isOwned()) {
@@ -544,18 +551,36 @@ public class MultiPlayerMatchActivity extends Activity
 					darkCount++;
 			}
 		}
-		Participant winner = null;
-		if (lightCount != darkCount)
-			winner = (lightCount > darkCount) ? player : opponent;
-		submitWinner(winner);
-//		int diff = 64 - lightCount - darkCount;
-//		winner.setScore(winner.getScore() + diff);
-//		updateScoreForPlayer(winner);
-//		gameInProgress = false;
-	}
 
-	private void submitWinner(Participant player) {
-
+		int diff = 64 - lightCount - darkCount;
+		ParticipantResult winnerResult = null;
+		ParticipantResult loserResult = null;
+		int winningCount;
+		int resourceToUpdate;
+		if (lightCount != darkCount) {
+			if (lightCount > darkCount) {
+				winnerResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
+						ParticipantResult.PLACING_UNINITIALIZED);
+				loserResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
+						ParticipantResult.PLACING_UNINITIALIZED);
+				winningCount = lightCount;
+				resourceToUpdate = R.id.p1score;
+			} else {
+				winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
+						ParticipantResult.PLACING_UNINITIALIZED);
+				loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
+						ParticipantResult.PLACING_UNINITIALIZED);
+				winningCount = darkCount;
+				resourceToUpdate = R.id.p2score;
+			}
+			((TextView) findViewById(resourceToUpdate)).setText(String.valueOf(winningCount+diff));
+		} else {
+			winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
+					ParticipantResult.PLACING_UNINITIALIZED);
+			loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
+					ParticipantResult.PLACING_UNINITIALIZED);
+		}
+		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mGameData, winnerResult, loserResult);
 	}
 
 	private Participant getCurrentPlayer() {
