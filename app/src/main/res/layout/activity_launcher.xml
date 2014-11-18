@@ -14,13 +14,13 @@
         android:text="@string/activity_launcher_title"/>
 
     <Button
-        style="@style/CallToActionButton"
+        style="@style/LauncherCTA"
         android:id="@+id/button_start_1p"
         android:text="@string/button_start_1p"
         android:onClick="start1p" />
 
     <Button
-        style="@style/CallToActionButton"
+        style="@style/LauncherCTA"
         android:id="@+id/button_start_mp"
         android:text="@string/button_start_mp"
         android:onClick="startMultiplayer" />

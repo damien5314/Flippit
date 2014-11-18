@@ -2,7 +2,8 @@
 <resources>
 
 	<color name="board_color">#42A321</color>
-	<color name="board_panel_color">#FFFFFF</color>
+	<color name="board_action_panel">#FFFFFF</color>
+	<color name="launcher_cta">#000000</color>
 	<color name="transparent">#00000000</color>
 
 </resources>
