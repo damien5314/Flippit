@@ -180,7 +180,6 @@ public class MultiPlayerMatchActivity extends Activity
 		mResolvingError = false;
     }
 
-    /* A fragment to display an error dialog */
     public static class ErrorDialogFragment extends DialogFragment {
         public ErrorDialogFragment() { }
 
@@ -281,14 +280,14 @@ public class MultiPlayerMatchActivity extends Activity
 		TurnBasedMatch match = result.getMatch();
 		mGameData = null;
 		saveGameData();
-//		dismissSpinner();
 
 		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
 			return;
 		}
 
 		if (match.getData() != null) { // This is a game that has already started, just update
-			Log.d(TAG, "Data received from new match: " + bytesToString(match.getData()));
+			Log.d(TAG, "Game already started, data:");
+			Log.d(TAG, bytesToString(match.getData()));
 			updateMatch(match);
 			return;
 		}
@@ -394,7 +393,6 @@ public class MultiPlayerMatchActivity extends Activity
 
 				// Call endGame() here to trigger finish() method and result display
 				endGame();
-//				showWarning("Complete!", "This game is over; someone finished it!  You can only finish it now.");
 		}
 
 		// OK, it's active. Check on turn status.
@@ -534,6 +532,7 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void endGame() {
+		// Calculate score for each piece
 		int lightCount = 0;
 		int darkCount = 0;
 		BoardIterator i = new BoardIterator(board);
@@ -548,11 +547,10 @@ public class MultiPlayerMatchActivity extends Activity
 			}
 		}
 
-		int diff = 64 - lightCount - darkCount;
+		addRemainingSpacesToWinningCount(lightCount, darkCount);
+
 		ParticipantResult winnerResult = null;
 		ParticipantResult loserResult = null;
-		int winningCount;
-		int resourceToUpdate;
 		if (lightCount != darkCount) {
 			if (lightCount > darkCount) {
 				winnerResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
@@ -569,7 +567,6 @@ public class MultiPlayerMatchActivity extends Activity
 				winningCount = darkCount;
 				resourceToUpdate = R.id.p2score;
 			}
-			((TextView) findViewById(resourceToUpdate)).setText(String.valueOf(winningCount+diff));
 		} else {
 			winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
@@ -577,6 +574,14 @@ public class MultiPlayerMatchActivity extends Activity
 					ParticipantResult.PLACING_UNINITIALIZED);
 		}
 		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mGameData, winnerResult, loserResult);
+	}
+
+	private void addRemainingSpacesToWinningCount(int lightCount, int darkCount) {
+		int diff = 64 - lightCount - darkCount;
+		if (lightCount > darkCount)
+			((TextView) findViewById(R.id.p1score)).setText(String.valueOf(lightCount+diff));
+		else if (darkCount > lightCount)
+			((TextView) findViewById(R.id.p2score)).setText(String.valueOf(darkCount+diff));
 	}
 
 	private Participant getCurrentPlayer() {
@@ -725,6 +730,7 @@ public class MultiPlayerMatchActivity extends Activity
 			case GamesStatusCodes.STATUS_OK:
 				return true;
 			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED:
+				// TODO Remove this Toast
 				// This is OK; the action is stored by Google Play Services and will
 				// be dealt with later.
 				Toast.makeText(
@@ -776,7 +782,6 @@ public class MultiPlayerMatchActivity extends Activity
 			progressBar = new ProgressDialog(this, R.style.ProgressDialog);
 			progressBar.setCancelable(false);
 			progressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-			progressBar.setMessage(getString(R.string.loading_match));
 		}
 		switch (spinnerMsg) {
 			case 1: progressBar.setMessage(getString(R.string.loading_match)); break;
@@ -842,6 +847,7 @@ public class MultiPlayerMatchActivity extends Activity
 		return super.onOptionsItemSelected(item);
 	}
 
+	// Used for converting Board to debugging text String only
 	private String bytesToString(byte[] in) {
 		// Converting mGameData to String for debugging
 		StringBuffer buf = new StringBuffer();
