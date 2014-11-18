@@ -547,25 +547,22 @@ public class MultiPlayerMatchActivity extends Activity
 			}
 		}
 
+		// Add remaining spaces to winning count as per Reversi rules
 		addRemainingSpacesToWinningCount(lightCount, darkCount);
 
-		ParticipantResult winnerResult = null;
-		ParticipantResult loserResult = null;
+		// Generate ParticipantResult objects for passing to finishMatch()
+		ParticipantResult winnerResult, loserResult;
 		if (lightCount != darkCount) {
 			if (lightCount > darkCount) {
 				winnerResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				winningCount = lightCount;
-				resourceToUpdate = R.id.p1score;
 			} else {
 				winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				winningCount = darkCount;
-				resourceToUpdate = R.id.p2score;
 			}
 		} else {
 			winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
@@ -573,6 +570,8 @@ public class MultiPlayerMatchActivity extends Activity
 			loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
 		}
+
+		// Call finishMatch() with results
 		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mGameData, winnerResult, loserResult);
 	}
 
@@ -670,18 +669,14 @@ public class MultiPlayerMatchActivity extends Activity
 		Participant dark = getDarkPlayer();
 
 		if (light != null) {
-			Log.d(TAG, "Light's name: " + light.getDisplayName());
 			((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
 		} else {
-			Log.d(TAG, "Light's name: Unknown");
 			((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
 		}
 
 		if (dark != null) {
-			Log.d(TAG, "Dark's name: " + dark.getDisplayName());
 			((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
 		} else {
-			Log.d(TAG, "Dark's name: Unknown");
 			((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
 		}
 	}
@@ -698,10 +693,8 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 		((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
 		((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
-		updateTurnIndicator();
-	}
 
-	private void updateTurnIndicator() {
+		// Update turn indicator
 		ImageView turnIndicator = (ImageView) findViewById(R.id.turnIndicator);
 		int myTurnResource = (getCurrentPlayer() == getLightPlayer()) ?
 				R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2;
@@ -731,14 +724,10 @@ public class MultiPlayerMatchActivity extends Activity
 				return true;
 			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED:
 				// TODO Remove this Toast
-				// This is OK; the action is stored by Google Play Services and will
-				// be dealt with later.
 				Toast.makeText(
 						this,
 						"Stored action for later. (Please remove this toast before release.)",
 						Toast.LENGTH_SHORT).show();
-				// NOTE: This toast is for informative reasons only; please remove
-				// it from your final application.
 				return true;
 			case GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
 				showErrorMessage(R.string.status_multiplayer_error_not_trusted_tester);
