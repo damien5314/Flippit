@@ -459,51 +459,47 @@ public class MultiPlayerMatchActivity extends Activity
 		Log.d(TAG, "Match removed: " + matchId);
     }
 
-	private View.OnClickListener claim(final BoardSpace s) {
-		return new View.OnClickListener() {
-			@Override
-			public void onClick(View view) {
-				if (mGoogleApiClient.isConnected()) {
-                    if (evaluatingMove || !mQueuedMoves.isEmpty()) {
-                        Log.d(TAG, "Error: Still evaluating last move");
-                        return;
-                    }
-
-					if (s.isOwned())
-						return;
-
-                    Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus() + " (My Turn Status = "
-							+ TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN + ")");
-					if (mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-						Toast.makeText(view.getContext(), "Not your turn!", Toast.LENGTH_SHORT).show();
-						return;
-					}
-
-					ReversiColor playerColor = getCurrentPlayerColor();
-
-					if (board.spacesCapturedWithMove(s, playerColor) > 0) {
-                        evaluatingMove = true;
-                        showSpinner(2);
-						board.commitPiece(s, playerColor);
-						saveGameData();
-
-						// Add selected piece to the end of mGameData array
-						// 0 [White's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [White's Moves]
-						int nextIndex = (getCurrentPlayer() == getLightPlayer()) ? 164 : 64;
-						while (mGameData[nextIndex] != 0)
-							nextIndex++; // Increase index til we run into an unfilled index
-						mGameData[nextIndex] = GameStorage.getSpaceNumber(s);
-						Log.d(TAG, "Queued move for opponent's Board");
-						Log.d(TAG, bytesToString(mGameData));
-
-						updateGameState();
-					} else {
-						Toast.makeText(view.getContext(), R.string.bad_move, Toast.LENGTH_SHORT).show();
-					}
-				}
-                else Log.d(TAG, "GoogleApiClient not connected");
+	private void claim(final BoardSpace s) {
+		if (mGoogleApiClient.isConnected()) {
+			if (evaluatingMove || !mQueuedMoves.isEmpty()) {
+				Log.d(TAG, "Error: Still evaluating last move");
+				return;
 			}
-		};
+
+			if (s.isOwned())
+				return;
+
+			Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus() + " (My Turn Status = "
+					+ TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN + ")");
+			if (mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+				Toast.makeText(this, "Not your turn!", Toast.LENGTH_SHORT).show();
+				return;
+			}
+
+			ReversiColor playerColor = getCurrentPlayerColor();
+
+			if (board.spacesCapturedWithMove(s, playerColor) > 0) {
+				evaluatingMove = true;
+				showSpinner(2);
+				board.commitPiece(s, playerColor);
+				saveGameData();
+
+				// Add selected piece to the end of mGameData array
+				// 0 [White's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [White's Moves]
+				int nextIndex = (getCurrentPlayer() == getLightPlayer()) ? 164 : 64;
+				while (mGameData[nextIndex] != 0)
+					nextIndex++; // Increase index til we run into an unfilled index
+				mGameData[nextIndex] = GameStorage.getSpaceNumber(s);
+				Log.d(TAG, "Queued move for opponent's Board");
+				Log.d(TAG, bytesToString(mGameData));
+
+				updateGameState();
+			} else {
+				Toast.makeText(this, R.string.bad_move, Toast.LENGTH_SHORT).show();
+			}
+		}
+		else // TODO Change this to display a sign-in dialog
+			Log.d(TAG, "GoogleApiClient not connected");
 	}
 
 	private void updateGameState() {
@@ -650,7 +646,13 @@ public class MultiPlayerMatchActivity extends Activity
 				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);
 				space.setLayoutParams(params);
-				space.setOnClickListener(claim(space));
+				space.setOnClickListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								claim((BoardSpace) v);
+							}
+						});
 				row.addView(space);
 			}
 			grid.addView(row);
