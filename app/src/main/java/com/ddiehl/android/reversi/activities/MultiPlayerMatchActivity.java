@@ -2,8 +2,6 @@ package com.ddiehl.android.reversi.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -22,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
+import com.ddiehl.android.reversi.fragments.ErrorDialogFragment;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardIterator;
 import com.ddiehl.android.reversi.game.BoardSpace;
@@ -52,14 +51,12 @@ public class MultiPlayerMatchActivity extends Activity
                     OnTurnBasedMatchUpdateReceivedListener {
 	private final static String TAG = MultiPlayerMatchActivity.class.getSimpleName();
 
-    private static final int RC_RESOLVE_ERROR = 1001;
+	public static final int RC_RESOLVE_ERROR = 1001;
 	private static final int RC_VIEW_MATCHES = 1002;
 	private static final int RC_SELECT_PLAYERS = 1003;
 
     private ProgressDialog progressBar;
-	private AlertDialog mAlertDialog;
 
-	private static final String KEY_RESOLVING_ERROR = "resolving_error";
     private static final String DIALOG_ERROR = "dialog_error";
 
     // Client used to interact with Google APIs
@@ -180,26 +177,11 @@ public class MultiPlayerMatchActivity extends Activity
 		mResolvingError = false;
     }
 
-    public static class ErrorDialogFragment extends DialogFragment {
-        public ErrorDialogFragment() { }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Get the error code and retrieve the appropriate dialog
-            int errorCode = this.getArguments().getInt(KEY_RESOLVING_ERROR);
-            return GooglePlayServicesUtil.getErrorDialog(errorCode, this.getActivity(), RC_RESOLVE_ERROR);
-        }
-
-        @Override
-        public void onDismiss(DialogInterface dialog) {
-            ((MultiPlayerMatchActivity) getActivity()).onDialogDismissed();
-        }
-    }
-
 	public void startNewGame(View v) {
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
 			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+			return;
 		}
 		intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
 		startActivityForResult(intent, RC_SELECT_PLAYERS);
@@ -209,6 +191,7 @@ public class MultiPlayerMatchActivity extends Activity
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
 			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+			return;
 		}
 		intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
 		startActivityForResult(intent, RC_VIEW_MATCHES);
@@ -447,8 +430,10 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
         Log.d(TAG, "Match update received for match: " + match.getMatchId());
-		if (mMatch.getMatchId().equals(match.getMatchId()))
-			updateMatch(match);
+		if (mMatch != null) {
+			if (mMatch.getMatchId().equals(match.getMatchId()))
+				updateMatch(match);
+		}
     }
 
     @Override
@@ -787,18 +772,18 @@ public class MultiPlayerMatchActivity extends Activity
 
 	// Generic warning/info dialog
 	private void showWarning(String title, String message) {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-
-		alertDialogBuilder.setTitle(title).setMessage(message);
-		alertDialogBuilder.setCancelable(false).setPositiveButton("OK",
+		new AlertDialog.Builder(this)
+				.setTitle(title)
+				.setMessage(message)
+				.setCancelable(false)
+				.setPositiveButton("OK",
 				new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int id) {
 						// if this button is clicked, close current activity
 					}
-				});
-		mAlertDialog = alertDialogBuilder.create();
-		mAlertDialog.show();
+				})
+				.create().show();
 	}
 
 	private void showErrorMessage(int stringId) {
