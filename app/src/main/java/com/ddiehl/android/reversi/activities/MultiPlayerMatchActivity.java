@@ -24,7 +24,6 @@ import com.ddiehl.android.reversi.fragments.ErrorDialogFragment;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardIterator;
 import com.ddiehl.android.reversi.game.BoardSpace;
-import com.ddiehl.android.reversi.game.GameStorage;
 import com.ddiehl.android.reversi.game.ReversiColor;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -63,7 +62,7 @@ public class MultiPlayerMatchActivity extends Activity
     private GoogleApiClient mGoogleApiClient;
 
 	private TurnBasedMatch mMatch;
-	private Board board;
+	private Board mBoard;
 	Participant player, opponent;
 	private byte[] mGameData;
 
@@ -77,7 +76,7 @@ public class MultiPlayerMatchActivity extends Activity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_reversi);
-		board = Board.getInstance(this);
+		mBoard = new Board(this);
 
 		// Clear player names in score overlay
 		((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
@@ -280,7 +279,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void startMatch(TurnBasedMatch match) {
 		mMatch = match;
-		board.reset();
+		mBoard.reset();
 		saveGameData();
 		displayBoard();
 		updateScoreDisplay();
@@ -313,15 +312,7 @@ public class MultiPlayerMatchActivity extends Activity
 //			askForRematch();
 		}
 
-//		if (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN)
-			updateMatch(mMatch);
-
-//		isDoingTurn = (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN);
-//		if (isDoingTurn) {
-//			updateMatch(mMatch);
-//			return;
-//		}
-//		setViewVisibility();
+		updateMatch(mMatch);
 	}
 
 	// This is the main function that gets called when players choose a match
@@ -336,7 +327,7 @@ public class MultiPlayerMatchActivity extends Activity
 		int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
 		byte[] playerData = Arrays.copyOfRange(mGameData, startIndex, startIndex+64);
 
-        GameStorage.deserialize(this, playerData);
+        mBoard.deserialize(playerData);
 		findViewById(R.id.board_panels).setVisibility(View.GONE);
         displayBoard();
 		updateScoreDisplay();
@@ -347,7 +338,7 @@ public class MultiPlayerMatchActivity extends Activity
 		// 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
 		startIndex += 64;
 		while (mGameData[startIndex] != 0) {
-			BoardSpace s = GameStorage.getBoardSpaceFromNum(board, mGameData[startIndex++]);
+			BoardSpace s = mBoard.getBoardSpaceFromNum(mGameData[startIndex++]);
 			Log.d(TAG, "Opponent moved @(" + s.x + " " + s.y + ")");
 			mQueuedMoves.add(s);
 		}
@@ -392,7 +383,7 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void saveGameData() {
-		byte[] playerBoard = GameStorage.serialize(board);
+		byte[] playerBoard = mBoard.serialize();
 
 		if (mGameData == null) {
 			mGameData = new byte[256];
@@ -415,9 +406,9 @@ public class MultiPlayerMatchActivity extends Activity
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
-				board.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
+				mBoard.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
 				updateScoreDisplay();
-//				mGameData = GameStorage.serialize(board);
+//				mGameData = GameStorage.serialize(mBoard);
 				saveGameData();
 				if (!mQueuedMoves.isEmpty())
 					processReceivedTurns();
@@ -461,10 +452,10 @@ public class MultiPlayerMatchActivity extends Activity
 
 			ReversiColor playerColor = getCurrentPlayerColor();
 
-			if (board.spacesCapturedWithMove(s, playerColor) > 0) {
+			if (mBoard.spacesCapturedWithMove(s, playerColor) > 0) {
 				evaluatingMove = true;
 				showSpinner(2);
-				board.commitPiece(s, playerColor);
+				mBoard.commitPiece(s, playerColor);
 				saveGameData();
 
 				// Add selected piece to the end of mGameData array
@@ -472,7 +463,7 @@ public class MultiPlayerMatchActivity extends Activity
 				int nextIndex = (getCurrentPlayer() == getLightPlayer()) ? 164 : 64;
 				while (mGameData[nextIndex] != 0)
 					nextIndex++; // Increase index til we run into an unfilled index
-				mGameData[nextIndex] = GameStorage.getSpaceNumber(s);
+				mGameData[nextIndex] = mBoard.getSpaceNumber(s);
 				Log.d(TAG, "Queued move for opponent's Board");
 				Log.d(TAG, bytesToString(mGameData));
 
@@ -486,7 +477,7 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void updateGameState() {
-		if (board.hasMove(getOpponentColor())) { // If opponent can make a move, it's his turn
+		if (mBoard.hasMove(getOpponentColor())) { // If opponent can make a move, it's his turn
             String pId = (opponent == null) ? null : opponent.getParticipantId();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, pId)
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
@@ -496,7 +487,7 @@ public class MultiPlayerMatchActivity extends Activity
 							processResult(updateMatchResult);
 						}
 					});
-		} else if (board.hasMove(getCurrentPlayerColor())) { // Opponent has no move, keep turn
+		} else if (mBoard.hasMove(getCurrentPlayerColor())) { // Opponent has no move, keep turn
 			Toast.makeText(this, getString(R.string.no_moves) + opponent.getDisplayName(), Toast.LENGTH_SHORT).show();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, player.getParticipantId())
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
@@ -520,7 +511,7 @@ public class MultiPlayerMatchActivity extends Activity
 		// Calculate score for each piece
 		int lightCount = 0;
 		int darkCount = 0;
-		BoardIterator i = new BoardIterator(board);
+		BoardIterator i = new BoardIterator(mBoard);
 
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
@@ -627,11 +618,11 @@ public class MultiPlayerMatchActivity extends Activity
 		int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
 		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
 
-		for (int y = 0; y < board.height(); y++) {
+		for (int y = 0; y < mBoard.height(); y++) {
 			TableRow row = new TableRow(this);
-			row.setWeightSum(board.width());
-			for (int x = 0; x < board.width(); x++) {
-				BoardSpace space = board.getSpaceAt(x, y);
+			row.setWeightSum(mBoard.width());
+			for (int x = 0; x < mBoard.width(); x++) {
+				BoardSpace space = mBoard.getSpaceAt(x, y);
 				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);
 				space.setLayoutParams(params);
@@ -668,7 +659,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void updateScoreDisplay() {
 		int p1c = 0, p2c = 0;
-		BoardIterator i = new BoardIterator(board);
+		BoardIterator i = new BoardIterator(mBoard);
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
 			if (s.isOwned()) {

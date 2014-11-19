@@ -26,7 +26,6 @@ import com.ddiehl.android.reversi.game.ComputerAI;
 import com.ddiehl.android.reversi.game.ReversiPlayer;
 import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.game.BoardIterator;
-import com.ddiehl.android.reversi.game.GameStorage;
 
 
 public class SinglePlayerMatchActivity extends Activity {
@@ -40,7 +39,7 @@ public class SinglePlayerMatchActivity extends Activity {
     private Context ctx;
 	protected ReversiPlayer p1, p2, currentPlayer;
     protected ReversiPlayer firstTurn;
-    protected Board b;
+    protected Board mBoard;
     protected boolean gameInProgress;
 
     @Override
@@ -55,7 +54,7 @@ public class SinglePlayerMatchActivity extends Activity {
         p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
         p2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
-		b = Board.getInstance(this);
+		mBoard = new Board(this);
 
         if (getSavedGame()) {
             displayBoard();
@@ -89,7 +88,7 @@ public class SinglePlayerMatchActivity extends Activity {
                 && sp.contains(PREF_BOARD_STATE)) {
             currentPlayer = (sp.getBoolean(PREF_CURRENT_PLAYER, true) ? p1 : p2);
             firstTurn = (sp.getBoolean(PREF_FIRST_TURN, true) ? p1 : p2);
-            GameStorage.deserialize(this, sp.getString(PREF_BOARD_STATE, "").getBytes());
+            mBoard.deserialize(sp.getString(PREF_BOARD_STATE, "").getBytes());
             return true;
         }
         return false;
@@ -100,7 +99,7 @@ public class SinglePlayerMatchActivity extends Activity {
         SharedPreferences.Editor e = sp.edit();
         e.putBoolean(PREF_CURRENT_PLAYER, (currentPlayer == p1));
         e.putBoolean(PREF_FIRST_TURN, (firstTurn == p1));
-        e.putString(PREF_BOARD_STATE, GameStorage.serialize(b).toString());
+        e.putString(PREF_BOARD_STATE, mBoard.serialize().toString());
         e.apply();
     }
 
@@ -110,7 +109,7 @@ public class SinglePlayerMatchActivity extends Activity {
 	}
 
     private void startNewGame() {
-        b.reset();
+        mBoard.reset();
         displayBoard();
         switchFirstTurn();
         updateScoreDisplay();
@@ -139,14 +138,14 @@ public class SinglePlayerMatchActivity extends Activity {
         int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
 		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
 
-//        grid.setWeightSum(b.height()); // Attempting to scale board to all screens
-        for (int y = 0; y < b.height(); y++) {
+//        grid.setWeightSum(mBoard.height()); // Attempting to scale board to all screens
+        for (int y = 0; y < mBoard.height(); y++) {
 			TableRow row = new TableRow(this);
 //            TableLayout.LayoutParams tParams = new TableLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
 //            row.setLayoutParams(tParams);
-            row.setWeightSum(b.width());
-            for (int x = 0; x < b.width(); x++) {
-                BoardSpace space = b.getSpaceAt(x, y);
+            row.setWeightSum(mBoard.width());
+            for (int x = 0; x < mBoard.width(); x++) {
+                BoardSpace space = mBoard.getSpaceAt(x, y);
 //                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
                 TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
                 params.setMargins(bMargin, bMargin, bMargin, bMargin);
@@ -166,8 +165,8 @@ public class SinglePlayerMatchActivity extends Activity {
                 if (s.isOwned() || currentPlayer.isCPU())
 					return;
 
-				if (b.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
-					b.commitPiece(s, currentPlayer.getColor());
+				if (mBoard.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
+					mBoard.commitPiece(s, currentPlayer.getColor());
                     calculateGameState();
                 } else
                     Toast.makeText(ctx, R.string.bad_move, Toast.LENGTH_SHORT).show();
@@ -177,9 +176,9 @@ public class SinglePlayerMatchActivity extends Activity {
 
     public void calculateGameState() {
 		ReversiPlayer opponent = (currentPlayer == p1) ? p2 : p1;
-		if (b.hasMove(opponent.getColor())) { // If opponent can make a move, it's his turn
+		if (mBoard.hasMove(opponent.getColor())) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
-        } else if (b.hasMove(currentPlayer.getColor())) { // Opponent has no move, keep turn
+        } else if (mBoard.hasMove(currentPlayer.getColor())) { // Opponent has no move, keep turn
             Toast.makeText(this, getString(R.string.no_moves) + opponent.getName(), Toast.LENGTH_SHORT).show();
         } else { // No moves remaining, end of game
             updateScoreDisplay();
@@ -201,10 +200,10 @@ public class SinglePlayerMatchActivity extends Activity {
             BoardSpace move;
             switch (difficulty) {
                 case 1:
-                    move = ComputerAI.getBestMove_d1(b, currentPlayer);
+                    move = ComputerAI.getBestMove_d1(mBoard, currentPlayer);
                     break;
                 case 2:
-                    move = ComputerAI.getBestMove_d3(b, currentPlayer, (currentPlayer == p1) ? p2 : p1);
+                    move = ComputerAI.getBestMove_d3(mBoard, currentPlayer, (currentPlayer == p1) ? p2 : p1);
                     break;
                 default:
                     move = null;
@@ -220,7 +219,7 @@ public class SinglePlayerMatchActivity extends Activity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    b.commitPiece(space, currentPlayer.getColor());
+                    mBoard.commitPiece(space, currentPlayer.getColor());
                     calculateGameState();
                 }
             }, Math.max(0, getResources().getInteger(R.integer.cpu_turn_delay) - tt));
@@ -230,7 +229,7 @@ public class SinglePlayerMatchActivity extends Activity {
     public void updateScoreDisplay() {
         int p1c = 0;
         int p2c = 0;
-		BoardIterator i = new BoardIterator(b);
+		BoardIterator i = new BoardIterator(mBoard);
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
 			if (s.isOwned()) {

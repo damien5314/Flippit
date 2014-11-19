@@ -5,7 +5,6 @@ import android.content.Context;
 
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
-	private static Board _instance = null;
     private static Context ctx;
 	private BoardSpace[][] spaces;
 	private int width;
@@ -22,7 +21,7 @@ public class Board {
             {1,  1} // Top-Right
     };
 
-	private Board(Context c) {
+	public Board(Context c) {
         ctx = c;
 		width = 8;
 		height = 8;
@@ -139,11 +138,48 @@ public class Board {
 		return height;
 	}
 
-	public static Board getInstance(Context c) {
-		if (_instance == null)
-			_instance = new Board(c);
+	public void deserialize(byte[] in) {
+		int index = 0;
+		for (int y = 0; y < height(); y++) {
+			for (int x = 0; x < width(); x++) {
+				byte c = in[index++];
+				setSpace(x, y, new BoardSpace(ctx, x, y));
+				switch (c) {
+					case 0:
+						break;
+					case 1:
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.White);
+						break;
+					case 2:
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Black);
+				}
+			}
+		}
+	}
 
-		return _instance;
+	public byte[] serialize() {
+		byte[] out = new byte[64];
+		int index = 0;
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (!s.isOwned())
+				out[index++] = 0;
+			else if (s.getColor() == ReversiColor.White)
+				out[index++] = 1;
+			else
+				out[index++] = 2;
+		}
+		return out;
+	}
+
+	public byte getSpaceNumber(BoardSpace s) {
+		return (byte) (s.y * 8 + s.x + 1);
+	}
+
+	public BoardSpace getBoardSpaceFromNum(int n) {
+		n -= 1;
+		return getSpaceAt(n % 8, n / 8);
 	}
 
 	@Override
