@@ -1,6 +1,5 @@
 package com.ddiehl.android.reversi.activities;
 
-import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -22,8 +21,11 @@ import java.util.List;
  */
 public class HowToPlayActivity extends FragmentActivity {
     private static final String TAG = HowToPlayActivity.class.getSimpleName();
-    ViewPager pager;
-    HowToPlayPageAdapter pageAdapter;
+
+    private ViewPager pager;
+	private HowToPlayPageAdapter pageAdapter;
+	private MenuItem previous, next;
+
 	final int[] FRAGMENT_LAYOUT_ID = new int[] {
 			R.layout.activity_howtoplay_p1,
 			R.layout.activity_howtoplay_p2,
@@ -39,14 +41,38 @@ public class HowToPlayActivity extends FragmentActivity {
         pageAdapter = new HowToPlayPageAdapter(getSupportFragmentManager(), fragments);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pageAdapter);
+		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+			@Override
+			public void onPageSelected(int i) {
+				if (i == 0)
+					previous.setEnabled(false);
+				else
+					previous.setEnabled(true);
+
+				if (i == FRAGMENT_LAYOUT_ID.length - 1)
+					next.setEnabled(false);
+				else
+					next.setEnabled(true);
+			}
+
+			@Override
+			public void onPageScrolled(int i, float v, int i2) {
+
+			}
+
+			@Override
+			public void onPageScrollStateChanged(int i) {
+
+			}
+		});
     }
 
     private List<Fragment> getFragments() {
-        List<Fragment> flist = new ArrayList<Fragment>();
+        List<Fragment> fragmentList = new ArrayList<Fragment>();
         for (int id : FRAGMENT_LAYOUT_ID) {
-            flist.add(HowToPlayFragment.newInstance(id));
+            fragmentList.add(HowToPlayFragment.newInstance(id));
         }
-        return flist;
+        return fragmentList;
     }
 
     public static class HowToPlayFragment extends Fragment {
@@ -68,14 +94,13 @@ public class HowToPlayActivity extends FragmentActivity {
         }
     }
 
-	MenuItem previous, next;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.how_to_play, menu);
 		previous = menu.getItem(0);
+		previous.setEnabled(false);
 		next = menu.getItem(1);
-		updateMenuItemState();
+//		updateMenuItemState();
         return true;
     }
 
@@ -89,7 +114,7 @@ public class HowToPlayActivity extends FragmentActivity {
 				pager.setCurrentItem(pager.getCurrentItem()+1);
 				break;
         }
-		updateMenuItemState();
+//		updateMenuItemState();
         return true;
     }
 
