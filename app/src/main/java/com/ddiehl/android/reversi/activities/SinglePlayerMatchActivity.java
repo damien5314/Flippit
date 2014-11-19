@@ -21,11 +21,11 @@ import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.game.Board;
+import com.ddiehl.android.reversi.game.BoardIterator;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ComputerAI;
-import com.ddiehl.android.reversi.game.ReversiPlayer;
 import com.ddiehl.android.reversi.game.ReversiColor;
-import com.ddiehl.android.reversi.game.BoardIterator;
+import com.ddiehl.android.reversi.game.ReversiPlayer;
 
 
 public class SinglePlayerMatchActivity extends Activity {
@@ -46,6 +46,8 @@ public class SinglePlayerMatchActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reversi);
+		// Hide select game panel for single player
+		findViewById(R.id.board_panel_select_game).setVisibility(View.GONE);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         ctx = this;
 
@@ -88,7 +90,27 @@ public class SinglePlayerMatchActivity extends Activity {
                 && sp.contains(PREF_BOARD_STATE)) {
             currentPlayer = (sp.getBoolean(PREF_CURRENT_PLAYER, true) ? p1 : p2);
             firstTurn = (sp.getBoolean(PREF_FIRST_TURN, true) ? p1 : p2);
-            mBoard.deserialize(sp.getString(PREF_BOARD_STATE, "").getBytes());
+
+			// TODO Need to convert to new game data format for backward compatibility
+			String savedData = sp.getString(PREF_BOARD_STATE, "");
+//			Log.d(TAG, "Raw String: " + savedData);
+//			char[] stringToChars = savedData.toCharArray();
+//			byte[] stringToBytes = new byte[stringToChars.length];
+//			for (int i = 0; i < stringToChars.length; i++) {
+//				switch (stringToChars[i]) {
+//					case '\0': stringToBytes[i] = 0; break;
+//					case '\1': stringToBytes[i] = 1; break;
+//					case '\2': stringToBytes[i] = 2; break;
+//				}
+//			}
+//
+//			// debugging
+//			StringBuilder sb = new StringBuilder();
+//			for (byte b : stringToBytes)
+//				sb.append(b);
+//			Log.d(TAG, "Converted: " + sb.toString());
+
+            mBoard.deserialize(savedData.getBytes());
             return true;
         }
         return false;
@@ -108,8 +130,9 @@ public class SinglePlayerMatchActivity extends Activity {
 		return prefs.getString(PREF_PLAYER_NAME, getString(R.string.player1_label_default));
 	}
 
-    private void startNewMatch() {
+    public void startNewMatch(View v) {
         mBoard.reset();
+		findViewById(R.id.board_panels).setVisibility(View.GONE);
         displayBoard();
         switchFirstTurn();
         updateScoreDisplay();
@@ -291,9 +314,10 @@ public class SinglePlayerMatchActivity extends Activity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
 		switch (item.getItemId()) {
 			case R.id.action_new_match:
-				startNewMatch();
+				startNewMatch(findViewById(id));
 				return true;
 			case R.id.action_settings:
 				Intent settings = new Intent(this, SettingsActivity.class);
