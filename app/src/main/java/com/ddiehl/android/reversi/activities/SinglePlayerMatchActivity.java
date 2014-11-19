@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,24 +94,8 @@ public class SinglePlayerMatchActivity extends Activity {
 
 			// TODO Need to convert to new game data format for backward compatibility
 			String savedData = sp.getString(PREF_BOARD_STATE, "");
-//			Log.d(TAG, "Raw String: " + savedData);
-//			char[] stringToChars = savedData.toCharArray();
-//			byte[] stringToBytes = new byte[stringToChars.length];
-//			for (int i = 0; i < stringToChars.length; i++) {
-//				switch (stringToChars[i]) {
-//					case '\0': stringToBytes[i] = 0; break;
-//					case '\1': stringToBytes[i] = 1; break;
-//					case '\2': stringToBytes[i] = 2; break;
-//				}
-//			}
-//
-//			// debugging
-//			StringBuilder sb = new StringBuilder();
-//			for (byte b : stringToBytes)
-//				sb.append(b);
-//			Log.d(TAG, "Converted: " + sb.toString());
-
-            mBoard.deserialize(savedData.getBytes());
+			Log.d(TAG, "Raw String: " + savedData);
+            mBoard.deserialize(savedData);
             return true;
         }
         return false;
@@ -121,7 +106,11 @@ public class SinglePlayerMatchActivity extends Activity {
         SharedPreferences.Editor e = sp.edit();
         e.putBoolean(PREF_CURRENT_PLAYER, (currentPlayer == p1));
         e.putBoolean(PREF_FIRST_TURN, (firstTurn == p1));
-        e.putString(PREF_BOARD_STATE, mBoard.serialize().toString());
+		byte[] bytes = mBoard.serialize();
+		StringBuilder out = new StringBuilder();
+		for (byte b : bytes)
+			out.append(b);
+        e.putString(PREF_BOARD_STATE, out.toString());
         e.apply();
     }
 
@@ -132,7 +121,6 @@ public class SinglePlayerMatchActivity extends Activity {
 
     public void startNewMatch(View v) {
         mBoard.reset();
-		findViewById(R.id.board_panels).setVisibility(View.GONE);
         displayBoard();
         switchFirstTurn();
         updateScoreDisplay();
@@ -152,6 +140,7 @@ public class SinglePlayerMatchActivity extends Activity {
 	}
 
     private void displayBoard() {
+		findViewById(R.id.board_panels).setVisibility(View.GONE);
 		TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
         grid.setLayoutParams(new LinearLayout.LayoutParams(

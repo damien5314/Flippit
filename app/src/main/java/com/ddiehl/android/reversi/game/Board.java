@@ -157,6 +157,25 @@ public class Board {
 		}
 	}
 
+	public void deserialize(String in) {
+		int index = 0;
+		for (int y = 0; y < height(); y++) {
+			for (int x = 0; x < width(); x++) {
+				char c = in.charAt(index++);
+				setSpace(x, y, new BoardSpace(ctx, x, y));
+				switch (c) {
+					case '0':
+						break;
+					case '1':
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.White);
+						break;
+					case '2':
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Black);
+				}
+			}
+		}
+	}
+
 	public byte[] serialize() {
 		byte[] out = new byte[64];
 		int index = 0;
