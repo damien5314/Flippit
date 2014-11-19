@@ -19,11 +19,12 @@ public class LauncherActivity extends Activity {
         setContentView(R.layout.activity_launcher);
     }
 
-    public void start1p(View view) {
+    public void startSinglePlayer(View view) {
         startActivity(new Intent(this, SinglePlayerMatchActivity.class));
     }
 
-    public void startMultiplayer(View view) {
+    public void startMultiPlayer(View view) {
 		startActivity(new Intent(this, MultiPlayerMatchActivity.class));
     }
+
 }
