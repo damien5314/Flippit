@@ -32,7 +32,7 @@ public class SinglePlayerMatchActivity extends Activity {
 	private static final String TAG = SinglePlayerMatchActivity.class.getSimpleName();
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
-    private static final String PREF_GAME_STATE = "key_gamePrefs";
+    private static final String PREF_MATCH_STATE = "key_gamePrefs";
     private static final String PREF_CURRENT_PLAYER = "pref_currentPlayer";
     private static final String PREF_FIRST_TURN = "pref_firstTurn";
     private static final String PREF_BOARD_STATE = "pref_boardState";
@@ -40,7 +40,7 @@ public class SinglePlayerMatchActivity extends Activity {
 	protected ReversiPlayer p1, p2, currentPlayer;
     protected ReversiPlayer firstTurn;
     protected Board mBoard;
-    protected boolean gameInProgress;
+    protected boolean matchInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,12 +56,12 @@ public class SinglePlayerMatchActivity extends Activity {
 
 		mBoard = new Board(this);
 
-        if (getSavedGame()) {
+        if (getSavedMatch()) {
             displayBoard();
             updateScoreDisplay();
-            gameInProgress = true;
+            matchInProgress = true;
         } else {
-            gameInProgress = false;
+            matchInProgress = false;
         }
     }
 
@@ -70,19 +70,19 @@ public class SinglePlayerMatchActivity extends Activity {
         super.onResume();
         p1.setName(getPlayerName());
         ((TextView)findViewById(R.id.p1_label)).setText(p1.getName());
-        if (gameInProgress && currentPlayer.isCPU())
+        if (matchInProgress && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        if (gameInProgress)
-            saveGameToPrefs();
+        if (matchInProgress)
+            saveMatchToPrefs();
     }
 
-    public boolean getSavedGame() {
-        SharedPreferences sp = getSharedPreferences(PREF_GAME_STATE, 0);
+    public boolean getSavedMatch() {
+        SharedPreferences sp = getSharedPreferences(PREF_MATCH_STATE, 0);
         if (sp.contains(PREF_CURRENT_PLAYER)
                 && sp.contains(PREF_FIRST_TURN)
                 && sp.contains(PREF_BOARD_STATE)) {
@@ -94,8 +94,8 @@ public class SinglePlayerMatchActivity extends Activity {
         return false;
     }
 
-    public void saveGameToPrefs() {
-        SharedPreferences sp = getSharedPreferences(PREF_GAME_STATE, 0);
+    public void saveMatchToPrefs() {
+        SharedPreferences sp = getSharedPreferences(PREF_MATCH_STATE, 0);
         SharedPreferences.Editor e = sp.edit();
         e.putBoolean(PREF_CURRENT_PLAYER, (currentPlayer == p1));
         e.putBoolean(PREF_FIRST_TURN, (firstTurn == p1));
@@ -108,12 +108,12 @@ public class SinglePlayerMatchActivity extends Activity {
 		return prefs.getString(PREF_PLAYER_NAME, getString(R.string.player1_label_default));
 	}
 
-    private void startNewGame() {
+    private void startNewMatch() {
         mBoard.reset();
         displayBoard();
         switchFirstTurn();
         updateScoreDisplay();
-        gameInProgress = true;
+        matchInProgress = true;
 
         // CPU takes first move if it has turn
         if (currentPlayer.isCPU())
@@ -129,7 +129,7 @@ public class SinglePlayerMatchActivity extends Activity {
 	}
 
     private void displayBoard() {
-		TableLayout grid = (TableLayout) findViewById(R.id.GameGrid);
+		TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
         grid.setLayoutParams(new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
@@ -167,22 +167,22 @@ public class SinglePlayerMatchActivity extends Activity {
 
 				if (mBoard.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
 					mBoard.commitPiece(s, currentPlayer.getColor());
-                    calculateGameState();
+                    calculateMatchState();
                 } else
                     Toast.makeText(ctx, R.string.bad_move, Toast.LENGTH_SHORT).show();
             }
         };
     }
 
-    public void calculateGameState() {
+    public void calculateMatchState() {
 		ReversiPlayer opponent = (currentPlayer == p1) ? p2 : p1;
 		if (mBoard.hasMove(opponent.getColor())) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
         } else if (mBoard.hasMove(currentPlayer.getColor())) { // Opponent has no move, keep turn
             Toast.makeText(this, getString(R.string.no_moves) + opponent.getName(), Toast.LENGTH_SHORT).show();
-        } else { // No moves remaining, end of game
+        } else { // No moves remaining, end of match
             updateScoreDisplay();
-            endGame();
+            endMatch();
             return;
         }
         updateScoreDisplay();
@@ -220,7 +220,7 @@ public class SinglePlayerMatchActivity extends Activity {
                 @Override
                 public void run() {
                     mBoard.commitPiece(space, currentPlayer.getColor());
-                    calculateGameState();
+                    calculateMatchState();
                 }
             }, Math.max(0, getResources().getInteger(R.integer.cpu_turn_delay) - tt));
         }
@@ -254,7 +254,7 @@ public class SinglePlayerMatchActivity extends Activity {
 		vScore.setText(String.valueOf(p.getScore()));
 	}
 
-	public void endGame() {
+	public void endMatch() {
 		ReversiPlayer winner = null;
 		if (p1.getScore() != p2.getScore())
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
@@ -263,8 +263,8 @@ public class SinglePlayerMatchActivity extends Activity {
 		winner.setScore(winner.getScore() + diff);
 		updateScoreForPlayer(winner);
         switchFirstTurn();
-        getSharedPreferences(PREF_GAME_STATE, 0).edit().clear().apply();
-        gameInProgress = false;
+        getSharedPreferences(PREF_MATCH_STATE, 0).edit().clear().apply();
+        matchInProgress = false;
 	}
 
 	public void showWinningToast(ReversiPlayer winner) {
@@ -292,8 +292,8 @@ public class SinglePlayerMatchActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.action_new_game:
-				startNewGame();
+			case R.id.action_new_match:
+				startNewMatch();
 				return true;
 			case R.id.action_settings:
 				Intent settings = new Intent(this, SettingsActivity.class);

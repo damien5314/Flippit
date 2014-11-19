@@ -65,22 +65,22 @@
 				android:id="@+id/board_panel_new_game"
 				style="@style/BoardActionPanel"
 				android:text="@string/multiplayer_new_match"
-				android:onClick="startNewGame"/>
+				android:onClick="startNewMatch"/>
 
 			<Button
 				android:id="@+id/board_panel_select_game"
 				style="@style/BoardActionPanel"
 				android:text="@string/multiplayer_select_match"
-				android:onClick="selectGame"/>
+				android:onClick="selectMatch"/>
 
 		</LinearLayout>
 
 		<TableLayout
-			android:id="@+id/GameGrid"
+			android:id="@+id/MatchGrid"
 			style="@style/GameBoardTable" />
 
 		<TextView
-			android:id="@+id/gameMessage"
+			android:id="@+id/matchMessage"
 			style="@style/GameMessage"/>
 
 	</LinearLayout>

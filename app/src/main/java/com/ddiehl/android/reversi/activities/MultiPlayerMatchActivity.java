@@ -62,7 +62,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 	private TurnBasedMatch mMatch;
 	private Board mBoard;
 	Participant mPlayer, mOpponent;
-	private byte[] mGameData;
+	private byte[] mMatchData;
 
     private boolean resolvingError = false;
 	boolean updatingMatch = false;
@@ -172,7 +172,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		resolvingError = false;
     }
 
-	public void startNewGame(View v) {
+	public void startNewMatch(View v) {
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
 			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
@@ -182,7 +182,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		startActivityForResult(intent, RC_SELECT_PLAYERS);
 	}
 
-	public void selectGame(View v) {
+	public void selectMatch(View v) {
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
 			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
@@ -252,14 +252,14 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 		TurnBasedMatch match = result.getMatch();
-		mGameData = null;
-		saveGameData();
+		mMatchData = null;
+		saveMatchData();
 
 		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
 			return;
 		}
 
-		if (match.getData() != null) { // This is a game that has already started, just update
+		if (match.getData() != null) { // This is a match that has already started, just update
 			Log.d(TAG, bytesToString(match.getData()));
 			updateMatch(match);
 			return;
@@ -271,7 +271,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 	private void startMatch(TurnBasedMatch match) {
 		mMatch = match;
 		mBoard.reset();
-		saveGameData();
+		saveMatchData();
 		displayBoard();
 		updateScoreDisplay();
 
@@ -279,7 +279,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		String myParticipantId = mMatch.getParticipantId(playerId);
 
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
-				mGameData, myParticipantId).setResultCallback(
+				mMatchData, myParticipantId).setResultCallback(
 				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 					@Override
 					public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
@@ -309,11 +309,11 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		mMatch = match;
 		mPlayer = getCurrentPlayer();
 		mOpponent = getOpponent();
-		mGameData = match.getData();
+		mMatchData = match.getData();
 
-		// Grab the appropriate segment from mGameData based on player's color
+		// Grab the appropriate segment from mMatchData based on player's color
 		int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
-		byte[] playerData = Arrays.copyOfRange(mGameData, startIndex, startIndex+64);
+		byte[] playerData = Arrays.copyOfRange(mMatchData, startIndex, startIndex+64);
 
         mBoard.deserialize(playerData);
 		findViewById(R.id.board_panels).setVisibility(View.GONE);
@@ -325,8 +325,8 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		// Commit opponent's moves to the deserialized Board object
 		// 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
 		startIndex += 64;
-		while (mGameData[startIndex] != 0) {
-			BoardSpace s = mBoard.getBoardSpaceFromNum(mGameData[startIndex++]);
+		while (mMatchData[startIndex] != 0) {
+			BoardSpace s = mBoard.getBoardSpaceFromNum(mMatchData[startIndex++]);
 			Log.d(TAG, "Opponent moved @(" + s.x + " " + s.y + ")");
 			mQueuedMoves.add(s);
 		}
@@ -340,20 +340,20 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 
 		switch (status) {
 			case TurnBasedMatch.MATCH_STATUS_CANCELED:
-				displayMessage(getString(R.string.game_canceled));
+				displayMessage(getString(R.string.match_canceled));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_EXPIRED:
-				displayMessage(getString(R.string.game_expired));
+				displayMessage(getString(R.string.match_expired));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING:
-				displayMessage(getString(R.string.game_finding_partner));
+				displayMessage(getString(R.string.match_finding_partner));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_COMPLETE:
 				if (turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE) {
-					displayMessage(getString(R.string.game_complete));
+					displayMessage(getString(R.string.match_complete));
 					break;
 				}
-				endGame(); // Trigger finish() method and result display
+				endMatch(); // Trigger finish() method and result display
 		}
 
 		// OK, it's active. Check on turn status.
@@ -362,30 +362,30 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 				dismissMessage();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN: // Should return results.
-				displayMessage(getString(R.string.game_opponent_turn));
+				displayMessage(getString(R.string.match_opponent_turn));
 				break;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-				displayMessage(getString(R.string.game_invite_pending));
+				displayMessage(getString(R.string.match_invite_pending));
 		}
 	}
 
-	private void saveGameData() {
+	private void saveMatchData() {
 		byte[] playerBoard = mBoard.serialize();
 
-		if (mGameData == null) {
-			mGameData = new byte[256];
-			System.arraycopy(playerBoard, 0, mGameData, 0, playerBoard.length);
-			System.arraycopy(playerBoard, 0, mGameData, 100, playerBoard.length);
+		if (mMatchData == null) {
+			mMatchData = new byte[256];
+			System.arraycopy(playerBoard, 0, mMatchData, 0, playerBoard.length);
+			System.arraycopy(playerBoard, 0, mMatchData, 100, playerBoard.length);
 		} else {
 			int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
-			// Copy the serialized Board into the appropriate place in game data
-			System.arraycopy(playerBoard, 0, mGameData, startIndex, playerBoard.length);
+			// Copy the serialized Board into the appropriate place in match data
+			System.arraycopy(playerBoard, 0, mMatchData, startIndex, playerBoard.length);
 			// Clear out the first 16 nodes following (which were the other player's previous moves)
 			for (int clearIndex = startIndex+64; clearIndex < startIndex+64+16; clearIndex++)
-				mGameData[clearIndex] = 0;
+				mMatchData[clearIndex] = 0;
 		}
 
-		Log.d(TAG, "Player's game data saved: " + bytesToString(mGameData));
+		Log.d(TAG, "Player's match data saved: " + bytesToString(mMatchData));
 	}
 
 	private void processReceivedTurns() {
@@ -395,7 +395,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 			public void run() {
 				mBoard.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
 				updateScoreDisplay();
-				saveGameData();
+				saveMatchData();
 				if (!mQueuedMoves.isEmpty())
 					processReceivedTurns();
 				else
@@ -441,18 +441,18 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 				updatingMatch = true;
 				showSpinner(2);
 				mBoard.commitPiece(s, playerColor);
-				saveGameData();
+				saveMatchData();
 
-				// Add selected piece to the end of mGameData array
+				// Add selected piece to the end of mMatchData array
 				// 0 [White's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [White's Moves]
 				int nextIndex = (getCurrentPlayer() == getLightPlayer()) ? 164 : 64;
-				while (mGameData[nextIndex] != 0)
+				while (mMatchData[nextIndex] != 0)
 					nextIndex++; // Increase index til we run into an unfilled index
-				mGameData[nextIndex] = mBoard.getSpaceNumber(s);
+				mMatchData[nextIndex] = mBoard.getSpaceNumber(s);
 				Log.d(TAG, "Queued move for opponent's Board");
-				Log.d(TAG, bytesToString(mGameData));
+				Log.d(TAG, bytesToString(mMatchData));
 
-				updateGameState();
+				updateMatchState();
 			} else {
 				Toast.makeText(this, R.string.bad_move, Toast.LENGTH_SHORT).show();
 			}
@@ -461,10 +461,10 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 			Log.d(TAG, "GoogleApiClient not connected");
 	}
 
-	private void updateGameState() {
+	private void updateMatchState() {
 		if (mBoard.hasMove(getOpponentColor())) { // If opponent can make a move, it's his turn
             String pId = (mOpponent == null) ? null : mOpponent.getParticipantId();
-			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, pId)
+			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mMatchData, pId)
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
@@ -474,7 +474,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 					});
 		} else if (mBoard.hasMove(getCurrentPlayerColor())) { // Opponent has no move, keep turn
 			Toast.makeText(this, getString(R.string.no_moves) + mOpponent.getDisplayName(), Toast.LENGTH_SHORT).show();
-			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, mPlayer.getParticipantId())
+			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mMatchData, mPlayer.getParticipantId())
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
@@ -482,17 +482,17 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 							processResult(updateMatchResult);
 						}
 					});
-		} else { // No moves remaining, end of game
+		} else { // No moves remaining, end of match
             updatingMatch = false;
             dismissSpinner();
 			updateScoreDisplay();
-			endGame();
+			endMatch();
 			return;
 		}
 		updateScoreDisplay();
 	}
 
-	private void endGame() {
+	private void endMatch() {
 		// Calculate score for each piece
 		int lightCount = 0;
 		int darkCount = 0;
@@ -533,7 +533,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		}
 
 		// Call finishMatch() with results
-		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mGameData, winnerResult, loserResult);
+		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult);
 	}
 
 	private void addRemainingSpacesToWinningCount(int lightCount, int darkCount) {
@@ -594,7 +594,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 	// This is duplicated between the single player activity and multiplayer activity
 	// Consider refactoring this to a static method in another class to decrease code duplication
 	private void displayBoard() {
-		TableLayout grid = (TableLayout) findViewById(R.id.GameGrid);
+		TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
 		grid.setLayoutParams(new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
@@ -719,12 +719,12 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		return false;
 	}
 
-	private void displayMessage(String gameMsg) {
-		((TextView) findViewById(R.id.gameMessage)).setText(gameMsg);
+	private void displayMessage(String matchMsg) {
+		((TextView) findViewById(R.id.matchMessage)).setText(matchMsg);
 	}
 
 	private void dismissMessage() {
-		((TextView) findViewById(R.id.gameMessage)).setText("");
+		((TextView) findViewById(R.id.matchMessage)).setText("");
 	}
 
 	private void showSpinner(int spinnerMsg) {
@@ -788,10 +788,10 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		int id = item.getItemId();
 		switch(id) {
 			case R.id.findNewMatch:
-				startNewGame(findViewById(id));
+				startNewMatch(findViewById(id));
 				return true;
 			case R.id.selectMatch:
-				selectGame(findViewById(id));
+				selectMatch(findViewById(id));
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -799,7 +799,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 
 	// Used for converting Board to debugging text String only
 	private String bytesToString(byte[] in) {
-		// Converting mGameData to String for debugging
+		// Converting mMatchData to String for debugging
 		StringBuffer buf = new StringBuffer();
 		for (byte b : in)
 			buf.append(String.valueOf(b));
