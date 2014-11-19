@@ -41,7 +41,7 @@ public class HowToPlayActivity extends FragmentActivity {
         pageAdapter = new HowToPlayPageAdapter(getSupportFragmentManager(), fragments);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pageAdapter);
-		pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 			@Override
 			public void onPageSelected(int i) {
 				if (i == 0)
@@ -53,16 +53,6 @@ public class HowToPlayActivity extends FragmentActivity {
 					next.setEnabled(false);
 				else
 					next.setEnabled(true);
-			}
-
-			@Override
-			public void onPageScrolled(int i, float v, int i2) {
-
-			}
-
-			@Override
-			public void onPageScrollStateChanged(int i) {
-
 			}
 		});
     }
@@ -100,7 +90,6 @@ public class HowToPlayActivity extends FragmentActivity {
 		previous = menu.getItem(0);
 		previous.setEnabled(false);
 		next = menu.getItem(1);
-//		updateMenuItemState();
         return true;
     }
 
@@ -114,19 +103,6 @@ public class HowToPlayActivity extends FragmentActivity {
 				pager.setCurrentItem(pager.getCurrentItem()+1);
 				break;
         }
-//		updateMenuItemState();
         return true;
     }
-
-	private void updateMenuItemState() {
-		if (pager.getCurrentItem() == 0)
-			previous.setEnabled(false);
-		else
-			previous.setEnabled(true);
-
-		if (pager.getCurrentItem() == FRAGMENT_LAYOUT_ID.length - 1)
-			next.setEnabled(false);
-		else
-			next.setEnabled(true);
-	}
 }
