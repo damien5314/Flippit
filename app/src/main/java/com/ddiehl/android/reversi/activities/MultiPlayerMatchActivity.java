@@ -45,29 +45,27 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MultiPlayerMatchActivity extends Activity
-            implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-                    OnTurnBasedMatchUpdateReceivedListener {
+public class MultiPlayerMatchActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
+		GoogleApiClient.OnConnectionFailedListener, OnTurnBasedMatchUpdateReceivedListener {
 	private final static String TAG = MultiPlayerMatchActivity.class.getSimpleName();
 
 	public static final int RC_RESOLVE_ERROR = 1001;
 	private static final int RC_VIEW_MATCHES = 1002;
 	private static final int RC_SELECT_PLAYERS = 1003;
 
+	private static final String DIALOG_ERROR = "dialog_error";
+
     private ProgressDialog progressBar;
 
-    private static final String DIALOG_ERROR = "dialog_error";
-
-    // Client used to interact with Google APIs
     private GoogleApiClient mGoogleApiClient;
 
 	private TurnBasedMatch mMatch;
 	private Board mBoard;
-	Participant player, opponent;
+	Participant mPlayer, mOpponent;
 	private byte[] mGameData;
 
-    private boolean mResolvingError = false;
-	boolean evaluatingMove = false;
+    private boolean resolvingError = false;
+	boolean updatingMatch = false;
 
 	Handler mHandler;
 	List<BoardSpace> mQueuedMoves;
@@ -103,9 +101,9 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     protected void onStart() {
         super.onStart();
-        Log.d(TAG, "onStart(): connecting");
+//        Log.d(TAG, "onStart(): connecting");
 		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-		Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
+//		Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
 		if (result != ConnectionResult.SUCCESS) {
 			GooglePlayServicesUtil.getErrorDialog(result, this, RC_RESOLVE_ERROR).show();
 			return;
@@ -115,9 +113,9 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop(): disconnecting");
+//        Log.d(TAG, "onStop(): disconnecting");
         if (mGoogleApiClient.isConnected()) {
-            Log.d(TAG, "Unregistering match update listener");
+//            Log.d(TAG, "Unregistering match update listener");
             registerMatchUpdateListener(false);
             mGoogleApiClient.disconnect();
         }
@@ -126,7 +124,7 @@ public class MultiPlayerMatchActivity extends Activity
     @Override
     public void onConnected(Bundle bundle) {
         dismissSpinner();
-        Log.d(TAG, "Connected to Google Play Services");
+//        Log.d(TAG, "Connected to Google Play Services");
 		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
         registerMatchUpdateListener(true);
 		if (mMatch != null)
@@ -135,45 +133,43 @@ public class MultiPlayerMatchActivity extends Activity
 
     @Override
     public void onConnectionSuspended(int i) {
-        Log.d(TAG, "onConnectionSuspended(): attempting to connect");
+//        Log.d(TAG, "onConnectionSuspended(): attempting to connect");
         connectGoogleApiClient();
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "Failed to connect to Google Play services");
+//        Log.i(TAG, "Failed to connect to Google Play services");
 		dismissSpinner();
-        if (mResolvingError) {
+        if (resolvingError) {
             return; // Already attempting to resolve an error
         } else if (result.hasResolution()) {
 			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
-                mResolvingError = true;
+                resolvingError = true;
                 result.startResolutionForResult(this, RC_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
 				Log.e(TAG, "Unable to start resolution intent; Exception: " + e.getMessage());
-                // There was an error with the resolution intent. Try again.
                 connectGoogleApiClient();
             }
         } else {
 			Log.d(TAG, "Unresolvable error (ErrorCode: " + result.getErrorCode() + ")");
             showErrorDialog(result.getErrorCode());
-            mResolvingError = true;
+            resolvingError = true;
         }
     }
 
     private void registerMatchUpdateListener(boolean b) {
         // Unregister any existing listener
         Games.TurnBasedMultiplayer.unregisterMatchUpdateListener(mGoogleApiClient);
-
         if (b) { // Register update listener to replace notifications when a match is open
-            Log.d(TAG, "Registering match update listener");
+//            Log.d(TAG, "Registering match update listener");
             Games.TurnBasedMultiplayer.registerMatchUpdateListener(mGoogleApiClient, this);
         }
     }
 
     public void onDialogDismissed() {
-		mResolvingError = false;
+		resolvingError = false;
     }
 
 	public void startNewGame(View v) {
@@ -201,7 +197,7 @@ public class MultiPlayerMatchActivity extends Activity
 		switch (requestCode) {
 
 			case RC_RESOLVE_ERROR:
-				mResolvingError = false;
+				resolvingError = false;
 				switch (resultCode) {
 					case RESULT_OK:
 						if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
@@ -226,11 +222,8 @@ public class MultiPlayerMatchActivity extends Activity
 				if (resultCode != Activity.RESULT_OK) // User canceled
 					return;
 
-				// Get the invitee list
 				final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
-
-				// Get automatch criteria
-				Bundle autoMatchCriteria = null;
+				Bundle autoMatchCriteria;
 
 				int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
 				int maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
@@ -245,12 +238,11 @@ public class MultiPlayerMatchActivity extends Activity
 						.build();
 
 				showSpinner(1);
-				// Start the match
 				Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback(
 						new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
 							@Override
 							public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
-								Log.d(TAG, "TurnBasedMultiplayer match created");
+//								Log.d(TAG, "TurnBasedMultiplayer match created");
 								processResult(result);
 							}
 						});
@@ -268,7 +260,6 @@ public class MultiPlayerMatchActivity extends Activity
 		}
 
 		if (match.getData() != null) { // This is a game that has already started, just update
-			Log.d(TAG, "Game already started, data:");
 			Log.d(TAG, bytesToString(match.getData()));
 			updateMatch(match);
 			return;
@@ -287,7 +278,6 @@ public class MultiPlayerMatchActivity extends Activity
 		String playerId = Games.Players.getCurrentPlayerId(mGoogleApiClient);
 		String myParticipantId = mMatch.getParticipantId(playerId);
 
-//		showSpinner(1);
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
 				mGameData, myParticipantId).setResultCallback(
 				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
@@ -300,9 +290,8 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void processResult(TurnBasedMultiplayer.UpdateMatchResult result) {
 		mMatch = result.getMatch();
-		evaluatingMove = false;
+		updatingMatch = false;
 		dismissSpinner();
-//		updateScoreDisplay();
 
 		if (!checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
 			return;
@@ -315,12 +304,11 @@ public class MultiPlayerMatchActivity extends Activity
 		updateMatch(mMatch);
 	}
 
-	// This is the main function that gets called when players choose a match
-	// from the inbox, or else create a match and want to start it.
 	private void updateMatch(TurnBasedMatch match) {
+		updatingMatch = true;
 		mMatch = match;
-		player = getCurrentPlayer();
-		opponent = getOpponent();
+		mPlayer = getCurrentPlayer();
+		mOpponent = getOpponent();
 		mGameData = match.getData();
 
 		// Grab the appropriate segment from mGameData based on player's color
@@ -343,6 +331,7 @@ public class MultiPlayerMatchActivity extends Activity
 			mQueuedMoves.add(s);
 		}
 
+		updatingMatch = false;
 		if (!mQueuedMoves.isEmpty())
 			processReceivedTurns();
 
@@ -364,9 +353,7 @@ public class MultiPlayerMatchActivity extends Activity
 					displayMessage(getString(R.string.game_complete));
 					break;
 				}
-
-				// Call endGame() here to trigger finish() method and result display
-				endGame();
+				endGame(); // Trigger finish() method and result display
 		}
 
 		// OK, it's active. Check on turn status.
@@ -393,7 +380,7 @@ public class MultiPlayerMatchActivity extends Activity
 			int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
 			// Copy the serialized Board into the appropriate place in game data
 			System.arraycopy(playerBoard, 0, mGameData, startIndex, playerBoard.length);
-			// Clear out the first 20 nodes following (which were the other player's previous moves)
+			// Clear out the first 16 nodes following (which were the other player's previous moves)
 			for (int clearIndex = startIndex+64; clearIndex < startIndex+64+16; clearIndex++)
 				mGameData[clearIndex] = 0;
 		}
@@ -402,25 +389,23 @@ public class MultiPlayerMatchActivity extends Activity
 	}
 
 	private void processReceivedTurns() {
-		evaluatingMove = true;
+		updatingMatch = true;
 		mHandler.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				mBoard.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
 				updateScoreDisplay();
-//				mGameData = GameStorage.serialize(mBoard);
 				saveGameData();
 				if (!mQueuedMoves.isEmpty())
 					processReceivedTurns();
 				else
-					evaluatingMove = false;
+					updatingMatch = false;
 			}
 		}, getResources().getInteger(R.integer.cpu_turn_delay));
 	}
 
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
-        Log.d(TAG, "Match update received for match: " + match.getMatchId());
 		if (mMatch != null) {
 			if (mMatch.getMatchId().equals(match.getMatchId()))
 				updateMatch(match);
@@ -435,7 +420,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void claim(final BoardSpace s) {
 		if (mGoogleApiClient.isConnected()) {
-			if (evaluatingMove || !mQueuedMoves.isEmpty()) {
+			if (updatingMatch || !mQueuedMoves.isEmpty()) {
 				Log.d(TAG, "Error: Still evaluating last move");
 				return;
 			}
@@ -453,7 +438,7 @@ public class MultiPlayerMatchActivity extends Activity
 			ReversiColor playerColor = getCurrentPlayerColor();
 
 			if (mBoard.spacesCapturedWithMove(s, playerColor) > 0) {
-				evaluatingMove = true;
+				updatingMatch = true;
 				showSpinner(2);
 				mBoard.commitPiece(s, playerColor);
 				saveGameData();
@@ -478,7 +463,7 @@ public class MultiPlayerMatchActivity extends Activity
 
 	private void updateGameState() {
 		if (mBoard.hasMove(getOpponentColor())) { // If opponent can make a move, it's his turn
-            String pId = (opponent == null) ? null : opponent.getParticipantId();
+            String pId = (mOpponent == null) ? null : mOpponent.getParticipantId();
 			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, pId)
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
@@ -488,8 +473,8 @@ public class MultiPlayerMatchActivity extends Activity
 						}
 					});
 		} else if (mBoard.hasMove(getCurrentPlayerColor())) { // Opponent has no move, keep turn
-			Toast.makeText(this, getString(R.string.no_moves) + opponent.getDisplayName(), Toast.LENGTH_SHORT).show();
-			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, player.getParticipantId())
+			Toast.makeText(this, getString(R.string.no_moves) + mOpponent.getDisplayName(), Toast.LENGTH_SHORT).show();
+			Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mGameData, mPlayer.getParticipantId())
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
@@ -498,7 +483,7 @@ public class MultiPlayerMatchActivity extends Activity
 						}
 					});
 		} else { // No moves remaining, end of game
-            evaluatingMove = false;
+            updatingMatch = false;
             dismissSpinner();
 			updateScoreDisplay();
 			endGame();
