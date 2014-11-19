@@ -1,6 +1,5 @@
 package com.ddiehl.android.reversi.activities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -14,9 +13,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +25,7 @@ import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.game.ReversiPlayer;
 
 
-public class SinglePlayerMatchActivity extends Activity {
+public class SinglePlayerMatchActivity extends MatchActivity {
 	private static final String TAG = SinglePlayerMatchActivity.class.getSimpleName();
 	private static final String PREF_PLAYER_NAME = "pref_player_name";
 	private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
@@ -60,7 +56,7 @@ public class SinglePlayerMatchActivity extends Activity {
 		mBoard = new Board(this);
 
         if (getSavedMatch()) {
-            displayBoard();
+            mBoard.displayBoard(this);
             updateScoreDisplay();
             matchInProgress = true;
         } else {
@@ -121,7 +117,7 @@ public class SinglePlayerMatchActivity extends Activity {
 
     public void startNewMatch(View v) {
         mBoard.reset();
-        displayBoard();
+        mBoard.displayBoard(this);
         switchFirstTurn();
         updateScoreDisplay();
         matchInProgress = true;
@@ -139,51 +135,15 @@ public class SinglePlayerMatchActivity extends Activity {
 		currentPlayer = firstTurn;
 	}
 
-    private void displayBoard() {
-		findViewById(R.id.board_panels).setVisibility(View.GONE);
-		TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
-		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
-        grid.setLayoutParams(new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
-        grid.removeAllViews();
+    public void claim(final BoardSpace s) {
+		if (s.isOwned() || currentPlayer.isCPU())
+			return;
 
-        int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
-		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
-
-//        grid.setWeightSum(mBoard.height()); // Attempting to scale board to all screens
-        for (int y = 0; y < mBoard.height(); y++) {
-			TableRow row = new TableRow(this);
-//            TableLayout.LayoutParams tParams = new TableLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 1.0f);
-//            row.setLayoutParams(tParams);
-            row.setWeightSum(mBoard.width());
-            for (int x = 0; x < mBoard.width(); x++) {
-                BoardSpace space = mBoard.getSpaceAt(x, y);
-//                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-                TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
-                params.setMargins(bMargin, bMargin, bMargin, bMargin);
-                space.setLayoutParams(params);
-                space.setOnClickListener(claim(space));
-                row.addView(space);
-            }
-			grid.addView(row);
-        }
-		grid.setVisibility(View.VISIBLE);
-    }
-
-    public View.OnClickListener claim(final BoardSpace s) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (s.isOwned() || currentPlayer.isCPU())
-					return;
-
-				if (mBoard.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
-					mBoard.commitPiece(s, currentPlayer.getColor());
-                    calculateMatchState();
-                } else
-                    Toast.makeText(ctx, R.string.bad_move, Toast.LENGTH_SHORT).show();
-            }
-        };
+		if (mBoard.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
+			mBoard.commitPiece(s, currentPlayer.getColor());
+			calculateMatchState();
+		} else
+			Toast.makeText(ctx, R.string.bad_move, Toast.LENGTH_SHORT).show();
     }
 
     public void calculateMatchState() {

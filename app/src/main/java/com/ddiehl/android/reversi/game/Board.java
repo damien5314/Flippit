@@ -2,6 +2,13 @@ package com.ddiehl.android.reversi.game;
 
 
 import android.content.Context;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+
+import com.ddiehl.android.reversi.R;
+import com.ddiehl.android.reversi.activities.MatchActivity;
 
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
@@ -94,7 +101,7 @@ public class Board {
 		return moveVal;
 	}
 
-	public int moveValueInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
+	private int moveValueInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
 		if (s.x+dx < 0 || s.x+dx >= width || s.y+dy < 0 || s.y+dy >= height)
 			return 0;
 
@@ -118,7 +125,7 @@ public class Board {
 		return 0;
 	}
 
-    public void flipInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
+    private void flipInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
         s.setColorAnimated(playerColor);
         int cx = s.x + dx;
         int cy = s.y + dy;
@@ -199,6 +206,39 @@ public class Board {
 	public BoardSpace getBoardSpaceFromNum(int n) {
 		n -= 1;
 		return getSpaceAt(n % 8, n / 8);
+	}
+
+	public void displayBoard(final MatchActivity a) {
+		a.findViewById(R.id.board_panels).setVisibility(View.GONE);
+		TableLayout grid = (TableLayout) a.findViewById(R.id.MatchGrid);
+		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
+		grid.setLayoutParams(new LinearLayout.LayoutParams(
+				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+		grid.removeAllViews();
+
+		int bHeight = (int) a.getResources().getDimension(R.dimen.space_row_height);
+		int bMargin = (int) a.getResources().getDimension(R.dimen.space_padding);
+
+		for (int y = 0; y < height(); y++) {
+			TableRow row = new TableRow(a);
+			row.setWeightSum(width());
+			for (int x = 0; x < width(); x++) {
+				BoardSpace space = getSpaceAt(x, y);
+				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
+				params.setMargins(bMargin, bMargin, bMargin, bMargin);
+				space.setLayoutParams(params);
+				space.setOnClickListener(
+						new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								a.claim((BoardSpace) v);
+							}
+						});
+				row.addView(space);
+			}
+			grid.addView(row);
+		}
+		grid.setVisibility(View.VISIBLE);
 	}
 
 	@Override

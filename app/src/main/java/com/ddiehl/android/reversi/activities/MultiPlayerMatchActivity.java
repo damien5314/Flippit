@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MultiPlayerMatchActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
+public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApiClient.ConnectionCallbacks,
 		GoogleApiClient.OnConnectionFailedListener, OnTurnBasedMatchUpdateReceivedListener {
 	private final static String TAG = MultiPlayerMatchActivity.class.getSimpleName();
 
@@ -418,7 +418,7 @@ public class MultiPlayerMatchActivity extends Activity implements GoogleApiClien
 		Log.d(TAG, "Match removed: " + matchId);
     }
 
-	private void claim(final BoardSpace s) {
+	public void claim(final BoardSpace s) {
 		if (mGoogleApiClient.isConnected()) {
 			if (updatingMatch || !mQueuedMoves.isEmpty()) {
 				Log.d(TAG, "Error: Still evaluating last move");
