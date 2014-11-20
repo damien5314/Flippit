@@ -57,6 +57,7 @@
 	<string name="multiplayer_select_match_condensed">Select</string>
 
 	<!-- Match status errors -->
+	<string name="dialog_warning">Warning</string>
 	<string name="google_play_not_connected">Not connected to Play Services</string>
 	<string name="status_multiplayer_error_not_trusted_tester">Untrusted test account</string>
 	<string name="match_error_already_rematched">Already rematched</string>

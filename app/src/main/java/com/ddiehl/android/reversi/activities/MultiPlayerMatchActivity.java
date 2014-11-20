@@ -60,6 +60,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     private GoogleApiClient mGoogleApiClient;
 
 	private TurnBasedMatch mMatch;
+	private Board pBoard; // Saves old Board in case of a connection failure
 	private Board mBoard;
 	Participant mPlayer, mOpponent;
 	private byte[] mMatchData;
@@ -290,12 +291,17 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private void processResult(TurnBasedMultiplayer.UpdateMatchResult result) {
 		mMatch = result.getMatch();
-		updatingMatch = false;
 		dismissSpinner();
 
 		if (!checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
+			Log.d(TAG, "Failure status code: " + result.getStatus().getStatusCode());
+			showAlertDialog("Not connected", "Try move again");
+			mBoard = pBoard;
+			displayBoard();
 			return;
 		}
+
+		updatingMatch = false;
 
 		if (mMatch.canRematch()) {
 //			askForRematch();
@@ -349,11 +355,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				displayMessage(getString(R.string.match_finding_partner));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_COMPLETE:
-				if (turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE) {
-					displayMessage(getString(R.string.match_complete));
-					break;
-				}
-				endMatch(); // Trigger finish() method and result display
+				displayMessage(getString(R.string.match_complete));
+				Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId());
+				return;
 		}
 
 		// OK, it's active. Check on turn status.
@@ -440,6 +444,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			if (mBoard.spacesCapturedWithMove(s, playerColor) > 0) {
 				updatingMatch = true;
 				showSpinner(2);
+				pBoard = mBoard.copy();
 				mBoard.commitPiece(s, playerColor);
 				saveMatchData();
 
@@ -519,17 +524,20 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
+				showAlertDialog("Game Over", getLightPlayer().getDisplayName() + " wins");
 			} else {
 				winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
+				showAlertDialog("Game Over", getDarkPlayer().getDisplayName() + " wins");
 			}
 		} else {
 			winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
 			loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
+			showAlertDialog("Game Over", "The match is a tie");
 		}
 
 		// Call finishMatch() with results
@@ -684,35 +692,31 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			case GamesStatusCodes.STATUS_OK:
 				return true;
 			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED:
-				// TODO Remove this Toast
-				Toast.makeText(
-						this,
-						"Stored action for later. (Please remove this toast before release.)",
-						Toast.LENGTH_SHORT).show();
+				// Action deferred on Google Play until later
 				return true;
 			case GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
-				showErrorMessage(R.string.status_multiplayer_error_not_trusted_tester);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.status_multiplayer_error_not_trusted_tester));
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED:
-				showErrorMessage(R.string.match_error_already_rematched);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.match_error_already_rematched));
 				break;
 			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED:
-				showErrorMessage(R.string.network_error_operation_failed);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.network_error_operation_failed));
 				break;
 			case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
-				showErrorMessage(R.string.client_reconnect_required);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.client_reconnect_required));
 				break;
 			case GamesStatusCodes.STATUS_INTERNAL_ERROR:
-				showErrorMessage(R.string.internal_error);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.internal_error));
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH:
-				showErrorMessage(R.string.match_error_inactive_match);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.match_error_inactive_match));
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED:
-				showErrorMessage(R.string.match_error_locally_modified);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.match_error_locally_modified));
 				break;
 			default:
-				showErrorMessage(R.string.unexpected_status);
+				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.unexpected_status));
 				Log.d(TAG, "Did not have warning or string to deal with: " + statusCode);
 		}
 
@@ -747,7 +751,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	// Generic warning/info dialog
-	private void showWarning(String title, String message) {
+	private void showAlertDialog(String title, String message) {
 		new AlertDialog.Builder(this)
 				.setTitle(title)
 				.setMessage(message)
@@ -760,10 +764,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					}
 				})
 				.create().show();
-	}
-
-	private void showErrorMessage(int stringId) {
-		showWarning("Warning", getResources().getString(stringId));
 	}
 
 	/* Creates a dialog for an error message */
