@@ -22,6 +22,7 @@
 		<item name="android:layout_margin">@dimen/launcher_cta_margin</item>
 		<item name="android:background">@drawable/launcher_cta</item>
         <item name="android:textSize">@dimen/launcher_cta_size</item>
+		<item name="android:textColor">@color/launcher_cta_text_color</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 

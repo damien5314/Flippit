@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle" >
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <stroke android:width="@dimen/launcher_cta_border"
-			android:color="@color/launcher_cta" />
+	<item
+		android:drawable="@drawable/launcher_cta_inverted"
+		android:state_pressed="true"/>
 
-    <corners
-        android:radius="@dimen/board_panel_corner_radius" />
+	<item
+		android:drawable="@drawable/launcher_cta_normal" />
 
-    <solid
-        android:color="@android:color/transparent" />
-
-</shape>
+</selector>
