@@ -101,7 +101,7 @@
 		<item name="android:gravity">center</item>
 		<item name="android:background">@drawable/board_action_panel</item>
 		<item name="android:textSize">@dimen/board_panel_text_size</item>
-		<item name="android:textColor">@color/board_action_panel</item>
+		<item name="android:textColor">@color/board_action_panel_color</item>
 		<item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
 	</style>
 
