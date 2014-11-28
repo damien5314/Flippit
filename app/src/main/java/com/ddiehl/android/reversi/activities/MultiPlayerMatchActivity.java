@@ -724,11 +724,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private void displayMessage(String matchMsg) {
-		((TextView) findViewById(R.id.matchMessage)).setText(matchMsg);
+		((TextView) findViewById(R.id.matchMessageText)).setText(matchMsg);
+		findViewById(R.id.waiting_icon1).setBackground(getDrawable(R.drawable.player_icon_p1));
+		findViewById(R.id.waiting_icon2).setBackground(getDrawable(R.drawable.player_icon_p2));
+		findViewById(R.id.matchMessage).setVisibility(View.VISIBLE);
 	}
 
 	private void dismissMessage() {
-		((TextView) findViewById(R.id.matchMessage)).setText("");
+		findViewById(R.id.matchMessage).setVisibility(View.GONE);
+		((TextView) findViewById(R.id.matchMessageText)).setText("");
 	}
 
 	private void showSpinner(int spinnerMsg) {

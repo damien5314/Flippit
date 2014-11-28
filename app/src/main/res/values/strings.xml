@@ -81,9 +81,9 @@
 	<!-- Match messages -->
 	<string name="match_canceled">Match Canceled</string>
 	<string name="match_expired">Match Expired</string>
-	<string name="match_finding_partner">Finding opponent</string>
+	<string name="match_finding_partner">Finding opponent&#8230;</string>
 	<string name="match_complete">Match Complete</string>
-	<string name="match_opponent_turn">Opponent\'s turn</string>
+	<string name="match_opponent_turn">Opponent\'s turn&#8230;</string>
 	<string name="match_invite_pending">Waiting for invitation, be patient!</string>
 
 </resources>

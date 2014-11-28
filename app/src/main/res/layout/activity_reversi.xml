@@ -79,9 +79,25 @@
 			android:id="@+id/MatchGrid"
 			style="@style/GameBoardTable" />
 
-		<TextView
+		<RelativeLayout
 			android:id="@+id/matchMessage"
-			style="@style/GameMessage"/>
+			style="@style/GameMessage">
+
+			<TextView
+				android:id="@+id/matchMessageText"
+				style="@style/GameMessageText"/>
+
+			<ImageView
+				android:id="@+id/waiting_icon1"
+				style="@style/GameMessageIcon"
+				android:layout_toLeftOf="@id/matchMessageText"/>
+
+			<ImageView
+				android:id="@+id/waiting_icon2"
+				style="@style/GameMessageIcon"
+				android:layout_toRightOf="@id/matchMessageText"/>
+
+		</RelativeLayout>
 
 	</LinearLayout>
 

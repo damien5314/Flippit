@@ -87,11 +87,35 @@
 	</style>
 
 	<style name="GameMessage">
-		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_width">fill_parent</item>
 		<item name="android:layout_height">fill_parent</item>
-		<item name="android:gravity">center|center</item>
+	</style>
+
+	<style name="GameMessageText">
+		<!--<item name="android:layout_width">wrap_content</item>-->
+		<!--<item name="android:layout_height">fill_parent</item>-->
+		<!--<item name="android:layout_gravity">center_horizontal</item>-->
+		<!--<item name="android:gravity">center|center</item>-->
+
+		<item name="android:layout_width">wrap_content</item>
+		<item name="android:layout_height">wrap_content</item>
+		<item name="android:paddingLeft">@dimen/scoreValue_padding</item>
+		<item name="android:paddingRight">@dimen/scoreValue_padding</item>
+		<item name="android:layout_gravity">center</item>
+		<item name="android:layout_centerVertical">true</item>
+		<item name="android:layout_centerHorizontal">true</item>
 		<item name="android:textSize">@dimen/game_message_text_size</item>
 		<item name="android:textColor">@android:color/white</item>
+	</style>
+
+	<style name="GameMessageIcon">
+		<item name="android:layout_width">@dimen/playerIcon_width</item>
+		<item name="android:layout_height">@dimen/playerIcon_width</item>
+		<!--<item name="android:layout_marginLeft">@dimen/playerIcon_padding</item>-->
+		<!--<item name="android:layout_marginRight">@dimen/playerIcon_padding</item>-->
+		<item name="android:layout_gravity">center</item>
+		<item name="android:layout_centerVertical">true</item>
+		<item name="android:radius">@dimen/playerIcon_corner_radius</item>
 	</style>
 
 	<style name="BoardActionPanel">
