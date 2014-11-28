@@ -26,6 +26,9 @@
     <string name="pref_ComputerAI_label">Enabled</string>
     <string name="pref_ai_difficulty">Difficulty</string>
     <string name="pref_ai_difficulty_def">Easy</string>
+	<string name="winner_light">Light wins</string>
+	<string name="winner_dark">Dark wins</string>
+	<string name="winner_tie">The match is a tie</string>
 
     <string name="how_to_play_p1">
 		In Reversi there are two players, each represented by light or dark spaces on the game board.
@@ -77,9 +80,9 @@
 	<!-- Match messages -->
 	<string name="match_canceled">Match Canceled</string>
 	<string name="match_expired">Match Expired</string>
-	<string name="match_finding_partner">Finding automatch opponent&#8230;</string>
+	<string name="match_finding_partner">Finding opponent</string>
 	<string name="match_complete">Match Complete</string>
-	<string name="match_opponent_turn">Waiting for opponent to play&#8230;</string>
+	<string name="match_opponent_turn">Opponent\'s turn</string>
 	<string name="match_invite_pending">Waiting for invitation, be patient!</string>
 
 </resources>

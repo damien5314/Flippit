@@ -50,8 +50,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private final static String TAG = MultiPlayerMatchActivity.class.getSimpleName();
 
 	public static final int RC_RESOLVE_ERROR = 1001;
-	private static final int RC_VIEW_MATCHES = 1002;
-	private static final int RC_SELECT_PLAYERS = 1003;
+	public static final int RC_VIEW_MATCHES = 1002;
+	public static final int RC_SELECT_PLAYERS = 1003;
 
 	private static final String DIALOG_ERROR = "dialog_error";
 
@@ -62,14 +62,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private TurnBasedMatch mMatch;
 	private Board pBoard; // Saves old Board in case of a connection failure
 	private Board mBoard;
-	Participant mPlayer, mOpponent;
+	private Participant mPlayer, mOpponent;
+	private Participant mLightPlayer, mDarkPlayer;
 	private byte[] mMatchData;
 
     private boolean resolvingError = false;
-	boolean updatingMatch = false;
+	private boolean updatingMatch = false;
 
-	Handler mHandler;
-	List<BoardSpace> mQueuedMoves;
+	private Handler mHandler;
+	private List<BoardSpace> mQueuedMoves;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -315,6 +316,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mMatch = match;
 		mPlayer = getCurrentPlayer();
 		mOpponent = getOpponent();
+		mLightPlayer = getLightPlayer();
+		mDarkPlayer = getDarkPlayer();
 		mMatchData = match.getData();
 
 		// Grab the appropriate segment from mMatchData based on player's color
@@ -381,7 +384,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			System.arraycopy(playerBoard, 0, mMatchData, 0, playerBoard.length);
 			System.arraycopy(playerBoard, 0, mMatchData, 100, playerBoard.length);
 		} else {
-			int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
+			int startIndex = (mPlayer == mLightPlayer) ? 0 : 100;
 			// Copy the serialized Board into the appropriate place in match data
 			System.arraycopy(playerBoard, 0, mMatchData, startIndex, playerBoard.length);
 			// Clear out the first 16 nodes following (which were the other player's previous moves)
@@ -450,7 +453,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 				// Add selected piece to the end of mMatchData array
 				// 0 [White's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [White's Moves]
-				int nextIndex = (getCurrentPlayer() == getLightPlayer()) ? 164 : 64;
+				int nextIndex = (mPlayer == mLightPlayer) ? 164 : 64;
 				while (mMatchData[nextIndex] != 0)
 					nextIndex++; // Increase index til we run into an unfilled index
 				mMatchData[nextIndex] = mBoard.getSpaceNumber(s);
@@ -520,24 +523,24 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		ParticipantResult winnerResult, loserResult;
 		if (lightCount != darkCount) {
 			if (lightCount > darkCount) {
-				winnerResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
+				winnerResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				loserResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
+				loserResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				showAlertDialog("Game Over", getLightPlayer().getDisplayName() + " wins");
+				showAlertDialog("Game Over", getString(R.string.winner_light));
 			} else {
-				winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
+				winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
+				loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				showAlertDialog("Game Over", getDarkPlayer().getDisplayName() + " wins");
+				showAlertDialog("Game Over", getString(R.string.winner_dark));
 			}
 		} else {
-			winnerResult = new ParticipantResult(getDarkPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
+			winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
-			loserResult = new ParticipantResult(getLightPlayer().getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
+			loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
-			showAlertDialog("Game Over", "The match is a tie");
+			showAlertDialog("Game Over", getString(R.string.winner_tie));
 		}
 
 		// Call finishMatch() with results
@@ -566,13 +569,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private ReversiColor getCurrentPlayerColor() {
-		if (getCurrentPlayer() == getLightPlayer())
+		if (mPlayer == mLightPlayer)
 			return ReversiColor.White;
 		else return ReversiColor.Black;
 	}
 
 	private ReversiColor getOpponentColor() {
-		if (getOpponent() == getLightPlayer())
+		if (mOpponent == mLightPlayer)
 			return ReversiColor.White;
 		else return ReversiColor.Black;
 	}
@@ -634,17 +637,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private void updatePlayerNameDisplay() {
-		Participant light = getLightPlayer();
-		Participant dark = getDarkPlayer();
-
-		if (light != null) {
-			((TextView) findViewById(R.id.p1_label)).setText(light.getDisplayName());
+		if (mLightPlayer != null) {
+			((TextView) findViewById(R.id.p1_label)).setText(mLightPlayer.getDisplayName());
 		} else {
 			((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
 		}
 
-		if (dark != null) {
-			((TextView) findViewById(R.id.p2_label)).setText(dark.getDisplayName());
+		if (mDarkPlayer != null) {
+			((TextView) findViewById(R.id.p2_label)).setText(mDarkPlayer.getDisplayName());
 		} else {
 			((TextView) findViewById(R.id.p2_label)).setText(R.string.unknown_player);
 		}
@@ -665,7 +665,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		// Update turn indicator
 		ImageView turnIndicator = (ImageView) findViewById(R.id.turnIndicator);
-		int myTurnResource = (getCurrentPlayer() == getLightPlayer()) ?
+		int myTurnResource = (mPlayer == mLightPlayer) ?
 				R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2;
 		int oppTurnResource = (myTurnResource == R.drawable.ic_turn_indicator_p1) ?
 				R.drawable.ic_turn_indicator_p2 : R.drawable.ic_turn_indicator_p1;
