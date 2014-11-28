@@ -16,4 +16,9 @@
 		android:icon="@drawable/ic_action_action_view_list"
 		android:showAsAction="ifRoom" />
 
+	<item android:id="@+id/action_howtoplay"
+		  android:icon="@drawable/ic_action_action_help"
+		  android:showAsAction="never"
+		  android:title="@string/action_howtoplay"/>
+
 </menu>

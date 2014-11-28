@@ -527,20 +527,20 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				showAlertDialog("Game Over", getString(R.string.winner_light));
+				showAlertDialog(getString(R.string.game_over), getString(R.string.winner_light));
 			} else {
 				winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				showAlertDialog("Game Over", getString(R.string.winner_dark));
+				showAlertDialog(getString(R.string.game_over), getString(R.string.winner_dark));
 			}
 		} else {
 			winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
 			loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
-			showAlertDialog("Game Over", getString(R.string.winner_tie));
+			showAlertDialog(getString(R.string.game_over), getString(R.string.winner_tie));
 		}
 
 		// Call finishMatch() with results
@@ -792,6 +792,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				return true;
 			case R.id.selectMatch:
 				selectMatch(findViewById(id));
+				return true;
+			case R.id.action_howtoplay:
+				Intent htp = new Intent(this, HowToPlayActivity.class);
+				startActivity(htp);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

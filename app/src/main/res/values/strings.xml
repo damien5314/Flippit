@@ -26,6 +26,7 @@
     <string name="pref_ComputerAI_label">Enabled</string>
     <string name="pref_ai_difficulty">Difficulty</string>
     <string name="pref_ai_difficulty_def">Easy</string>
+	<string name="game_over">Game Over</string>
 	<string name="winner_light">Light wins</string>
 	<string name="winner_dark">Dark wins</string>
 	<string name="winner_tie">The match is a tie</string>
