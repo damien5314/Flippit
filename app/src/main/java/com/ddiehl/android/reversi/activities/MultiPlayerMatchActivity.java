@@ -12,6 +12,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
@@ -72,6 +74,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private Handler mHandler;
 	private List<BoardSpace> mQueuedMoves;
 
+	// Variables used for waiting animation
+	private ImageView mWaiting1, mWaiting2;
+	private Animation mLeftFadeOut, mLeftFadeIn, mRightFadeOut, mRightFadeIn;
+	private boolean mWaitingLeftColor = false;
+	private boolean mWaitingRightColor = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +99,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 .build();
 		mHandler = new Handler();
 		mQueuedMoves = new ArrayList<BoardSpace>();
+		initializeWaitingAnimations();
     }
 
     private void connectGoogleApiClient() {
@@ -725,14 +734,89 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private void displayMessage(String matchMsg) {
 		((TextView) findViewById(R.id.matchMessageText)).setText(matchMsg);
-		findViewById(R.id.waiting_icon1).setBackground(getDrawable(R.drawable.player_icon_p1));
-		findViewById(R.id.waiting_icon2).setBackground(getDrawable(R.drawable.player_icon_p2));
 		findViewById(R.id.matchMessage).setVisibility(View.VISIBLE);
+
+		// Start animations for side icons
+		if (mLeftFadeOut != null && mRightFadeOut != null) {
+			mWaiting1.startAnimation(mLeftFadeOut);
+			mWaiting2.startAnimation(mRightFadeOut);
+		}
 	}
 
 	private void dismissMessage() {
 		findViewById(R.id.matchMessage).setVisibility(View.GONE);
 		((TextView) findViewById(R.id.matchMessageText)).setText("");
+	}
+
+	private void initializeWaitingAnimations() {
+		mLeftFadeIn = AnimationUtils.loadAnimation(this, R.anim.anim_fadein);
+		mLeftFadeOut = AnimationUtils.loadAnimation(this, R.anim.anim_fadeout);
+		mRightFadeIn = AnimationUtils.loadAnimation(this, R.anim.anim_fadein);
+		mRightFadeOut = AnimationUtils.loadAnimation(this, R.anim.anim_fadeout);
+
+		mWaiting1 = (ImageView) findViewById(R.id.waiting_icon1);
+		mWaiting2 = (ImageView) findViewById(R.id.waiting_icon2);
+		mWaiting1.setBackgroundResource(R.drawable.player_icon_p1);
+		mWaiting2.setBackgroundResource(R.drawable.player_icon_p2);
+
+		mRightFadeOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				// Flip background resources
+				mWaiting2.setBackgroundResource(mWaitingRightColor ? R.drawable.player_icon_p1 : R.drawable.player_icon_p2);
+				mWaitingRightColor = !mWaitingRightColor;
+				// Start animations
+				mWaiting2.startAnimation(mRightFadeIn);
+			}
+		});
+
+		mLeftFadeOut.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				// Flip background resources
+				mWaiting1.setBackgroundResource(mWaitingLeftColor ? R.drawable.player_icon_p1 : R.drawable.player_icon_p2);
+				mWaitingLeftColor = !mWaitingLeftColor;
+				// Start animations
+				mWaiting1.startAnimation(mLeftFadeIn);
+			}
+		});
+
+		mLeftFadeIn.setAnimationListener(new Animation.AnimationListener() {
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				mHandler.postDelayed(new Runnable() {
+					@Override
+					public void run() {
+						mWaiting1.startAnimation(mLeftFadeOut);
+						mWaiting2.startAnimation(mRightFadeOut);
+					}
+				}, 1000);
+			}
+		});
 	}
 
 	private void showSpinner(int spinnerMsg) {
