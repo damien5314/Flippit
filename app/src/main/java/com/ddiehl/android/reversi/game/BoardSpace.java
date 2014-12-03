@@ -59,8 +59,8 @@ public class BoardSpace extends Button {
     }
 
     private void animateBackgroundChange() {
-        final Animation fadeOut = AnimationUtils.loadAnimation(ctx, R.anim.anim_fadeout);
-        final Animation fadeIn = AnimationUtils.loadAnimation(ctx, R.anim.anim_fadein);
+        final Animation fadeOut = AnimationUtils.loadAnimation(ctx, R.anim.playermove_fadeout);
+        final Animation fadeIn = AnimationUtils.loadAnimation(ctx, R.anim.playermove_fadein);
         fadeOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) { }

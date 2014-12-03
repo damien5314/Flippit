@@ -686,10 +686,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				turnIndicator.setImageResource(oppTurnResource);
 				break;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-				turnIndicator.setImageResource(android.R.color.transparent);
+				turnIndicator.setImageResource(R.drawable.ic_turn_neutral);
 				break;
 			case TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE:
-				turnIndicator.setImageResource(android.R.color.transparent);
+				turnIndicator.setImageResource(R.drawable.ic_turn_neutral);
 				break;
 		}
 	}
@@ -737,7 +737,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		findViewById(R.id.matchMessage).setVisibility(View.VISIBLE);
 
 		// Start animations for side icons
-		if (mLeftFadeOut != null && mRightFadeOut != null) {
+		if (mLeftFadeOut != null && mRightFadeOut != null
+				&& !mLeftFadeOut.hasStarted() && !mRightFadeOut.hasStarted()) {
 			mWaiting1.startAnimation(mLeftFadeOut);
 			mWaiting2.startAnimation(mRightFadeOut);
 		}
@@ -746,13 +747,17 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void dismissMessage() {
 		findViewById(R.id.matchMessage).setVisibility(View.GONE);
 		((TextView) findViewById(R.id.matchMessageText)).setText("");
+		mLeftFadeOut.cancel();
+		mRightFadeOut.cancel();
+		mLeftFadeIn.cancel();
+		mRightFadeIn.cancel();
 	}
 
 	private void initializeWaitingAnimations() {
-		mLeftFadeIn = AnimationUtils.loadAnimation(this, R.anim.anim_fadein);
-		mLeftFadeOut = AnimationUtils.loadAnimation(this, R.anim.anim_fadeout);
-		mRightFadeIn = AnimationUtils.loadAnimation(this, R.anim.anim_fadein);
-		mRightFadeOut = AnimationUtils.loadAnimation(this, R.anim.anim_fadeout);
+		mLeftFadeIn = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadein);
+		mLeftFadeOut = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadeout);
+		mRightFadeIn = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadein);
+		mRightFadeOut = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadeout);
 
 		mWaiting1 = (ImageView) findViewById(R.id.waiting_icon1);
 		mWaiting2 = (ImageView) findViewById(R.id.waiting_icon2);
@@ -814,7 +819,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						mWaiting1.startAnimation(mLeftFadeOut);
 						mWaiting2.startAnimation(mRightFadeOut);
 					}
-				}, 1000);
+				}, getResources().getInteger(R.integer.waitingMessageFadeDelay));
 			}
 		});
 	}

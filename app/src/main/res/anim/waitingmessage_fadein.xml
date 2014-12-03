@@ -4,8 +4,8 @@
     android:interpolator="@android:anim/linear_interpolator">
 
     <alpha
-        android:fromAlpha="1"
-        android:toAlpha="0"
-        android:duration="@integer/fadeOutDuration"/>
+        android:fromAlpha="0"
+        android:toAlpha="1"
+        android:duration="@integer/waitingMessageFadeInDuration"/>
 
 </set>
