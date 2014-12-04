@@ -43,8 +43,8 @@
 		<item name="android:radius">@dimen/playerIcon_corner_radius</item>
     </style>
 
-    <style name="PlayerLabel">
-        <item name="android:layout_width">wrap_content</item>
+    <style name="PlayerLabel" parent="autoscroll">
+        <item name="android:layout_width">@dimen/playerName_width</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:textSize">@dimen/scoreOverlay_text_size</item>
         <item name="android:textStyle">bold</item>
@@ -182,6 +182,15 @@
 		<item name="android:fullDark">@color/transparent</item>
 		<item name="android:topBright">@color/transparent</item>
 		<item name="android:topDark">@color/transparent</item>
+	</style>
+
+	<style name="autoscroll">
+		<item name="android:singleLine">true</item>
+		<item name="android:ellipsize">end</item>
+		<!--<item name="android:marqueeRepeatLimit">marquee_forever</item>-->
+		<item name="android:focusable">true</item>
+		<item name="android:focusableInTouchMode">true</item>
+		<item name="android:scrollHorizontally">true</item>
 	</style>
 
 </resources>
