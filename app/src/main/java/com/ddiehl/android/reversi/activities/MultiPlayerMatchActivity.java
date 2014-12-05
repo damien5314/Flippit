@@ -254,7 +254,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 							@Override
 							public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 //								Log.d(TAG, "TurnBasedMultiplayer match created");
-								processResult(result);
+                                processResult(result);
 							}
 						});
 				break;
@@ -264,6 +264,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 		TurnBasedMatch match = result.getMatch();
 		mMatchData = null;
+
+        if (match.getData() == null)
+            mBoard.reset();
+
 		saveMatchData();
 
 		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
