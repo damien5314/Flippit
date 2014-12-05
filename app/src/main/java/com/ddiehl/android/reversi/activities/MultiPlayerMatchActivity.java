@@ -24,7 +24,6 @@ import android.widget.Toast;
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.fragments.ErrorDialogFragment;
 import com.ddiehl.android.reversi.game.Board;
-import com.ddiehl.android.reversi.game.BoardIterator;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ReversiColor;
 import com.google.android.gms.common.ConnectionResult;
@@ -67,6 +66,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private Participant mPlayer, mOpponent;
 	private Participant mLightPlayer, mDarkPlayer;
 	private byte[] mMatchData;
+	private int lightScore, darkScore;
 
     private boolean resolvingError = false;
 	private boolean updatingMatch = false;
@@ -288,7 +288,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mBoard.reset();
 		saveMatchData();
 		displayBoard();
-		updateScoreDisplay();
+		updateScore();
 
 		String playerId = Games.Players.getCurrentPlayerId(mGoogleApiClient);
 		String myParticipantId = mMatch.getParticipantId(playerId);
@@ -340,8 +340,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         mBoard.deserialize(playerData);
 		findViewById(R.id.board_panels).setVisibility(View.GONE);
         displayBoard();
-		updateScoreDisplay();
-		updatePlayerNameDisplay();
+//		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
+//		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
+		updateScore();
+		updatePlayerNames();
 		dismissSpinner();
 
 		// Commit opponent's moves to the deserialized Board object
@@ -353,9 +355,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			mQueuedMoves.add(s);
 		}
 
-		updatingMatch = false;
 		if (!mQueuedMoves.isEmpty())
 			processReceivedTurns();
+		updatingMatch = false;
 
 		int status = match.getStatus();
 		int turnStatus = match.getTurnStatus();
@@ -371,8 +373,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				displayMessage(getString(R.string.match_finding_partner));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_COMPLETE:
-				displayMessage(getString(R.string.match_complete));
-				Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId());
+//				displayMessage(getString(R.string.match_complete));
+				endMatch();
 				return;
 		}
 
@@ -414,12 +416,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			@Override
 			public void run() {
 				mBoard.commitPiece(mQueuedMoves.remove(0), getOpponentColor());
-				updateScoreDisplay();
 				saveMatchData();
 				if (!mQueuedMoves.isEmpty())
 					processReceivedTurns();
-				else
+				else {
+					updateScore();
 					updatingMatch = false;
+				}
 			}
 		}, getResources().getInteger(R.integer.cpu_turn_delay));
 	}
@@ -506,66 +509,46 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		} else { // No moves remaining, end of match
             updatingMatch = false;
             dismissSpinner();
-			updateScoreDisplay();
+			updateScore();
 			endMatch();
 			return;
 		}
-		updateScoreDisplay();
+		updateScore();
 	}
 
 	private void endMatch() {
-		// Calculate score for each piece
-		int lightCount = 0;
-		int darkCount = 0;
-		BoardIterator i = new BoardIterator(mBoard);
-
-		while (i.hasNext()) {
-			BoardSpace s = i.next();
-			if (s.isOwned()) {
-				if (s.getColor() == ReversiColor.White)
-					lightCount++;
-				else
-					darkCount++;
-			}
-		}
-
-		// Add remaining spaces to winning count as per Reversi rules
-		addRemainingSpacesToWinningCount(lightCount, darkCount);
-
 		// Generate ParticipantResult objects for passing to finishMatch()
 		ParticipantResult winnerResult, loserResult;
-		if (lightCount != darkCount) {
-			if (lightCount > darkCount) {
+		if (lightScore != darkScore) {
+			if (lightScore > darkScore) {
 				winnerResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				showAlertDialog(getString(R.string.game_over), getString(R.string.winner_light));
+				displayMessage(getString(R.string.winner_light));
 			} else {
 				winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				showAlertDialog(getString(R.string.game_over), getString(R.string.winner_dark));
+				displayMessage(getString(R.string.winner_dark));
 			}
 		} else {
 			winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
 			loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
 					ParticipantResult.PLACING_UNINITIALIZED);
-			showAlertDialog(getString(R.string.game_over), getString(R.string.winner_tie));
+			displayMessage(getString(R.string.winner_tie));
 		}
 
-		// Call finishMatch() with results
-		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult);
-	}
+		// If the match status is already complete, just finish the match for the player
+		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE) {
+			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId());
+			return;
+		}
 
-	private void addRemainingSpacesToWinningCount(int lightCount, int darkCount) {
-		int diff = 64 - lightCount - darkCount;
-		if (lightCount > darkCount)
-			((TextView) findViewById(R.id.p1score)).setText(String.valueOf(lightCount+diff));
-		else if (darkCount > lightCount)
-			((TextView) findViewById(R.id.p2score)).setText(String.valueOf(darkCount+diff));
+		// If match is not complete, call finishMatch() with result parameters
+		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult);
 	}
 
 	private Participant getCurrentPlayer() {
@@ -649,7 +632,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		grid.setVisibility(View.VISIBLE);
 	}
 
-	private void updatePlayerNameDisplay() {
+	private void updatePlayerNames() {
 		if (mLightPlayer != null) {
 			((TextView) findViewById(R.id.p1_label)).setText(mLightPlayer.getDisplayName());
 		} else {
@@ -663,18 +646,21 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 	}
 
-	private void updateScoreDisplay() {
-		int p1c = 0, p2c = 0;
-		BoardIterator i = new BoardIterator(mBoard);
-		while (i.hasNext()) {
-			BoardSpace s = i.next();
-			if (s.isOwned()) {
-				if (s.getColor() == ReversiColor.White) p1c++;
-				else p2c++;
-			}
+	private void updateScore() {
+		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
+		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
+
+		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE && !updatingMatch) {
+			Log.d(TAG, "Match is complete, adding empty spaces to better score: " + mBoard.getNumberOfEmptySpaces());
+			// Add remaining spaces to winning count as per Reversi rules
+			if (lightScore > darkScore)
+				lightScore += mBoard.getNumberOfEmptySpaces();
+			else if (darkScore > lightScore)
+				darkScore += mBoard.getNumberOfEmptySpaces();
 		}
-		((TextView) findViewById(R.id.p1score)).setText(String.valueOf(p1c));
-		((TextView) findViewById(R.id.p2score)).setText(String.valueOf(p2c));
+
+		((TextView) findViewById(R.id.p1score)).setText(String.valueOf(lightScore));
+		((TextView) findViewById(R.id.p2score)).setText(String.valueOf(darkScore));
 
 		// Update turn indicator
 		ImageView turnIndicator = (ImageView) findViewById(R.id.turnIndicator);

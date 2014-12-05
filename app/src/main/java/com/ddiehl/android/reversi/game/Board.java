@@ -137,6 +137,28 @@ public class Board {
         }
     }
 
+	public int getNumSpacesForColor(ReversiColor c) {
+		int count = 0;
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (s.isOwned() && s.getColor() == c)
+				count++;
+		}
+		return count;
+	}
+
+	public int getNumberOfEmptySpaces() {
+		int count = 0;
+		BoardIterator i = new BoardIterator(this);
+		while (i.hasNext()) {
+			BoardSpace s = i.next();
+			if (!s.isOwned())
+				count++;
+		}
+		return count;
+	}
+
 	public int width() {
 		return width;
 	}

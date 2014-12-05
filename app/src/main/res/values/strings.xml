@@ -29,7 +29,7 @@
 	<string name="game_over">Game Over</string>
 	<string name="winner_light">Light wins</string>
 	<string name="winner_dark">Dark wins</string>
-	<string name="winner_tie">The match is a tie</string>
+	<string name="winner_tie">Tie Match</string>
 
     <string name="how_to_play_p1">
 		In Reversi there are two players, each represented by light or dark spaces on the game board.
