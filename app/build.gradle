@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.0.0"
+    buildToolsVersion "21.1.1"
 
     defaultConfig {
         applicationId "com.ddiehl.android.reversi"
@@ -14,7 +14,7 @@ android {
 
     buildTypes {
         release {
-            runProguard true
+            minifyEnabled true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
