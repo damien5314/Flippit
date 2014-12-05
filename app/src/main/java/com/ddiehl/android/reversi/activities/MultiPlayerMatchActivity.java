@@ -342,7 +342,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         displayBoard();
 //		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
 //		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
-		updateScore();
+//		updateScore();
 		updatePlayerNames();
 		dismissSpinner();
 
@@ -355,14 +355,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			mQueuedMoves.add(s);
 		}
 
+		updatingMatch = false;
 		if (!mQueuedMoves.isEmpty())
 			processReceivedTurns();
-		updatingMatch = false;
+		updateScore();
 
-		int status = match.getStatus();
-		int turnStatus = match.getTurnStatus();
-
-		switch (status) {
+		switch (mMatch.getStatus()) {
 			case TurnBasedMatch.MATCH_STATUS_CANCELED:
 				displayMessage(getString(R.string.match_canceled));
 				return;
@@ -379,7 +377,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 
 		// OK, it's active. Check on turn status.
-		switch (turnStatus) {
+		switch (mMatch.getTurnStatus()) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
 				dismissMessage();
 				return;
@@ -420,8 +418,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				if (!mQueuedMoves.isEmpty())
 					processReceivedTurns();
 				else {
-					updateScore();
 					updatingMatch = false;
+					updateScore();
 				}
 			}
 		}, getResources().getInteger(R.integer.cpu_turn_delay));
@@ -649,6 +647,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void updateScore() {
 		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
 		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
+		Log.d(TAG, "Updating score: " + lightScore + " " + darkScore);
 
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE && !updatingMatch) {
 			Log.d(TAG, "Match is complete, adding empty spaces to better score: " + mBoard.getNumberOfEmptySpaces());
