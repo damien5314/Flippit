@@ -655,7 +655,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         Log.d(TAG, "clearBoard()");
         TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
         grid.setVisibility(View.GONE);
-//        grid.removeAllViews();
+        grid.removeAllViews();
+        ((TextView) findViewById(R.id.p1_score)).setText("");
+        ((TextView) findViewById(R.id.p2_score)).setText("");
+        ((ImageView) findViewById(R.id.turnIndicator)).setImageResource(android.R.color.transparent);
         findViewById(R.id.board_panels).setVisibility(View.VISIBLE);
     }
 
@@ -686,8 +689,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				darkScore += mBoard.getNumberOfEmptySpaces();
 		}
 
-		((TextView) findViewById(R.id.p1score)).setText(String.valueOf(lightScore));
-		((TextView) findViewById(R.id.p2score)).setText(String.valueOf(darkScore));
+		((TextView) findViewById(R.id.p1_score)).setText(String.valueOf(lightScore));
+		((TextView) findViewById(R.id.p2_score)).setText(String.valueOf(darkScore));
 
 		// Update turn indicator
 		ImageView turnIndicator = (ImageView) findViewById(R.id.turnIndicator);

@@ -16,12 +16,12 @@
 			style="@style/TurnIndicator"/>
 
 		<TextView
-			android:id="@+id/p1score"
+			android:id="@+id/p1_score"
 			android:layout_toLeftOf="@id/turnIndicator"
 			style="@style/ScoreValue"/>
 
 		<TextView
-			android:id="@+id/p2score"
+			android:id="@+id/p2_score"
 			android:layout_toRightOf="@id/turnIndicator"
 			style="@style/ScoreValue"/>
 
