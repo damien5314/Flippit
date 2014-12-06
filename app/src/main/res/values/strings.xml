@@ -65,6 +65,9 @@
     <string name="dialog_signin_confirm">Sign In</string>
     <string name="dialog_signin_cancel">Cancel</string>
 
+    <string name="dialog_invalid_match_title">Not connected</string>
+    <string name="dialog_invalid_match_message">Try move again</string>
+
 	<!-- Match status errors -->
 	<string name="dialog_warning">Warning</string>
 	<string name="google_play_not_connected">Not connected to Play Services</string>
@@ -72,7 +75,7 @@
 	<string name="match_error_already_rematched">Already rematched</string>
 	<string name="network_error_operation_failed">Network operation failed</string>
 	<string name="client_reconnect_required">Client reconnect required</string>
-	<string name="internal_error">Internal error</string>
+	<string name="internal_error">Match is no longer active</string>
 	<string name="match_error_inactive_match">Inactive match</string>
 	<string name="match_error_locally_modified">Match locally modified</string>
 	<string name="unexpected_status">Unexpected match status</string>

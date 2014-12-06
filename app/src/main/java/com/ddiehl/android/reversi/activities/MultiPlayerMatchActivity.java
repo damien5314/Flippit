@@ -188,15 +188,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				.setTitle(getString(R.string.dialog_signin_title))
 				.setMessage(getString(R.string.dialog_signin_message))
 				.setPositiveButton(getString(R.string.dialog_signin_confirm), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						mGoogleApiClient.connect();
-					}
-				})
+                    public void onClick(DialogInterface dialog, int id) {
+                        mGoogleApiClient.connect();
+                    }
+                })
 				.setNegativeButton(getString(R.string.dialog_signin_cancel), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						// Do nothing, user cancelled
-					}
-				})
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Do nothing, user cancelled
+                    }
+                })
 				.create()
 				.show();
 	}
@@ -329,9 +329,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		if (!checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
 			Log.d(TAG, "Failure status code: " + result.getStatus().getStatusCode());
-			showAlertDialog("Not connected", "Try move again");
-			mBoard = pBoard;
-			displayBoard();
+//			mBoard = pBoard;
+//			displayBoard();
 			return;
 		}
 
@@ -358,7 +357,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		byte[] playerData = Arrays.copyOfRange(mMatchData, startIndex, startIndex+64);
 
         mBoard.deserialize(playerData);
-		findViewById(R.id.board_panels).setVisibility(View.GONE);
         displayBoard();
 //		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
 //		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
@@ -469,10 +467,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			if (s.isOwned())
 				return;
 
-			Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus() + " (My Turn Status = "
-					+ TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN + ")");
 			if (mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-				Toast.makeText(this, "Not your turn!", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(this, "Not your turn!", Toast.LENGTH_SHORT).show();
+                Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus() + " (My Turn Status = "
+                        + TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN + ")");
 				return;
 			}
 
@@ -499,8 +497,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				Toast.makeText(this, R.string.bad_move, Toast.LENGTH_SHORT).show();
 			}
 		}
-		else // TODO Change this to display a sign-in dialog
-			Log.d(TAG, "GoogleApiClient not connected");
+		else {
+            Log.d(TAG, "GoogleApiClient not connected");
+            mGoogleApiClient.connect();
+        }
 	}
 
 	private void updateMatchState() {
@@ -619,6 +619,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	// This is duplicated between the single player activity and multiplayer activity
 	// Consider refactoring this to a static method in another class to decrease code duplication
 	private void displayBoard() {
+        Log.d(TAG, "displayBoard()");
+        findViewById(R.id.board_panels).setVisibility(View.GONE);
 		TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
 		grid.setLayoutParams(new LinearLayout.LayoutParams(
@@ -647,8 +649,16 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			}
 			grid.addView(row);
 		}
-		grid.setVisibility(View.VISIBLE);
+        grid.setVisibility(View.VISIBLE);
 	}
+
+    private void clearBoard() {
+        Log.d(TAG, "clearBoard()");
+        TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
+        grid.setVisibility(View.GONE);
+//        grid.removeAllViews();
+        findViewById(R.id.board_panels).setVisibility(View.VISIBLE);
+    }
 
 	private void updatePlayerNames() {
 		if (mLightPlayer != null) {
@@ -725,6 +735,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.client_reconnect_required));
 				break;
 			case GamesStatusCodes.STATUS_INTERNAL_ERROR:
+                clearBoard();
 				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.internal_error));
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH:
