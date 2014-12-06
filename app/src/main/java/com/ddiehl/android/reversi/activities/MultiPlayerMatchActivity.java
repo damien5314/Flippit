@@ -327,20 +327,19 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mMatch = result.getMatch();
 		dismissSpinner();
 
-		if (!checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
-			Log.d(TAG, "Failure status code: " + result.getStatus().getStatusCode());
+		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
+            if (mMatch.canRematch()) {
+//			askForRematch();
+            }
+
+            updateMatch(mMatch);
+		} else {
+            Log.d(TAG, "Failure status code: " + result.getStatus().getStatusCode());
 //			mBoard = pBoard;
 //			displayBoard();
-			return;
-		}
+        }
 
-		updatingMatch = false;
-
-		if (mMatch.canRematch()) {
-//			askForRematch();
-		}
-
-		updateMatch(mMatch);
+        updatingMatch = false;
 	}
 
 	private void updateMatch(TurnBasedMatch match) {
@@ -677,10 +676,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void updateScore() {
 		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
 		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
-		Log.d(TAG, "Updating score: " + lightScore + " " + darkScore);
+//		Log.d(TAG, "Updating score: " + lightScore + " " + darkScore);
 
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE && !updatingMatch) {
-			Log.d(TAG, "Match is complete, adding empty spaces to better score: " + mBoard.getNumberOfEmptySpaces());
 			// Add remaining spaces to winning count as per Reversi rules
 			if (lightScore > darkScore)
 				lightScore += mBoard.getNumberOfEmptySpaces();
