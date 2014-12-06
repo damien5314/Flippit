@@ -60,6 +60,11 @@
 	<string name="multiplayer_select_match">Select Match</string>
 	<string name="multiplayer_select_match_condensed">Select</string>
 
+    <string name="dialog_signin_title">Sign In Required</string>
+    <string name="dialog_signin_message">Google Play sign in is required to start or join a multiplayer match.</string>
+    <string name="dialog_signin_confirm">Sign In</string>
+    <string name="dialog_signin_cancel">Cancel</string>
+
 	<!-- Match status errors -->
 	<string name="dialog_warning">Warning</string>
 	<string name="google_play_not_connected">Not connected to Play Services</string>

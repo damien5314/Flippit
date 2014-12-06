@@ -185,14 +185,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private void displaySignInPrompt() {
 		new AlertDialog.Builder(this)
-				.setTitle("Sign In Required")
-				.setMessage("Google Play sign in is required to start or join a multiplayer match")
-				.setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
+				.setTitle(getString(R.string.dialog_signin_title))
+				.setMessage(getString(R.string.dialog_signin_message))
+				.setPositiveButton(getString(R.string.dialog_signin_confirm), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						mGoogleApiClient.connect();
 					}
 				})
-				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+				.setNegativeButton(getString(R.string.dialog_signin_cancel), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						// Do nothing, user cancelled
 					}
