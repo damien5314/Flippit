@@ -183,10 +183,29 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		resolvingError = false;
     }
 
+	private void displaySignInPrompt() {
+		new AlertDialog.Builder(this)
+				.setTitle("Sign In Required")
+				.setMessage("Google Play sign in is required to start or join a multiplayer match")
+				.setPositiveButton("Sign In", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						mGoogleApiClient.connect();
+					}
+				})
+				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						// Do nothing, user cancelled
+					}
+				})
+				.create()
+				.show();
+	}
+
 	public void startNewMatch(View v) {
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
-			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+//			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+			displaySignInPrompt();
 			return;
 		}
 		intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true);
@@ -196,7 +215,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	public void selectMatch(View v) {
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
-			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+//			Toast.makeText(this, R.string.google_play_not_connected, Toast.LENGTH_SHORT).show();
+			displaySignInPrompt();
 			return;
 		}
 		intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
