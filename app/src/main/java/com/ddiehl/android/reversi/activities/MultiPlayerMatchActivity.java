@@ -239,44 +239,48 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				break;
 
 			case RC_VIEW_MATCHES: // Returned from the 'Select Match' dialog
-				if (resultCode != Activity.RESULT_OK) // User canceled
-					break;
-
-				TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
-				if (match != null) {
-					Log.d(TAG, "Selected match: " + match.getMatchId());
-					updateMatch(match);
+				if (resultCode == Activity.RESULT_OK) { // User canceled
+					TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+					if (match != null) {
+						Log.d(TAG, "Selected match: " + match.getMatchId());
+						updateMatch(match);
+					}
+				} else {
+					// Present error dialog
+					Log.d(TAG, "Error in Activity VIEW_MATCHES - Result Code: " + resultCode);
 				}
 				break;
 
 			case RC_SELECT_PLAYERS: // Returned from 'Select players to Invite' dialog
-				if (resultCode != Activity.RESULT_OK) // User canceled
-					return;
+				if (resultCode == Activity.RESULT_OK) { // User canceled
+					final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
+					Bundle autoMatchCriteria;
 
-				final ArrayList<String> invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS);
-				Bundle autoMatchCriteria;
+					int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
+					int maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
 
-				int minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0);
-				int maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0);
+					if (minAutoMatchPlayers > 0)
+						autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0);
+					else autoMatchCriteria = null;
 
-				if (minAutoMatchPlayers > 0)
-					autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0);
-				else autoMatchCriteria = null;
+					TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
+							.addInvitedPlayers(invitees)
+							.setAutoMatchCriteria(autoMatchCriteria)
+							.build();
 
-				TurnBasedMatchConfig tbmc = TurnBasedMatchConfig.builder()
-						.addInvitedPlayers(invitees)
-						.setAutoMatchCriteria(autoMatchCriteria)
-						.build();
-
-				showSpinner(1);
-				Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback(
-						new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
-							@Override
-							public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
-//								Log.d(TAG, "TurnBasedMultiplayer match created");
-                                processResult(result);
-							}
-						});
+					showSpinner(1);
+					Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback(
+							new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
+								@Override
+								public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
+								Log.d(TAG, "TurnBasedMultiplayer match created");
+								processResult(result);
+								}
+							});
+				} else {
+					// Present error dialog
+					Log.d(TAG, "Error in Activity SELECT_PLAYERS - Result Code: " + resultCode);
+				}
 				break;
 		}
 	}
