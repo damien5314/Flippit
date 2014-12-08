@@ -469,7 +469,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			if (mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
 //				Toast.makeText(this, "Not your turn!", Toast.LENGTH_SHORT).show();
                 Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus() + " (My Turn Status = "
-                        + TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN + ")");
+						+ TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN + ")");
 				return;
 			}
 
@@ -724,32 +724,32 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				// Action deferred on Google Play until later
 				return true;
 			case GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER:
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.status_multiplayer_error_not_trusted_tester));
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.status_multiplayer_error_not_trusted_tester));
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED:
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.match_error_already_rematched));
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.match_error_already_rematched));
 				break;
 			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED:
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.network_error_operation_failed));
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.network_error_operation_failed));
 				break;
 			case GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED:
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.client_reconnect_required));
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.client_reconnect_required));
 				break;
 			case GamesStatusCodes.STATUS_INTERNAL_ERROR:
-                clearBoard();
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.internal_error));
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.internal_error));
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH:
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.match_error_inactive_match));
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.match_error_inactive_match));
 				break;
 			case GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED:
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.match_error_locally_modified));
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.match_error_locally_modified));
 				break;
 			default:
-				showAlertDialog(getString(R.string.dialog_warning), getString(R.string.unexpected_status));
-				Log.d(TAG, "Did not have warning or string to deal with: " + statusCode);
+//				showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.unexpected_status));
 		}
 
+		clearBoard();
+		showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_message));
 		return false;
 	}
 
