@@ -534,13 +534,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				displayMessage(getString(R.string.winner_light));
+				displayMessage(getString((mPlayer == mLightPlayer) ? R.string.winner_you : R.string.winner_light));
 			} else {
 				winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
 						ParticipantResult.PLACING_UNINITIALIZED);
 				loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
 						ParticipantResult.PLACING_UNINITIALIZED);
-				displayMessage(getString(R.string.winner_dark));
+				displayMessage(getString((mPlayer == mDarkPlayer) ? R.string.winner_you : R.string.winner_dark));
 			}
 		} else {
 			winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
