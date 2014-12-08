@@ -54,7 +54,7 @@ public class BoardSpace extends Button {
     }
 
     public void flipColor() {
-        color = (color == ReversiColor.Black) ? ReversiColor.White : ReversiColor.Black;
+        color = (color == ReversiColor.Dark) ? ReversiColor.Light : ReversiColor.Dark;
         animateBackgroundChange();
     }
 
@@ -78,7 +78,7 @@ public class BoardSpace extends Button {
     }
 
     private void updateBackgroundResource() {
-        setBackgroundResource((color == ReversiColor.White)
+        setBackgroundResource((color == ReversiColor.Light)
                 ? R.drawable.board_space_p1 : R.drawable.board_space_p2);
     }
 }

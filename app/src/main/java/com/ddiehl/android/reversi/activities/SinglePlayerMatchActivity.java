@@ -48,8 +48,8 @@ public class SinglePlayerMatchActivity extends MatchActivity {
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         ctx = this;
 
-		p1 = new ReversiPlayer(ReversiColor.White, getString(R.string.player1_label_default));
-		p2 = new ReversiPlayer(ReversiColor.Black, getString(R.string.player2_label));
+		p1 = new ReversiPlayer(ReversiColor.Light, getString(R.string.player1_label_default));
+		p2 = new ReversiPlayer(ReversiColor.Dark, getString(R.string.player2_label));
         p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
         p2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
@@ -205,7 +205,7 @@ public class SinglePlayerMatchActivity extends MatchActivity {
 		while (i.hasNext()) {
 			BoardSpace s = i.next();
 			if (s.isOwned()) {
-				if (s.getColor() == ReversiColor.White)
+				if (s.getColor() == ReversiColor.Light)
 					p1c++;
 				else
 					p2c++;

@@ -349,8 +349,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
         mBoard.deserialize(playerData);
         displayBoard();
-//		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
-//		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
+//		lightScore = mBoard.getNumSpacesForColor(ReversiColor.Light);
+//		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Dark);
 //		updateScore();
 		updatePlayerNames();
 		dismissSpinner();
@@ -475,7 +475,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				saveMatchData();
 
 				// Add selected piece to the end of mMatchData array
-				// 0 [White's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [White's Moves]
+				// 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
 				int nextIndex = (mPlayer == mLightPlayer) ? 164 : 64;
 				while (mMatchData[nextIndex] != 0)
 					nextIndex++; // Increase index til we run into an unfilled index
@@ -575,14 +575,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private ReversiColor getCurrentPlayerColor() {
 		if (mPlayer == mLightPlayer)
-			return ReversiColor.White;
-		else return ReversiColor.Black;
+			return ReversiColor.Light;
+		else return ReversiColor.Dark;
 	}
 
 	private ReversiColor getOpponentColor() {
 		if (mOpponent == mLightPlayer)
-			return ReversiColor.White;
-		else return ReversiColor.Black;
+			return ReversiColor.Light;
+		else return ReversiColor.Dark;
 	}
 
 	private Participant getLightPlayer() {
@@ -669,8 +669,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private void updateScore() {
-		lightScore = mBoard.getNumSpacesForColor(ReversiColor.White);
-		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Black);
+		lightScore = mBoard.getNumSpacesForColor(ReversiColor.Light);
+		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Dark);
 //		Log.d(TAG, "Updating score: " + lightScore + " " + darkScore);
 
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE && !updatingMatch) {

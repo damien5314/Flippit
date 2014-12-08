@@ -52,10 +52,10 @@ public class Board {
 				spaces[y][x] = new BoardSpace(ctx, x, y);
 			}
 		}
-		spaces[3][3].setColorNoAnimation(ReversiColor.White);
-		spaces[3][4].setColorNoAnimation(ReversiColor.Black);
-		spaces[4][4].setColorNoAnimation(ReversiColor.White);
-		spaces[4][3].setColorNoAnimation(ReversiColor.Black);
+		spaces[3][3].setColorNoAnimation(ReversiColor.Light);
+		spaces[3][4].setColorNoAnimation(ReversiColor.Dark);
+		spaces[4][4].setColorNoAnimation(ReversiColor.Light);
+		spaces[4][3].setColorNoAnimation(ReversiColor.Dark);
 	}
 
 	public boolean hasMove(ReversiColor c) {
@@ -106,7 +106,7 @@ public class Board {
 			return 0;
 
 		int moveVal = 0;
-		ReversiColor opponentColor = (playerColor == ReversiColor.Black) ? ReversiColor.White : ReversiColor.Black;
+		ReversiColor opponentColor = (playerColor == ReversiColor.Dark) ? ReversiColor.Light : ReversiColor.Dark;
         BoardSpace firstPiece = getSpaceAt(s.x + dx, s.y + dy);
 
 		if (firstPiece != null && firstPiece.getColor() == opponentColor) {
@@ -177,10 +177,10 @@ public class Board {
 					case 0:
 						break;
 					case 1:
-						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.White);
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Light);
 						break;
 					case 2:
-						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Black);
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Dark);
 				}
 			}
 		}
@@ -196,10 +196,10 @@ public class Board {
 					case '0':
 						break;
 					case '1':
-						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.White);
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Light);
 						break;
 					case '2':
-						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Black);
+						getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Dark);
 				}
 			}
 		}
@@ -213,7 +213,7 @@ public class Board {
 			BoardSpace s = i.next();
 			if (!s.isOwned())
 				out[index++] = 0;
-			else if (s.getColor() == ReversiColor.White)
+			else if (s.getColor() == ReversiColor.Light)
 				out[index++] = 1;
 			else
 				out[index++] = 2;
@@ -272,7 +272,7 @@ public class Board {
                 BoardSpace s = getSpaceAt(x, y);
                 if (!s.isOwned())
                     sb.append("0 ");
-				else if (s.getColor() == ReversiColor.White)
+				else if (s.getColor() == ReversiColor.Light)
 					sb.append("1 ");
 				else
 					sb.append("2 ");
