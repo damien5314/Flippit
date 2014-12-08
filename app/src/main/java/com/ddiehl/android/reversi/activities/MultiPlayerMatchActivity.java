@@ -285,22 +285,16 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		TurnBasedMatch match = result.getMatch();
 		mMatchData = null;
 
-        if (match.getData() == null)
-            mBoard.reset();
-
-		saveMatchData();
-
 		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
 			return;
 		}
 
-		if (match.getData() != null) { // This is a match that has already started, just update
-			Log.d(TAG, bytesToString(match.getData()));
+        if (match.getData() == null) {
+			startMatch(match);
+		} else { // This is a match that has already started, just update
+//			Log.d(TAG, bytesToString(match.getData()));
 			updateMatch(match);
-			return;
 		}
-
-		startMatch(match);
 	}
 
 	private void startMatch(TurnBasedMatch match) {
@@ -310,11 +304,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		displayBoard();
 		updateScore();
 
-		String playerId = Games.Players.getCurrentPlayerId(mGoogleApiClient);
-		String myParticipantId = mMatch.getParticipantId(playerId);
-
+		String participantId = mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
-				mMatchData, myParticipantId).setResultCallback(
+				mMatchData, participantId).setResultCallback(
 				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 					@Override
 					public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
@@ -749,6 +741,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 
 		clearBoard();
+		dismissSpinner();
 		showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_message));
 		return false;
 	}
@@ -870,13 +863,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				.setTitle(title)
 				.setMessage(message)
 				.setCancelable(false)
-				.setPositiveButton("OK",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						// if this button is clicked, close current activity
-					}
-				})
+				.setPositiveButton(getString(R.string.dialog_error_confirm),
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog, int id) {
+								// if this button is clicked, close current activity
+							}
+						})
 				.create().show();
 	}
 
