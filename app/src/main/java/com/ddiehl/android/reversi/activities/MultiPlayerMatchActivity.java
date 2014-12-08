@@ -321,7 +321,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
             if (mMatch.canRematch()) {
-//			askForRematch();
+				Log.d(TAG, "Can rematch - Presenting rematch dialog");
+//				askForRematch();
             }
 
             updateMatch(mMatch);
@@ -487,8 +488,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			} else {
 				Toast.makeText(this, R.string.bad_move, Toast.LENGTH_SHORT).show();
 			}
-		}
-		else {
+		} else {
             Log.d(TAG, "GoogleApiClient not connected");
             mGoogleApiClient.connect();
         }
@@ -516,9 +516,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						}
 					});
 		} else { // No moves remaining, end of match
-            updatingMatch = false;
-            dismissSpinner();
-			updateScore();
 			endMatch();
 			return;
 		}
@@ -526,6 +523,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private void endMatch() {
+		updateScore();
+
 		// Generate ParticipantResult objects for passing to finishMatch()
 		ParticipantResult winnerResult, loserResult;
 		if (lightScore != darkScore) {
@@ -550,14 +549,34 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			displayMessage(getString(R.string.winner_tie));
 		}
 
+//		updatingMatch = false;
+//		dismissSpinner();
+
 		// If the match status is already complete, just finish the match for the player
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE) {
-			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId());
-			return;
+			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId())
+				.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+					@Override
+					public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
+						processResultFinishMatch(updateMatchResult);
+					}
+			});
+		} else {
+			// If match is not complete, call finishMatch() with result parameters
+			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult)
+				.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+					@Override
+					public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
+						processResultFinishMatch(updateMatchResult);
+					}
+				});
 		}
 
-		// If match is not complete, call finishMatch() with result parameters
-		Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult);
+	}
+
+	private void processResultFinishMatch(TurnBasedMultiplayer.UpdateMatchResult result) {
+		updatingMatch = false;
+		checkStatusCode(mMatch, result.getStatus().getStatusCode());
 	}
 
 	private Participant getCurrentPlayer() {
