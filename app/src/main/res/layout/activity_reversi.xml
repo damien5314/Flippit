@@ -27,14 +27,12 @@
 
             <TextView
                 android:id="@+id/p1_score"
-                android:text="88"
                 style="@style/ScoreValue"/>
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/turnIndicator"
-            android:src="@drawable/ic_turn_neutral"
             style="@style/TurnIndicator"/>
 
         <LinearLayout
@@ -42,7 +40,6 @@
 
             <TextView
                 android:id="@+id/p2_score"
-                android:text="1"
                 style="@style/ScoreValue"/>
 
             <TextView
