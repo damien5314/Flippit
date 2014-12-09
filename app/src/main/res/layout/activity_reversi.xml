@@ -6,52 +6,59 @@
 	android:orientation="vertical"
     tools:context=".MainActivity">
 
-	<RelativeLayout
+	<LinearLayout
 		android:id="@+id/ScoreOverlay"
 		style="@style/ScoreOverlay"
 		android:background="@drawable/border">
 
-		<ImageView
-			android:id="@+id/turnIndicator"
-			style="@style/TurnIndicator"/>
+        <LinearLayout
+            style="@style/ScoreOverlaySection">
 
-		<TextView
-			android:id="@+id/p1_score"
-			android:layout_toLeftOf="@id/turnIndicator"
-			style="@style/ScoreValue"/>
+            <ImageView
+                android:id="@+id/p1_icon"
+                style="@style/PlayerIcon"
+                android:background="@drawable/player_icon_p1"/>
 
-		<TextView
-			android:id="@+id/p2_score"
-			android:layout_toRightOf="@id/turnIndicator"
-			style="@style/ScoreValue"/>
+            <TextView
+                android:id="@+id/p1_label"
+                style="@style/PlayerLabel"
+                android:gravity="left|center"
+                android:text="@string/player1_label_default"/>
+
+            <TextView
+                android:id="@+id/p1_score"
+                android:text="88"
+                style="@style/ScoreValue"/>
+
+        </LinearLayout>
 
         <ImageView
-            android:id="@+id/p1_icon"
-            style="@style/PlayerIcon"
-            android:background="@drawable/player_icon_p1"
-            android:layout_alignParentLeft="true"/>
+            android:id="@+id/turnIndicator"
+            android:src="@drawable/ic_turn_neutral"
+            style="@style/TurnIndicator"/>
 
-        <ImageView
-            android:id="@+id/p2_icon"
-            style="@style/PlayerIcon"
-            android:background="@drawable/player_icon_p2"
-            android:layout_alignParentRight="true"/>
+        <LinearLayout
+            style="@style/ScoreOverlaySection">
 
-		<TextView
-			android:id="@+id/p1_label"
-			android:layout_toRightOf="@id/p1_icon"
-			style="@style/PlayerLabel"
-			android:gravity="left|center"
-			android:text="@string/player1_label_default"/>
+            <TextView
+                android:id="@+id/p2_score"
+                android:text="1"
+                style="@style/ScoreValue"/>
 
-		<TextView
-			android:id="@+id/p2_label"
-			android:layout_toLeftOf="@id/p2_icon"
-			style="@style/PlayerLabel"
-			android:gravity="right|center"
-			android:text="@string/player2_label"/>
+            <TextView
+                android:id="@+id/p2_label"
+                style="@style/PlayerLabel"
+                android:gravity="right|center"
+                android:text="@string/player2_label"/>
 
-	</RelativeLayout>
+            <ImageView
+                android:id="@+id/p2_icon"
+                style="@style/PlayerIcon"
+                android:background="@drawable/player_icon_p2"/>
+
+        </LinearLayout>
+
+	</LinearLayout>
 
 	<LinearLayout
 		android:id="@+id/gameArea"

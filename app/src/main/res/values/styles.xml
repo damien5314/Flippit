@@ -19,19 +19,26 @@
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
-		<item name="android:layout_margin">@dimen/launcher_cta_margin</item>
-		<item name="android:background">@drawable/launcher_cta</item>
+        <item name="android:layout_margin">@dimen/launcher_cta_margin</item>
+        <item name="android:background">@drawable/launcher_cta</item>
         <item name="android:textSize">@dimen/launcher_cta_size</item>
-		<item name="android:textColor">@color/launcher_cta_text_color</item>
+        <item name="android:textColor">@color/launcher_cta_text_color</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
-	<style name="ScoreOverlay">
-		<item name="android:layout_width">fill_parent</item>
-		<!--<item name="android:layout_height">@dimen/scoreOverlay_height</item>-->
-		<item name="android:layout_height">@dimen/scoreOverlay_height</item>
-		<item name="android:orientation">horizontal</item>
-	</style>
+    <style name="ScoreOverlay">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">@dimen/scoreOverlay_height</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_gravity">center</item> <!-- Added in refactoring to LinearLayout -->
+    </style>
+
+    <style name="ScoreOverlaySection">
+        <item name="android:orientation">horizontal</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_weight">1</item>
+    </style>
 
     <style name="PlayerIcon">
         <item name="android:layout_width">@dimen/playerIcon_width</item>
@@ -40,12 +47,13 @@
         <item name="android:layout_marginRight">@dimen/playerIcon_padding</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
-		<item name="android:radius">@dimen/playerIcon_corner_radius</item>
+        <item name="android:radius">@dimen/playerIcon_corner_radius</item>
     </style>
 
     <style name="PlayerLabel" parent="autoscroll">
-        <item name="android:layout_width">@dimen/playerName_width</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_weight">1</item>
         <item name="android:textSize">@dimen/scoreOverlay_text_size</item>
         <item name="android:textStyle">bold</item>
     </style>
@@ -53,81 +61,81 @@
     <style name="ScoreValue">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">fill_parent</item>
-		<item name="android:textSize">@dimen/scoreOverlay_text_size</item>
+        <item name="android:textSize">@dimen/scoreOverlay_text_size</item>
         <item name="android:gravity">center</item>
     </style>
 
-	<style name="TurnIndicator">
-		<item name="android:layout_width">wrap_content</item>
-		<item name="android:layout_height">wrap_content</item>
-		<item name="android:paddingLeft">@dimen/scoreValue_padding</item>
-		<item name="android:paddingRight">@dimen/scoreValue_padding</item>
-		<item name="android:layout_gravity">center</item>
+    <style name="TurnIndicator">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/scoreValue_padding</item>
+        <item name="android:paddingRight">@dimen/scoreValue_padding</item>
+        <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_centerHorizontal">true</item>
-	</style>
+    </style>
 
-	<style name="GameArea">
-		<item name="android:layout_width">match_parent</item>
-		<item name="android:layout_height">fill_parent</item>
-		<item name="android:orientation">vertical</item>
-		<item name="android:background">@color/board_color</item>
-	</style>
+    <style name="GameArea">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:background">@color/board_color</item>
+    </style>
 
-	<style name="BoardPanels">
-		<item name="android:layout_width">fill_parent</item>
-		<item name="android:layout_height">fill_parent</item>
-		<item name="android:gravity">center</item>
-		<item name="android:orientation">vertical</item>
-	</style>
+    <style name="BoardPanels">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:orientation">vertical</item>
+    </style>
 
-	<style name="GameBoardTable">
-		<item name="android:layout_width">fill_parent</item>
+    <style name="GameBoardTable">
+        <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
-	</style>
+    </style>
 
-	<style name="GameMessage">
-		<item name="android:layout_width">fill_parent</item>
-		<item name="android:layout_height">fill_parent</item>
-	</style>
+    <style name="GameMessage">
+        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_height">fill_parent</item>
+    </style>
 
-	<style name="GameMessageText">
-		<!--<item name="android:layout_width">wrap_content</item>-->
-		<!--<item name="android:layout_height">fill_parent</item>-->
-		<!--<item name="android:layout_gravity">center_horizontal</item>-->
-		<!--<item name="android:gravity">center|center</item>-->
+    <style name="GameMessageText">
+        <!--<item name="android:layout_width">wrap_content</item>-->
+        <!--<item name="android:layout_height">fill_parent</item>-->
+        <!--<item name="android:layout_gravity">center_horizontal</item>-->
+        <!--<item name="android:gravity">center|center</item>-->
 
-		<item name="android:layout_width">wrap_content</item>
-		<item name="android:layout_height">wrap_content</item>
-		<item name="android:paddingLeft">@dimen/scoreValue_padding</item>
-		<item name="android:paddingRight">@dimen/scoreValue_padding</item>
-		<item name="android:layout_gravity">center</item>
-		<item name="android:layout_centerVertical">true</item>
-		<item name="android:layout_centerHorizontal">true</item>
-		<item name="android:textSize">@dimen/game_message_text_size</item>
-		<item name="android:textColor">@android:color/white</item>
-	</style>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingLeft">@dimen/scoreValue_padding</item>
+        <item name="android:paddingRight">@dimen/scoreValue_padding</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_centerHorizontal">true</item>
+        <item name="android:textSize">@dimen/game_message_text_size</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
 
-	<style name="GameMessageIcon">
-		<item name="android:layout_width">@dimen/playerIcon_width</item>
-		<item name="android:layout_height">@dimen/playerIcon_width</item>
-		<!--<item name="android:layout_marginLeft">@dimen/playerIcon_padding</item>-->
-		<!--<item name="android:layout_marginRight">@dimen/playerIcon_padding</item>-->
-		<item name="android:layout_gravity">center</item>
-		<item name="android:layout_centerVertical">true</item>
-		<item name="android:radius">@dimen/playerIcon_corner_radius</item>
-	</style>
+    <style name="GameMessageIcon">
+        <item name="android:layout_width">@dimen/playerIcon_width</item>
+        <item name="android:layout_height">@dimen/playerIcon_width</item>
+        <!--<item name="android:layout_marginLeft">@dimen/playerIcon_padding</item>-->
+        <!--<item name="android:layout_marginRight">@dimen/playerIcon_padding</item>-->
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:radius">@dimen/playerIcon_corner_radius</item>
+    </style>
 
-	<style name="BoardActionPanel">
-		<item name="android:layout_width">@dimen/board_panel_width</item>
-		<item name="android:layout_height">@dimen/board_panel_height</item>
-		<item name="android:layout_margin">@dimen/board_panel_margin</item>
-		<item name="android:gravity">center</item>
-		<item name="android:background">@drawable/board_action_panel</item>
-		<item name="android:textSize">@dimen/board_panel_text_size</item>
-		<item name="android:textColor">@color/board_action_panel_color</item>
-		<item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
-	</style>
+    <style name="BoardActionPanel">
+        <item name="android:layout_width">@dimen/board_panel_width</item>
+        <item name="android:layout_height">@dimen/board_panel_height</item>
+        <item name="android:layout_margin">@dimen/board_panel_margin</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/board_action_panel</item>
+        <item name="android:textSize">@dimen/board_panel_text_size</item>
+        <item name="android:textColor">@color/board_action_panel_color</item>
+        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+    </style>
 
     <style name="HowToPlayLayout">
         <item name="android:orientation">vertical</item>
@@ -150,7 +158,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-thin</item>
-		<item name="android:textSize">@dimen/how_to_play_text_size</item>
+        <item name="android:textSize">@dimen/how_to_play_text_size</item>
         <!--<item name="android:textAppearance">?android:attr/textAppearanceLarge</item>-->
     </style>
 
@@ -161,36 +169,36 @@
         <item name="android:adjustViewBounds">true</item>
     </style>
 
-	<style name="ProgressDialog" parent="android:Theme.Holo.Dialog">
-		<item name="android:alertDialogStyle">@style/CustomAlertDialogStyle</item>
-		<item name="android:windowBackground">@color/transparent</item>
-		<item name="android:textColorPrimary">#FFFFFF</item>
-		<item name="android:backgroundDimEnabled">true</item>
-		<item name="android:textColor">#FFFFFF</item>
-		<item name="android:textStyle">normal</item>
-		<item name="android:textSize">12sp</item>
-	</style>
+    <style name="ProgressDialog" parent="android:Theme.Holo.Dialog">
+        <item name="android:alertDialogStyle">@style/CustomAlertDialogStyle</item>
+        <item name="android:windowBackground">@color/transparent</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textSize">12sp</item>
+    </style>
 
-	<style name="CustomAlertDialogStyle">
-		<item name="android:bottomBright">@color/transparent</item>
-		<item name="android:bottomDark">@color/transparent</item>
-		<item name="android:bottomMedium">@color/transparent</item>
-		<item name="android:centerBright">@color/transparent</item>
-		<item name="android:centerDark">@color/transparent</item>
-		<item name="android:centerMedium">@color/transparent</item>
-		<item name="android:fullBright">@color/transparent</item>
-		<item name="android:fullDark">@color/transparent</item>
-		<item name="android:topBright">@color/transparent</item>
-		<item name="android:topDark">@color/transparent</item>
-	</style>
+    <style name="CustomAlertDialogStyle">
+        <item name="android:bottomBright">@color/transparent</item>
+        <item name="android:bottomDark">@color/transparent</item>
+        <item name="android:bottomMedium">@color/transparent</item>
+        <item name="android:centerBright">@color/transparent</item>
+        <item name="android:centerDark">@color/transparent</item>
+        <item name="android:centerMedium">@color/transparent</item>
+        <item name="android:fullBright">@color/transparent</item>
+        <item name="android:fullDark">@color/transparent</item>
+        <item name="android:topBright">@color/transparent</item>
+        <item name="android:topDark">@color/transparent</item>
+    </style>
 
-	<style name="autoscroll">
-		<item name="android:singleLine">true</item>
-		<item name="android:ellipsize">end</item>
-		<!--<item name="android:marqueeRepeatLimit">marquee_forever</item>-->
-		<item name="android:focusable">true</item>
-		<item name="android:focusableInTouchMode">true</item>
-		<item name="android:scrollHorizontally">true</item>
-	</style>
+    <style name="autoscroll">
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">end</item>
+        <!--<item name="android:marqueeRepeatLimit">marquee_forever</item>-->
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:scrollHorizontally">true</item>
+    </style>
 
 </resources>
