@@ -832,7 +832,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						// User canceled
 					}
 				})
-				.setIcon(getResources().getDrawable(R.drawable.ic_action_av_replay))
+				.setIcon(getResources().getDrawable(R.drawable.ic_av_replay_blue))
 				.show();
 	}
 
