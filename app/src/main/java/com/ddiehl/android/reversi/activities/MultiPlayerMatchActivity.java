@@ -25,7 +25,9 @@ import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.fragments.ErrorDialogFragment;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;
+import com.ddiehl.android.reversi.game.ComputerAI;
 import com.ddiehl.android.reversi.game.ReversiColor;
+import com.ddiehl.android.reversi.game.ReversiPlayer;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -349,9 +351,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
         mBoard.deserialize(playerData);
         displayBoard();
-//		lightScore = mBoard.getNumSpacesForColor(ReversiColor.Light);
-//		darkScore = mBoard.getNumSpacesForColor(ReversiColor.Dark);
-//		updateScore();
 		updatePlayerNames();
 		dismissSpinner();
 
@@ -389,12 +388,28 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		switch (mMatch.getTurnStatus()) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
 				dismissMessage();
+				autoplayIfEnabled();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN: // Should return results.
 				displayMessage(getString(R.string.match_opponent_turn));
 				break;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
 				displayMessage(getString(R.string.match_invite_pending));
+		}
+	}
+
+	// Added for testing full end-to-end multiplayer flow
+	private void autoplayIfEnabled() {
+		if (!updatingMatch && getResources().getBoolean(R.bool.automated_multiplayer)
+				&& mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_ACTIVE
+				&& mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+			mHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					ReversiPlayer p1 = new ReversiPlayer((mPlayer == mLightPlayer) ? ReversiColor.Light : ReversiColor.Dark, "");
+					claim(ComputerAI.getBestMove_d1(mBoard, p1));
+				}
+			}, 500);
 		}
 	}
 
@@ -429,6 +444,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				else {
 					updatingMatch = false;
 					updateScore();
+					autoplayIfEnabled();
 				}
 			}
 		}, getResources().getInteger(R.integer.cpu_turn_delay));
@@ -437,8 +453,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
 		if (mMatch != null) {
-			if (mMatch.getMatchId().equals(match.getMatchId()))
+			if (mMatch.getMatchId().equals(match.getMatchId())) {
 				updateMatch(match);
+			}
 		}
     }
 
@@ -576,6 +593,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void processResultFinishMatch(TurnBasedMultiplayer.UpdateMatchResult result) {
 		Log.d(TAG, "FinishMatch() result: " + result.getStatus().getStatusCode());
 		updatingMatch = false;
+		dismissSpinner();
 		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
 			if (mMatch.canRematch()) {
 				askForRematch();
