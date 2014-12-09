@@ -324,11 +324,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		dismissSpinner();
 
 		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
-            if (mMatch.canRematch()) {
-				Log.d(TAG, "Can rematch - Presenting rematch dialog");
-//				askForRematch();
-            }
-
             updateMatch(mMatch);
 		} else {
             Log.d(TAG, "Failure status code: " + result.getStatus().getStatusCode());
@@ -579,8 +574,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private void processResultFinishMatch(TurnBasedMultiplayer.UpdateMatchResult result) {
+		Log.d(TAG, "FinishMatch() result: " + result.getStatus().getStatusCode());
 		updatingMatch = false;
-		checkStatusCode(mMatch, result.getStatus().getStatusCode());
+		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
+			if (mMatch.canRematch()) {
+				askForRematch();
+			}
+		}
 	}
 
 	private Participant getCurrentPlayer() {
@@ -788,6 +788,34 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mRightFadeOut.cancel();
 		mLeftFadeIn.cancel();
 		mRightFadeIn.cancel();
+	}
+
+	private void askForRematch() {
+		new AlertDialog.Builder(this)
+				.setTitle(getString(R.string.dialog_rematch_title))
+				.setMessage(getString(R.string.dialog_rematch_message))
+				.setPositiveButton(getString(R.string.dialog_rematch_confirm), new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						showSpinner(1);
+						Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch.getMatchId())
+								.setResultCallback(new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
+									@Override
+									public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
+										processResult(result);
+									}
+								});
+						mMatch = null;
+					}
+				})
+				.setNegativeButton(getString(R.string.dialog_rematch_cancel), new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						// User canceled
+					}
+				})
+				.setIcon(getResources().getDrawable(R.drawable.ic_action_av_replay))
+				.show();
 	}
 
 	private void initializeWaitingAnimations() {
