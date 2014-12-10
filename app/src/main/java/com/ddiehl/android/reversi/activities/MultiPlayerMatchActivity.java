@@ -1108,6 +1108,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			case R.id.action_settings:
 				Intent settings = new Intent(this, SettingsActivity.class);
 				settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER);
+				boolean isSignedIn = mGoogleApiClient.isConnected();
+				settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn);
+				settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT,
+						isSignedIn ? Plus.AccountApi.getAccountName(mGoogleApiClient) : "");
 				startActivity(settings);
 				return true;
 		}
