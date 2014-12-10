@@ -3,6 +3,7 @@ package com.ddiehl.android.reversi.activities;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -58,6 +59,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private static final String DIALOG_ERROR = "dialog_error";
 
+    private Context mContext;
+
     private ProgressDialog progressBar;
 
     private GoogleApiClient mGoogleApiClient;
@@ -82,10 +85,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private boolean mWaitingLeftColor = false;
 	private boolean mWaitingRightColor = true;
 
+    private MenuItem mMenuLeaveMatch;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_reversi);
+        mContext = this;
 		mBoard = new Board(this);
 
 		// Clear player names in score overlay
@@ -345,6 +351,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mDarkPlayer = getDarkPlayer();
 		mMatchData = match.getData();
 
+        mMenuLeaveMatch.setEnabled(false);
+
 		// Grab the appropriate segment from mMatchData based on player's color
 		int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
 		byte[] playerData = Arrays.copyOfRange(mMatchData, startIndex, startIndex+64);
@@ -388,6 +396,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		switch (mMatch.getTurnStatus()) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
 				dismissMessage();
+                mMenuLeaveMatch.setEnabled(true);
 				autoplayIfEnabled();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN: // Should return results.
@@ -541,8 +550,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void endMatch() {
 		updateScore();
 
-		// Generate ParticipantResult objects for passing to finishMatch()
-		ParticipantResult winnerResult, loserResult;
+        ParticipantResult winnerResult, loserResult;
 		if (lightScore != darkScore) {
 			if (lightScore > darkScore) {
 				winnerResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
@@ -588,17 +596,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				});
 		}
 
-	}
-
-	private void processResultFinishMatch(TurnBasedMultiplayer.UpdateMatchResult result) {
-		Log.d(TAG, "FinishMatch() result: " + result.getStatus().getStatusCode());
-		updatingMatch = false;
-		dismissSpinner();
-		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
-			if (mMatch.canRematch()) {
-				askForRematch();
-			}
-		}
 	}
 
 	private Participant getCurrentPlayer() {
@@ -953,9 +950,91 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		dialogFragment.show(getFragmentManager(), DIALOG_ERROR);
 	}
 
+    private void showLeaveMatchDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_leave_match_title)
+                .setMessage(R.string.dialog_leave_match_message)
+                .setPositiveButton(R.string.dialog_leave_match_confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (mOpponent == null) {
+                            leaveMatch();
+                        } else {
+                            ParticipantResult winnerResult = new ParticipantResult(mOpponent.getParticipantId(),
+                                    ParticipantResult.MATCH_RESULT_WIN, ParticipantResult.PLACING_UNINITIALIZED);
+                            ParticipantResult loserResult = new ParticipantResult(mPlayer.getParticipantId(),
+                                    ParticipantResult.MATCH_RESULT_LOSS, ParticipantResult.PLACING_UNINITIALIZED);
+                            Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult)
+                                    .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+                                        @Override
+                                        public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
+                                            Log.d(TAG, "FinishMatch() result: " + result.getStatus().getStatusCode());
+//                                            processResultFinishMatch(updateMatchResult);
+                                            if (result.getStatus().isSuccess()) {
+                                                Toast.makeText(mContext, getString(R.string.forfeit_success), Toast.LENGTH_LONG).show();
+                                                clearBoard();
+                                            }
+                                        }
+                                    });
+                        }
+
+                    }
+                })
+                .setNegativeButton(R.string.dialog_leave_match_cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // User canceled
+                    }
+                })
+                .setCancelable(true)
+                .show();
+    }
+
+    private void leaveMatch() {
+        if (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+            Log.d(TAG, "Leaving match during OWN turn");
+            Games.TurnBasedMultiplayer.leaveMatchDuringTurn(mGoogleApiClient, mMatch.getMatchId(), null)
+                    .setResultCallback(new ResultCallback<TurnBasedMultiplayer.LeaveMatchResult>() {
+                        @Override
+                        public void onResult(TurnBasedMultiplayer.LeaveMatchResult result) {
+                            processResultLeaveMatch(result);
+                        }
+                    });
+        } else {
+            Log.d(TAG, "Leaving match during OPPONENT'S turn");
+            Games.TurnBasedMultiplayer.leaveMatch(mGoogleApiClient, mMatch.getMatchId())
+                    .setResultCallback(new ResultCallback<TurnBasedMultiplayer.LeaveMatchResult>() {
+                        @Override
+                        public void onResult(TurnBasedMultiplayer.LeaveMatchResult result) {
+                            processResultLeaveMatch(result);
+                        }
+                    });
+        }
+    }
+
+    private void processResultFinishMatch(TurnBasedMultiplayer.UpdateMatchResult result) {
+        Log.d(TAG, "FinishMatch() result: " + result.getStatus().getStatusCode());
+        updatingMatch = false;
+        dismissSpinner();
+        if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
+            if (mMatch.canRematch()) {
+                askForRematch();
+            }
+        }
+    }
+
+    private void processResultLeaveMatch(TurnBasedMultiplayer.LeaveMatchResult result) {
+        Log.d(TAG, "LeaveMatch() result: " + result.getStatus().getStatusCode());
+        if (result.getStatus().isSuccess())
+            clearBoard();
+    }
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.multi_player, menu);
+        mMenuLeaveMatch = menu.findItem(R.id.leaveMatch);
+        mMenuLeaveMatch.setEnabled(false);
 		return true;
 	}
 
@@ -973,6 +1052,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				Intent htp = new Intent(this, HowToPlayActivity.class);
 				startActivity(htp);
 				return true;
+            case R.id.leaveMatch:
+                showLeaveMatchDialog();
+                return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

@@ -4,7 +4,7 @@
 	<integer name="cpu_turn_delay">1000</integer>
 	<bool name="p1_cpu">false</bool>
 	<bool name="p2_cpu">true</bool>
-	<bool name="automated_multiplayer">true</bool>
+	<bool name="automated_multiplayer">false</bool>
 	<integer name="playerMoveFadeOutDuration">150</integer>
 	<integer name="playerMoveFadeInDuration">150</integer>
 	<integer name="waitingMessageFadeDelay">2000</integer>
