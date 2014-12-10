@@ -967,8 +967,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
     private void showLeaveMatchDialog() {
-		if (mMatch == null)
+		if (mMatch == null) {
+			Toast.makeText(this, R.string.no_match_selected, Toast.LENGTH_LONG).show();
 			return;
+		}
 
 		int status = mMatch.getStatus();
 		if (status != TurnBasedMatch.MATCH_STATUS_ACTIVE && status != TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING) {
@@ -1087,21 +1089,24 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		switch(id) {
-			case R.id.findNewMatch:
+			case R.id.action_create_match:
 				startNewMatch(findViewById(id));
 				return true;
-			case R.id.selectMatch:
+			case R.id.action_select_match:
 				selectMatch(findViewById(id));
 				return true;
 			case R.id.action_howtoplay:
 				Intent htp = new Intent(this, HowToPlayActivity.class);
 				startActivity(htp);
 				return true;
-            case R.id.leaveMatch:
+            case R.id.action_leave_match:
                 showLeaveMatchDialog();
                 return true;
-			case R.id.achievements:
+			case R.id.action_achievements:
 				showAchievements();
+				return true;
+			case R.id.action_settings:
+
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

@@ -61,6 +61,7 @@
 	<string name="multiplayer_select_match">Select Match</string>
 	<string name="multiplayer_select_match_condensed">Select</string>
     <string name="multiplayer_leave_match">Leave Match</string>
+	<string name="multiplayer_settings">Settings</string>
 
     <string name="dialog_signin_title">Sign In Required</string>
     <string name="dialog_signin_message">Google Play sign in is required to use this feature.</string>
@@ -113,6 +114,7 @@
 	<string name="dialog_leave_match_forbidden_confirm">OK</string>
     <string name="forfeit_success">You have forfeit the match</string>
 	<string name="forfeit_fail">Error leaving match, please try again</string>
+	<string name="no_match_selected">No match selected</string>
 
 	<!-- Achievements -->
 	<string name="menu_achievements_title">Achievements</string>
