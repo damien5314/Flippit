@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+	android:key="pref_category">
 
 	<EditTextPreference
 		android:key="pref_player_name"
@@ -14,5 +15,9 @@
 		android:entryValues="@array/pref_ai_difficulty_values"
 		android:defaultValue="1"
 		android:summary="%s"/>
+
+	<Preference
+		android:key="pref_play_services_sign_in"
+		android:title="@string/pref_play_services_sign_in" />
 
 </PreferenceScreen>

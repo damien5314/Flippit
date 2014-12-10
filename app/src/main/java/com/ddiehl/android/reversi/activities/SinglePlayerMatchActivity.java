@@ -270,6 +270,7 @@ public class SinglePlayerMatchActivity extends MatchActivity {
 				return true;
 			case R.id.action_settings:
 				Intent settings = new Intent(this, SettingsActivity.class);
+				settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER);
 				startActivity(settings);
 				return true;
             case R.id.action_howtoplay:

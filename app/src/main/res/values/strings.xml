@@ -26,6 +26,8 @@
     <string name="pref_ComputerAI_label">Enabled</string>
     <string name="pref_ai_difficulty">Difficulty</string>
     <string name="pref_ai_difficulty_def">Easy</string>
+	<string name="pref_play_services_sign_in">Sign In/Out</string>
+
 	<string name="game_over">Game Over</string>
 	<string name="winner_you">You win</string>
 	<string name="winner_light">Light wins</string>

@@ -1106,7 +1106,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				showAchievements();
 				return true;
 			case R.id.action_settings:
-
+				Intent settings = new Intent(this, SettingsActivity.class);
+				settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER);
+				startActivity(settings);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
