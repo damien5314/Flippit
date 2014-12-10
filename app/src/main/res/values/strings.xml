@@ -109,5 +109,6 @@
     <string name="dialog_leave_match_confirm">Yes</string>
     <string name="dialog_leave_match_cancel">Cancel</string>
     <string name="forfeit_success">You have forfeit the match</string>
+	<string name="forfeit_fail">Error leaving match, please try again</string>
 
 </resources>

@@ -683,6 +683,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void clearBoard() {
         Log.d(TAG, "clearBoard()");
+		mMatch = null;
         TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
         grid.setVisibility(View.GONE);
         grid.removeAllViews();
@@ -1026,8 +1027,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void processResultLeaveMatch(TurnBasedMultiplayer.LeaveMatchResult result) {
         Log.d(TAG, "LeaveMatch() result: " + result.getStatus().getStatusCode());
-        if (result.getStatus().isSuccess())
-            clearBoard();
+        if (result.getStatus().isSuccess()) {
+			clearBoard();
+		} else {
+			Toast.makeText(this, getString(R.string.forfeit_fail), Toast.LENGTH_SHORT).show();
+		}
     }
 
 	@Override
