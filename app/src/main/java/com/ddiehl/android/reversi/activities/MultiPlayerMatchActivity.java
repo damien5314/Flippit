@@ -57,6 +57,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	public static final int RC_VIEW_MATCHES = 1002;
 	public static final int RC_SELECT_PLAYERS = 1003;
 	public static final int RC_SHOW_ACHIEVEMENTS = 1004;
+	public static final int RC_SETTINGS = 1005;
 
 	private static final String DIALOG_ERROR = "dialog_error";
 
@@ -74,6 +75,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private byte[] mMatchData;
 	private int lightScore, darkScore;
 
+	private boolean signInOnStart = true;
     private boolean resolvingError = false;
 	private boolean updatingMatch = false;
 
@@ -119,13 +121,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     protected void onStart() {
         super.onStart();
-//        Log.d(TAG, "onStart(): connecting");
-		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-//		Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
-		if (result != ConnectionResult.SUCCESS) {
-			GooglePlayServicesUtil.getErrorDialog(result, this, RC_RESOLVE_ERROR).show();
-			return;
-		} else connectGoogleApiClient();
+		if (signInOnStart) {
+			Log.d(TAG, "onStart(): connecting");
+			int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+//			Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
+			if (result != ConnectionResult.SUCCESS) {
+				GooglePlayServicesUtil.getErrorDialog(result, this, RC_RESOLVE_ERROR).show();
+				return;
+			} else connectGoogleApiClient();
+		}
     }
 
     @Override
@@ -293,7 +297,24 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			case RC_SHOW_ACHIEVEMENTS:
 				Log.d(TAG, "Achievement activity result code: " + resultCode);
 				if (resultCode == 10001) { // User signed out
+					signInOnStart = false;
 					mGoogleApiClient.disconnect();
+				}
+				break;
+
+			case RC_SETTINGS:
+				Log.d(TAG, "Settings result code: " + resultCode);
+				switch (resultCode) {
+					case SettingsActivity.RESULT_SIGN_IN:
+						mGoogleApiClient.connect();
+						break;
+
+					case SettingsActivity.RESULT_SIGN_OUT:
+						Log.d(TAG, "Signing out based on settings menu request");
+						Toast.makeText(this, R.string.sign_out_confirmation, Toast.LENGTH_SHORT).show();
+						signInOnStart = false;
+						mGoogleApiClient.disconnect();
+						break;
 				}
 				break;
 		}
@@ -1112,7 +1133,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn);
 				settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT,
 						isSignedIn ? Plus.AccountApi.getAccountName(mGoogleApiClient) : "");
-				startActivity(settings);
+				startActivityForResult(settings, RC_SETTINGS);
 				return true;
 		}
 		return super.onOptionsItemSelected(item);

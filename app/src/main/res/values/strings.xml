@@ -27,7 +27,6 @@
     <string name="pref_ai_difficulty">Difficulty</string>
     <string name="pref_ai_difficulty_def">Easy</string>
 
-
 	<string name="dialog_signin_title">Sign In Required</string>
 	<string name="dialog_signin_message">Google Play sign in is required to use this feature.</string>
 	<string name="dialog_signin_confirm">Sign In</string>
@@ -41,10 +40,12 @@
 	<string name="settings_dialog_sign_in_message">Do you want to sign in?</string>
 	<string name="settings_dialog_sign_in_confirm">Sign In</string>
 	<string name="settings_dialog_sign_in_cancel">Cancel</string>
+
 	<string name="settings_dialog_sign_out_title">Sign Out</string>
 	<string name="settings_dialog_sign_out_message">Do you want to sign out?</string>
 	<string name="settings_dialog_sign_out_confirm">Sign Out</string>
 	<string name="settings_dialog_sign_out_cancel">Cancel</string>
+	<string name="sign_out_confirmation">Signed out from Google Play</string>
 
 	<string name="game_over">Game Over</string>
 	<string name="winner_you">You win</string>

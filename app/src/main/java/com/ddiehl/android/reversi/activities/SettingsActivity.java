@@ -29,6 +29,8 @@ public class SettingsActivity extends Activity {
 	public static final String EXTRA_SIGNED_IN_ACCOUNT = "signed_in_account";
 	public static final int SETTINGS_MODE_SINGLE_PLAYER = 101;
 	public static final int SETTINGS_MODE_MULTI_PLAYER = 102;
+	public static final int RESULT_SIGN_IN = 201;
+	public static final int RESULT_SIGN_OUT = 202;
 
 	public static class SettingsFragment extends PreferenceFragment
 			implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -56,14 +58,7 @@ public class SettingsActivity extends Activity {
 			PreferenceManager.setDefaultValues(this.getActivity(), R.xml.preferences, false);
 
 			Bundle extras = getArguments();
-//			if (extras.containsKey(EXTRA_SETTINGS_MODE))
-//				mode = extras.getInt(EXTRA_SETTINGS_MODE);
-//			if (extras.containsKey(EXTRA_IS_SIGNED_IN))
-//				isSignedIn = extras.getBoolean(EXTRA_IS_SIGNED_IN);
-//			if (extras.containsKey(EXTRA_IS_SIGNED_IN))
-//				isSignedIn = extras.getBoolean(EXTRA_IS_SIGNED_IN);
 
-//			prefs.removeAll();
 			// Show/Hide different options based on current game mode
 			switch (getArguments().getInt(EXTRA_SETTINGS_MODE)) {
 				case SETTINGS_MODE_SINGLE_PLAYER:
@@ -160,7 +155,8 @@ public class SettingsActivity extends Activity {
 					.setPositiveButton(getString(R.string.settings_dialog_sign_in_confirm), new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-
+							((Activity) mContext).setResult(RESULT_SIGN_IN);
+							((Activity) mContext).finish();
 						}
 					})
 					.setNegativeButton(getString(R.string.settings_dialog_sign_in_cancel), new DialogInterface.OnClickListener() {
@@ -180,7 +176,8 @@ public class SettingsActivity extends Activity {
 					.setPositiveButton(getString(R.string.settings_dialog_sign_out_confirm), new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-
+							((Activity) mContext).setResult(RESULT_SIGN_OUT);
+							((Activity) mContext).finish();
 						}
 					})
 					.setNegativeButton(getString(R.string.settings_dialog_sign_out_cancel), new DialogInterface.OnClickListener() {
