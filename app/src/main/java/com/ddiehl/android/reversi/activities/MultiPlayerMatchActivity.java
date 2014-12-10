@@ -291,6 +291,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					Log.d(TAG, "Error in Activity SELECT_PLAYERS - Result Code: " + resultCode);
 				}
 				break;
+
+			case RC_SHOW_ACHIEVEMENTS:
+				Log.d(TAG, "Achievement activity result code: " + resultCode);
+				if (resultCode == 10001) { // User signed out
+					mGoogleApiClient.disconnect();
+				}
+				break;
 		}
 	}
 
