@@ -108,6 +108,9 @@
     <string name="dialog_leave_match_message">Are you sure you want to forfeit?</string>
     <string name="dialog_leave_match_confirm">Yes</string>
     <string name="dialog_leave_match_cancel">Cancel</string>
+	<string name="dialog_leave_match_forbidden_title">Not Your Turn</string>
+	<string name="dialog_leave_match_forbidden_message">You must wait until your turn to forfeit the match.</string>
+	<string name="dialog_leave_match_forbidden_confirm">OK</string>
     <string name="forfeit_success">You have forfeit the match</string>
 	<string name="forfeit_fail">Error leaving match, please try again</string>
 
