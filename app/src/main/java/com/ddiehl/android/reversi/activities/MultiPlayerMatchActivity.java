@@ -246,7 +246,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				break;
 
 			case RC_VIEW_MATCHES: // Returned from the 'Select Match' dialog
-				if (resultCode == Activity.RESULT_OK) { // User canceled
+				if (resultCode == Activity.RESULT_OK) {
 					TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
 					if (match != null) {
 						Log.d(TAG, "Selected match: " + match.getMatchId());
@@ -530,7 +530,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-							Log.d(TAG, "Turn updated, opponent receives turn. Result: " + updateMatchResult.getStatus());
+							Log.d(TAG, "Turn updated, opponent receives turn. Result: " + updateMatchResult.getStatus().getStatusMessage());
 							processResult(updateMatchResult);
 						}
 					});
@@ -553,53 +553,62 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private void endMatch() {
 		updateScore();
-
-        ParticipantResult winnerResult, loserResult;
-		if (lightScore != darkScore) {
-			if (lightScore > darkScore) {
-				winnerResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
-						ParticipantResult.PLACING_UNINITIALIZED);
-				loserResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
-						ParticipantResult.PLACING_UNINITIALIZED);
-				displayMessage(getString((mPlayer == mLightPlayer) ? R.string.winner_you : R.string.winner_light));
-			} else {
-				winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
-						ParticipantResult.PLACING_UNINITIALIZED);
-				loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
-						ParticipantResult.PLACING_UNINITIALIZED);
-				displayMessage(getString((mPlayer == mDarkPlayer) ? R.string.winner_you : R.string.winner_dark));
-			}
-		} else {
-			winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
-					ParticipantResult.PLACING_UNINITIALIZED);
-			loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
-					ParticipantResult.PLACING_UNINITIALIZED);
-			displayMessage(getString(R.string.winner_tie));
-		}
-
-//		updatingMatch = false;
-//		dismissSpinner();
-
-		// If the match status is already complete, just finish the match for the player
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE) {
-			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId())
-				.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
-					@Override
-					public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-						processResultFinishMatch(updateMatchResult);
-					}
-			});
-		} else {
-			// If match is not complete, call finishMatch() with result parameters
-			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult)
-				.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
-					@Override
-					public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-						processResultFinishMatch(updateMatchResult);
-					}
-				});
-		}
+			// Display appropriate match message
+			switch (mPlayer.getResult().getResult()) {
+				case ParticipantResult.MATCH_RESULT_WIN:
+					displayMessage(getString(R.string.winner_you));
+					break;
+				case ParticipantResult.MATCH_RESULT_TIE:
+					displayMessage(getString(R.string.winner_tie));
+					break;
+				case ParticipantResult.MATCH_RESULT_LOSS:
+					displayMessage(getString((mPlayer == mLightPlayer) ? R.string.winner_dark : R.string.winner_light));
+					break;
+				default:
+					displayMessage(getString(R.string.match_complete));
+					break;
+			}
 
+			// Call finishMatch() to close out match for player
+			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId())
+					.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+						@Override
+						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
+							processResultFinishMatch(updateMatchResult);
+						}
+					});
+		} else { // Match is not yet finished
+			// Generate ParticipantResults based on current score
+			ParticipantResult winnerResult, loserResult;
+			if (lightScore != darkScore) {
+				if (lightScore > darkScore) {
+					winnerResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
+							ParticipantResult.PLACING_UNINITIALIZED);
+					loserResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
+							ParticipantResult.PLACING_UNINITIALIZED);
+				} else {
+					winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_WIN,
+							ParticipantResult.PLACING_UNINITIALIZED);
+					loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_LOSS,
+							ParticipantResult.PLACING_UNINITIALIZED);
+				}
+			} else {
+				winnerResult = new ParticipantResult(mDarkPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
+						ParticipantResult.PLACING_UNINITIALIZED);
+				loserResult = new ParticipantResult(mLightPlayer.getParticipantId(), ParticipantResult.MATCH_RESULT_TIE,
+						ParticipantResult.PLACING_UNINITIALIZED);
+			}
+
+			// Call finishMatch() with result parameters
+			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult)
+					.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
+						@Override
+						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
+							processResultFinishMatch(updateMatchResult);
+						}
+					});
+		}
 	}
 
 	private Participant getCurrentPlayer() {
@@ -720,9 +729,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE && !updatingMatch) {
 			// Add remaining spaces to winning count as per Reversi rules
-			if (lightScore > darkScore)
+			if (lightScore > darkScore && mLightPlayer.getResult().getResult() == ParticipantResult.MATCH_RESULT_WIN)
 				lightScore += mBoard.getNumberOfEmptySpaces();
-			else if (darkScore > lightScore)
+			else if (darkScore > lightScore && mDarkPlayer.getResult().getResult() == ParticipantResult.MATCH_RESULT_WIN)
 				darkScore += mBoard.getNumberOfEmptySpaces();
 		}
 
