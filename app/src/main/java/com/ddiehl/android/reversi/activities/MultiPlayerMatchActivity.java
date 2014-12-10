@@ -56,6 +56,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	public static final int RC_RESOLVE_ERROR = 1001;
 	public static final int RC_VIEW_MATCHES = 1002;
 	public static final int RC_SELECT_PLAYERS = 1003;
+	public static final int RC_SHOW_ACHIEVEMENTS = 1004;
 
 	private static final String DIALOG_ERROR = "dialog_error";
 
@@ -1034,6 +1035,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
     }
 
+	private void showAchievements() {
+		if (mGoogleApiClient.isConnected()) {
+			startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient), RC_SHOW_ACHIEVEMENTS);
+		} else {
+			displaySignInPrompt();
+		}
+	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.multi_player, menu);
@@ -1059,6 +1068,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             case R.id.leaveMatch:
                 showLeaveMatchDialog();
                 return true;
+			case R.id.achievements:
+				showAchievements();
+				return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}

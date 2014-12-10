@@ -16,13 +16,17 @@
 		android:title="@string/multiplayer_select_match"
 		android:titleCondensed="@string/multiplayer_select_match_condensed" />
 
+    <item android:id="@+id/leaveMatch"
+        android:showAsAction="never"
+        android:title="@string/multiplayer_leave_match"/>
+
+	<item android:id="@+id/achievements"
+		  android:showAsAction="never"
+		  android:title="@string/menu_achievements_title" />
+
 	<item android:id="@+id/action_howtoplay"
 		  android:icon="@drawable/ic_action_action_help"
 		  android:showAsAction="ifRoom"
 		  android:title="@string/action_howtoplay"/>
-
-    <item android:id="@+id/leaveMatch"
-        android:showAsAction="never"
-        android:title="@string/multiplayer_leave_match"/>
 
 </menu>

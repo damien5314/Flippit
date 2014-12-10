@@ -5,9 +5,10 @@ Save this file as res/values/games-ids.xml in your project.
 -->
 <resources>
 	<string name="app_id">997613127809</string>
-	<string name="achievement_the_perfect_win">CgkIgZGBs4QdEAIQAQ</string>
-	<string name="achievement_the_perfect_loss">CgkIgZGBs4QdEAIQAg</string>
+	<string name="achievement_lets_play_together">CgkIgZGBs4QdEAIQAg</string>
+	<string name="achievement_first_win">CgkIgZGBs4QdEAIQBQ</string>
+	<string name="achievement_up_coming">CgkIgZGBs4QdEAIQBA</string>
+	<string name="achievement_reversi_expert">CgkIgZGBs4QdEAIQBw</string>
 	<string name="achievement_evenly_matched">CgkIgZGBs4QdEAIQAw</string>
-	<string name="achievement_play_50_games">CgkIgZGBs4QdEAIQBA</string>
-	<string name="achievement_first_multiplayer_win">CgkIgZGBs4QdEAIQBQ</string>
+	<string name="achievement_the_perfect_win">CgkIgZGBs4QdEAIQAQ</string>
 </resources>
