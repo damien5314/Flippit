@@ -98,6 +98,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		setContentView(R.layout.activity_reversi);
         mContext = this;
 		mBoard = new Board(this);
+        mSignInOnStart = getAutoConnectPreference();
 
 		// Clear player names in score overlay
 		((TextView) findViewById(R.id.p1_label)).setText(R.string.unknown_player);
@@ -137,13 +138,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void setAutoConnectPreference(boolean b) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).commit();
+        prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-		if (getAutoConnectPreference()) {
+		if (mSignInOnStart) {
 			Log.d(TAG, "onStart(): connecting");
 			int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 //			Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
@@ -227,6 +228,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				.setMessage(getString(R.string.dialog_signin_message))
 				.setPositiveButton(getString(R.string.dialog_signin_confirm), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
+                        mSignInOnStart = true;
+                        setAutoConnectPreference(true);
                         connectGoogleApiClient();
                     }
                 })
@@ -283,7 +286,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						Log.d(TAG, "Selected match: " + match.getMatchId());
 						updateMatch(match);
 					}
-				} else {
+				} else if (resultCode == 10001) { // User signed out
+                    mSignInOnStart = false;
+                    mGoogleApiClient.disconnect();
+                } else {
 					// Present error dialog
 					Log.d(TAG, "Error in Activity VIEW_MATCHES - Result Code: " + resultCode);
 				}
@@ -315,7 +321,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 								processResult(result);
 								}
 							});
-				} else {
+				} else if (resultCode == 10001) { // User signed out
+                    mSignInOnStart = false;
+                    mGoogleApiClient.disconnect();
+                } else {
 					// Present error dialog
 					Log.d(TAG, "Error in Activity SELECT_PLAYERS - Result Code: " + resultCode);
 				}
@@ -405,6 +414,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mLightPlayer = getLightPlayer();
 		mDarkPlayer = getDarkPlayer();
 		mMatchData = match.getData();
+
+        Log.d(TAG, "Match Status: " + mMatch.getStatus());
+        Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
 
 		// Grab the appropriate segment from mMatchData based on player's color
 		int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
@@ -878,6 +890,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				.setPositiveButton(getString(R.string.dialog_rematch_confirm), new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int which) {
+                        if (!mGoogleApiClient.isConnected()) {
+                            displaySignInPrompt();
+                            return;
+                        }
 						showSpinner(1);
 						Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch.getMatchId())
 								.setResultCallback(new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
@@ -1040,14 +1056,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 							if (mOpponent == null) { // Cancel match
 								leaveMatch();
 							} else { // Forfeit match (declare opponent as winner)
-								ParticipantResult winnerResult = new ParticipantResult(mOpponent.getParticipantId(),
-										ParticipantResult.MATCH_RESULT_WIN, ParticipantResult.PLACING_UNINITIALIZED);
-								ParticipantResult loserResult = new ParticipantResult(mPlayer.getParticipantId(),
-										ParticipantResult.MATCH_RESULT_LOSS, ParticipantResult.PLACING_UNINITIALIZED);
                                 if (!mGoogleApiClient.isConnected()) {
                                     displaySignInPrompt();
                                     return;
                                 }
+								ParticipantResult winnerResult = new ParticipantResult(mOpponent.getParticipantId(),
+										ParticipantResult.MATCH_RESULT_WIN, ParticipantResult.PLACING_UNINITIALIZED);
+								ParticipantResult loserResult = new ParticipantResult(mPlayer.getParticipantId(),
+										ParticipantResult.MATCH_RESULT_LOSS, ParticipantResult.PLACING_UNINITIALIZED);
 								Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult)
 										.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 											@Override
