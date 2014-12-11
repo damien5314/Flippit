@@ -80,6 +80,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private int lightScore, darkScore;
 
 	private boolean mSignInOnStart = true;
+    private boolean mSignOutOnConnect = false;
     private boolean mResolvingError = false;
 	private boolean mUpdatingMatch = false;
 
@@ -150,7 +151,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 //			Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
 			if (result != ConnectionResult.SUCCESS) {
 				GooglePlayServicesUtil.getErrorDialog(result, this, RC_RESOLVE_ERROR).show();
-				return;
 			} else connectGoogleApiClient();
 		}
     }
@@ -176,6 +176,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         dismissSpinner();
 //        Log.d(TAG, "Connected to Google Play Services");
 		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+
+        if (mSignOutOnConnect) {
+            signOutFromGooglePlay();
+            return;
+        }
+
         registerMatchUpdateListener(true);
 		if (mMatch != null)
 			updateMatch(mMatch);
@@ -288,6 +294,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					}
 				} else if (resultCode == 10001) { // User signed out
                     mSignInOnStart = false;
+                    setAutoConnectPreference(false);
                     mGoogleApiClient.disconnect();
                 } else {
 					// Present error dialog
@@ -323,6 +330,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 							});
 				} else if (resultCode == 10001) { // User signed out
                     mSignInOnStart = false;
+                    setAutoConnectPreference(false);
                     mGoogleApiClient.disconnect();
                 } else {
 					// Present error dialog
@@ -334,7 +342,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				Log.d(TAG, "Achievement activity result code: " + resultCode);
 				if (resultCode == 10001) { // User signed out
                     mSignInOnStart = false;
-					mGoogleApiClient.disconnect();
+                    setAutoConnectPreference(false);
+                    mGoogleApiClient.disconnect();
 				}
 				break;
 
@@ -346,16 +355,21 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						break;
 
 					case SettingsActivity.RESULT_SIGN_OUT:
-						Log.d(TAG, "Signing out based on settings menu request");
-						Toast.makeText(this, R.string.sign_out_confirmation, Toast.LENGTH_SHORT).show();
-                        mSignInOnStart = false;
-                        setAutoConnectPreference(false);
-						mGoogleApiClient.disconnect();
+                        mSignOutOnConnect = true;
 						break;
 				}
 				break;
 		}
 	}
+
+    private void signOutFromGooglePlay() {
+        Toast.makeText(this, R.string.sign_out_confirmation, Toast.LENGTH_SHORT).show();
+        mSignOutOnConnect = false;
+        mSignInOnStart = false;
+        setAutoConnectPreference(false);
+        Games.signOut(mGoogleApiClient);
+        mGoogleApiClient.disconnect();
+    }
 
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
 		TurnBasedMatch match = result.getMatch();
