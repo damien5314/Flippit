@@ -81,7 +81,8 @@
 	<string name="multiplayer_new_match_condensed">New</string>
 	<string name="multiplayer_select_match">Select Match</string>
 	<string name="multiplayer_select_match_condensed">Select</string>
-    <string name="multiplayer_leave_match">Leave Match</string>
+	<string name="multiplayer_close_match">Close Match</string>
+	<string name="multiplayer_forfeit_match">Forfeit Match</string>
 	<string name="multiplayer_settings">Settings</string>
 
     <string name="dialog_invalid_match_title">Not connected</string>
@@ -121,16 +122,24 @@
 	<string name="dialog_rematch_confirm">Sure!</string>
 	<string name="dialog_rematch_cancel">No, thanks</string>
 
-    <string name="dialog_leave_match_title">Leave Match</string>
-    <string name="dialog_leave_match_message">Are you sure you want to forfeit?</string>
-    <string name="dialog_leave_match_confirm">Yes</string>
-    <string name="dialog_leave_match_cancel">Cancel</string>
-	<string name="dialog_leave_match_forbidden_title">Not Your Turn</string>
-	<string name="dialog_leave_match_forbidden_message">You must wait until your turn to forfeit the match.</string>
-	<string name="dialog_leave_match_forbidden_confirm">OK</string>
+    <string name="dialog_forfeit_match_title">Leave Match</string>
+    <string name="dialog_forfeit_match_message">Are you sure you want to forfeit?</string>
+    <string name="dialog_forfeit_match_confirm">Yes</string>
+    <string name="dialog_forfeit_match_cancel">No</string>
+	<string name="dialog_forfeit_match_forbidden_title">Not Your Turn</string>
+	<string name="dialog_forfeit_match_forbidden_message">You must wait until your turn to forfeit the match.</string>
+	<string name="dialog_forfeit_match_forbidden_confirm">OK</string>
+
+	<string name="dialog_leave_match_title">Cancel Match</string>
+	<string name="dialog_leave_match_message">Do you want to cancel this match?</string>
+	<string name="dialog_leave_match_confirm">Yes</string>
+	<string name="dialog_leave_match_cancel">No</string>
+
     <string name="forfeit_success">You have forfeit the match</string>
-	<string name="forfeit_fail">Error leaving match, please try again</string>
+	<string name="forfeit_fail">Error forfeiting match, please try again</string>
 	<string name="no_match_selected">No match selected</string>
+	<string name="match_inactive">Inactive match</string>
+	<string name="cancel_fail">Error canceling match, please try again</string>
 
 	<!-- Achievements -->
 	<string name="menu_achievements_title">Achievements</string>
