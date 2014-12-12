@@ -2,6 +2,7 @@ package com.ddiehl.android.reversi.activities;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -25,7 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
-import com.ddiehl.android.reversi.fragments.ErrorDialogFragment;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ComputerAI;
@@ -122,16 +122,28 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 .build();
     }
 
-    private void connectGoogleApiClient() {
-        if (mGoogleApiClient == null)
-            initializeGoogleApiClient();
+	private void connectGoogleApiClient() {
+		mSignInOnStart = true;
 
-        if (mProgressBar != null && mProgressBar.isShowing())
-            dismissSpinner();
-        showSpinner(3);
-        mSignInOnStart = true;
-        mGoogleApiClient.connect();
-    }
+		// Check if Google Play Services are available
+		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+		if (result != ConnectionResult.SUCCESS) {
+			showErrorDialog(result);
+			return;
+		}
+
+		// Show spinner
+		if (mProgressBar != null && mProgressBar.isShowing())
+			dismissSpinner();
+		showSpinner(3);
+
+		// Initialize client if null
+		if (mGoogleApiClient == null)
+			initializeGoogleApiClient();
+
+		// Call connect() on GoogleApiClient
+		mGoogleApiClient.connect();
+	}
 
     private boolean getAutoConnectPreference() {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -148,11 +160,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         super.onStart();
 		if (mSignInOnStart) {
 			Log.d(TAG, "onStart(): connecting");
-			int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-//			Log.d(TAG, "IsGooglePlayServicesAvailable = " + result);
-			if (result != ConnectionResult.SUCCESS) {
-				GooglePlayServicesUtil.getErrorDialog(result, this, RC_RESOLVE_ERROR).show();
-			} else connectGoogleApiClient();
+			connectGoogleApiClient();
 		}
     }
 
@@ -225,10 +233,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         }
     }
 
-    public void onDialogDismissed() {
-		mResolvingError = false;
-    }
-
 	private void displaySignInPrompt() {
 		new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.dialog_signin_title))
@@ -242,10 +246,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 })
 				.setNegativeButton(getString(R.string.dialog_signin_cancel), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        // Do nothing, user cancelled
+                        // User canceled
                     }
                 })
-				.create()
 				.show();
 	}
 
@@ -1046,13 +1049,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	/* Creates a dialog for an error message */
 	private void showErrorDialog(int errorCode) {
-		// Create a fragment for the error dialog
-		ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-		// Pass the error that should be displayed
-		Bundle args = new Bundle();
-		args.putInt(DIALOG_ERROR, errorCode);
-		dialogFragment.setArguments(args);
-		dialogFragment.show(getFragmentManager(), DIALOG_ERROR);
+		Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_RESOLVE_ERROR);
+		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				mResolvingError = false;
+			}
+		});
+		dialog.show();
 	}
 
     private void forfeitMatchSelected() {
