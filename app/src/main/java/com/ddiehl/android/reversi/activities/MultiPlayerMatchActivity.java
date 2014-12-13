@@ -62,8 +62,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	public static final int RC_SETTINGS = 1005;
 	public static final int MAXIMUM_SCORE = 64;
 
-	private static final String DIALOG_ERROR = "dialog_error";
-
     private static final String PREF_AUTO_SIGN_IN = "pref_auto_sign_in";
 
     private Context mContext;
@@ -144,16 +142,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		// Call connect() on GoogleApiClient
 		mGoogleApiClient.connect();
 	}
-
-    private boolean getAutoConnectPreference() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        return prefs.getBoolean(PREF_AUTO_SIGN_IN, false);
-    }
-
-    private void setAutoConnectPreference(boolean b) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
-    }
 
     @Override
     protected void onStart() {
@@ -298,8 +286,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					}
 				} else if (resultCode == 10001) { // User signed out
                     mSignInOnStart = false;
-                    setAutoConnectPreference(false);
-                    mGoogleApiClient.disconnect();
+                    setResult(SettingsActivity.RESULT_SIGN_OUT);
+                    finish();
+//                    setAutoConnectPreference(false);
+//                    mGoogleApiClient.disconnect();
                 } else {
 					// Present error dialog
 					Log.d(TAG, "Error in Activity VIEW_MATCHES - Result Code: " + resultCode);
@@ -337,8 +327,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 							});
 				} else if (resultCode == 10001) { // User signed out
                     mSignInOnStart = false;
-                    setAutoConnectPreference(false);
-                    mGoogleApiClient.disconnect();
+                    setResult(SettingsActivity.RESULT_SIGN_OUT);
+                    finish();
+//                    setAutoConnectPreference(false);
+//                    mGoogleApiClient.disconnect();
                 } else {
 					// Present error dialog
 					Log.d(TAG, "Error in Activity SELECT_PLAYERS - Result Code: " + resultCode);
@@ -349,8 +341,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				Log.d(TAG, "Achievement activity result code: " + resultCode);
 				if (resultCode == 10001) { // User signed out
                     mSignInOnStart = false;
-                    setAutoConnectPreference(false);
-                    mGoogleApiClient.disconnect();
+                    setResult(SettingsActivity.RESULT_SIGN_OUT);
+                    finish();
+//                    setAutoConnectPreference(false);
+//                    mGoogleApiClient.disconnect();
 				}
 				break;
 
@@ -375,6 +369,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         mSignOutOnConnect = false;
         mSignInOnStart = false;
         setAutoConnectPreference(false);
+        Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
         Games.signOut(mGoogleApiClient);
 
         setResult(SettingsActivity.RESULT_SIGN_OUT);
@@ -1233,6 +1228,16 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			displaySignInPrompt();
 		}
 	}
+
+    private boolean getAutoConnectPreference() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getBoolean(PREF_AUTO_SIGN_IN, false);
+    }
+
+    private void setAutoConnectPreference(boolean b) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

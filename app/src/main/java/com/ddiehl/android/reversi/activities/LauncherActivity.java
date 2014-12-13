@@ -28,7 +28,6 @@ public class LauncherActivity extends Activity
 	public static final String TAG = LauncherActivity.class.getSimpleName();
 
 	private static final String PREF_AUTO_SIGN_IN = "pref_auto_sign_in";
-	private static final String DIALOG_ERROR = "dialog_error";
 
 	public static final int RC_RESOLVE_ERROR = 1001;
     public static final int RC_START_MATCH = 1002;
