@@ -31,6 +31,8 @@ public class LauncherActivity extends Activity
 	private static final String DIALOG_ERROR = "dialog_error";
 
 	public static final int RC_RESOLVE_ERROR = 1001;
+    public static final int RC_START_MATCH = 1002;
+    public static final int RC_NORMAL = 1003;
 
 	private GoogleApiClient mGoogleApiClient;
 	private ProgressDialog mProgressBar;
@@ -116,6 +118,28 @@ public class LauncherActivity extends Activity
 		}
 	}
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG, "onActivityResult called: " + requestCode + " " + resultCode);
+        switch (requestCode) {
+            case RC_RESOLVE_ERROR:
+                mResolvingError = false;
+                if (resultCode == RESULT_OK) {
+                    if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
+                        connectGoogleApiClient();
+                    }
+                }
+                break;
+
+            case RC_NORMAL:
+            case RC_START_MATCH:
+                if (resultCode == SettingsActivity.RESULT_SIGN_OUT) {
+                    mSignInOnStart = false;
+                }
+                break;
+        }
+    }
+
 	private void displaySignInPrompt() {
 		new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.dialog_signin_title))
@@ -166,7 +190,7 @@ public class LauncherActivity extends Activity
 	public void startMultiPlayer(View view) {
 		if (mGoogleApiClient.isConnecting()) return;
 		if (mGoogleApiClient.isConnected()) {
-			startActivity(new Intent(this, MultiPlayerMatchActivity.class));
+			startActivityForResult(new Intent(this, MultiPlayerMatchActivity.class), RC_NORMAL);
 		} else {
 			displaySignInPrompt();
 		}

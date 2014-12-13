@@ -371,11 +371,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void signOutFromGooglePlay() {
         Toast.makeText(this, R.string.sign_out_confirmation, Toast.LENGTH_SHORT).show();
+
         mSignOutOnConnect = false;
         mSignInOnStart = false;
         setAutoConnectPreference(false);
         Games.signOut(mGoogleApiClient);
-        mGoogleApiClient.disconnect();
+
+        setResult(SettingsActivity.RESULT_SIGN_OUT);
+        finish();
     }
 
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
@@ -1051,11 +1054,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void showErrorDialog(int errorCode) {
 		Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_RESOLVE_ERROR);
 		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				mResolvingError = false;
-			}
-		});
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mResolvingError = false;
+            }
+        });
 		dialog.show();
 	}
 
