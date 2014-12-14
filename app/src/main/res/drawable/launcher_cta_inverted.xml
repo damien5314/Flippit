@@ -3,11 +3,11 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle" >
 
-    <stroke android:width="@dimen/launcher_cta_border"
+    <stroke android:width="@dimen/call_to_action_border"
 			android:color="@color/launcher_cta_border" />
 
     <corners
-        android:radius="@dimen/board_panel_corner_radius" />
+        android:radius="@dimen/call_to_action_corner_radius" />
 
     <solid
         android:color="@color/launcher_cta_pressed" />

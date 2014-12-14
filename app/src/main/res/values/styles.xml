@@ -19,16 +19,16 @@
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">0dp</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:layout_margin">@dimen/launcher_cta_margin</item>
+        <item name="android:layout_margin">@dimen/call_to_action_margin</item>
         <item name="android:background">@drawable/launcher_cta</item>
-        <item name="android:textSize">@dimen/launcher_cta_size</item>
+        <item name="android:textSize">@dimen/call_to_action_text_size</item>
         <item name="android:textColor">@color/launcher_cta_text_color</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
     <style name="ScoreOverlay">
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">@dimen/scoreOverlay_height</item>
+        <item name="android:layout_height">@dimen/score_overlay_height</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_gravity">center</item> <!-- Added in refactoring to LinearLayout -->
     </style>
@@ -41,29 +41,29 @@
     </style>
 
     <style name="PlayerIcon">
-        <item name="android:layout_width">@dimen/playerIcon_width</item>
-        <item name="android:layout_height">@dimen/playerIcon_width</item>
-        <item name="android:layout_marginLeft">@dimen/playerIcon_padding</item>
-        <item name="android:layout_marginRight">@dimen/playerIcon_padding</item>
+        <item name="android:layout_width">@dimen/player_icon_size</item>
+        <item name="android:layout_height">@dimen/player_icon_size</item>
+        <item name="android:layout_marginLeft">@dimen/player_icon_padding</item>
+        <item name="android:layout_marginRight">@dimen/player_icon_padding</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
-        <item name="android:radius">@dimen/playerIcon_corner_radius</item>
+        <item name="android:radius">@dimen/player_icon_corner_radius</item>
     </style>
 
     <style name="PlayerLabel" parent="autoscroll">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:textSize">@dimen/scoreOverlay_text_size</item>
+        <item name="android:textSize">@dimen/score_overlay_text_size</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="ScoreValue">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">fill_parent</item>
-        <item name="android:paddingLeft">@dimen/scoreValue_padding</item>
-        <item name="android:paddingRight">@dimen/scoreValue_padding</item>
-        <item name="android:textSize">@dimen/scoreOverlay_text_size</item>
+        <item name="android:paddingLeft">@dimen/player_name_padding</item>
+        <item name="android:paddingRight">@dimen/player_name_padding</item>
+        <item name="android:textSize">@dimen/score_overlay_text_size</item>
         <item name="android:gravity">center</item>
     </style>
 
@@ -107,8 +107,8 @@
 
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingLeft">@dimen/scoreValue_padding</item>
-        <item name="android:paddingRight">@dimen/scoreValue_padding</item>
+        <item name="android:paddingLeft">@dimen/player_name_padding</item>
+        <item name="android:paddingRight">@dimen/player_name_padding</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_centerHorizontal">true</item>
@@ -117,22 +117,23 @@
     </style>
 
     <style name="GameMessageIcon">
-        <item name="android:layout_width">@dimen/playerIcon_width</item>
-        <item name="android:layout_height">@dimen/playerIcon_width</item>
+        <item name="android:layout_width">@dimen/player_icon_size</item>
+        <item name="android:layout_height">@dimen/player_icon_size</item>
         <!--<item name="android:layout_marginLeft">@dimen/playerIcon_padding</item>-->
         <!--<item name="android:layout_marginRight">@dimen/playerIcon_padding</item>-->
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
-        <item name="android:radius">@dimen/playerIcon_corner_radius</item>
+        <item name="android:radius">@dimen/player_icon_corner_radius</item>
     </style>
 
     <style name="BoardActionPanel">
-        <item name="android:layout_width">@dimen/board_panel_width</item>
-        <item name="android:layout_height">@dimen/board_panel_height</item>
-        <item name="android:layout_margin">@dimen/board_panel_margin</item>
+        <!--<item name="android:layout_width">@dimen/board_panel_width</item>-->
+        <item name="android:layout_width">@dimen/call_to_action_width</item>
+        <item name="android:layout_height">@dimen/call_to_action_height</item>
+        <item name="android:layout_margin">@dimen/call_to_action_margin</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@drawable/board_action_panel</item>
-        <item name="android:textSize">@dimen/board_panel_text_size</item>
+        <item name="android:textSize">@dimen/call_to_action_text_size</item>
         <item name="android:textColor">@color/board_action_panel_color</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>

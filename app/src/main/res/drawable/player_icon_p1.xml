@@ -6,7 +6,7 @@
 	<stroke android:width="@dimen/space_border_width" android:color="#000000" />
 
 	<corners
-		android:radius="@dimen/playerIcon_corner_radius" />
+		android:radius="@dimen/player_icon_corner_radius" />
 
 	<solid
 		android:color="@android:color/white" />
