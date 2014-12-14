@@ -21,6 +21,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.games.Games;
+import com.google.android.gms.games.multiplayer.Multiplayer;
+import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch;
 import com.google.android.gms.plus.Plus;
 
 public class LauncherActivity extends Activity
@@ -37,6 +39,8 @@ public class LauncherActivity extends Activity
 	private ProgressDialog mProgressBar;
 	private boolean mSignInOnStart = false;
 	private boolean mResolvingError = false;
+    private boolean mStartMatchOnStart = false;
+    private TurnBasedMatch mMatchReceived;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +68,9 @@ public class LauncherActivity extends Activity
 		Log.d(TAG, "LauncherActivity - onStart");
 
 		if (mSignInOnStart) {
+            mStartMatchOnStart = true;
 			connectGoogleApiClient();
-		}
+		} else mStartMatchOnStart = false;
 	}
 
 	@Override
@@ -88,6 +93,13 @@ public class LauncherActivity extends Activity
 		dismissSpinner();
         Log.d(TAG, "Connected to Google Play Services");
 		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+
+        if (bundle != null && bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH))
+            mMatchReceived = bundle.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
+
+        if (mStartMatchOnStart && mMatchReceived != null) {
+            startMultiplayerMatch(mMatchReceived);
+        }
 	}
 
 	@Override
@@ -194,6 +206,17 @@ public class LauncherActivity extends Activity
 			displaySignInPrompt();
 		}
 	}
+
+    public void startMultiplayerMatch(TurnBasedMatch match) {
+        if (mGoogleApiClient.isConnected()) {
+            Intent intent = new Intent(this, MultiPlayerMatchActivity.class);
+            intent.putExtra(Multiplayer.EXTRA_TURN_BASED_MATCH, match);
+            mMatchReceived = null;
+            startActivityForResult(intent, RC_NORMAL);
+        } else {
+            displaySignInPrompt();
+        }
+    }
 
 	private void showSpinner() {
 		if (mProgressBar == null) {

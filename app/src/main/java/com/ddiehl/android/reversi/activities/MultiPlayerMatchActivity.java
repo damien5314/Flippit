@@ -82,6 +82,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     private boolean mSignOutOnConnect = false;
     private boolean mResolvingError = false;
 	private boolean mUpdatingMatch = false;
+    private TurnBasedMatch mMatchReceived;
 
 	private Handler mHandler;
 	private List<BoardSpace> mQueuedMoves;
@@ -108,6 +109,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mHandler = new Handler();
 		mQueuedMoves = new ArrayList<BoardSpace>();
 		initializeWaitingAnimations();
+
+        if (getIntent().hasExtra(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
+            mMatch = getIntent().getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+        }
     }
 
     // Create the Google API Client with access to Plus and Games
