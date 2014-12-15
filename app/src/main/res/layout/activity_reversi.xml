@@ -63,7 +63,7 @@
 
 		<LinearLayout
 			android:id="@+id/board_panels"
-			style="@style/BoardPanels">
+			style="@style/BoardActionPanels">
 
 			<Button
 				android:id="@+id/board_panel_new_game"

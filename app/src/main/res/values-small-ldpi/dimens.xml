@@ -6,7 +6,7 @@
 
     <dimen name="app_title_size">52sp</dimen>
 
-    <dimen name="call_to_action_text_size">18sp</dimen>
+    <dimen name="launcher_call_to_action_text_size">18sp</dimen>
     <dimen name="call_to_action_margin">2dp</dimen>
     <dimen name="call_to_action_border">1dp</dimen>
     <dimen name="call_to_action_corner_radius">20dp</dimen>

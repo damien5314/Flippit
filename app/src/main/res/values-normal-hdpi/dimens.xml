@@ -5,7 +5,7 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="app_title_size">60sp</dimen>
-    <dimen name="call_to_action_text_size">22sp</dimen>
+    <dimen name="launcher_call_to_action_text_size">22sp</dimen>
 
 	<dimen name="score_overlay_height">45dp</dimen>
     <dimen name="player_icon_size">14dp</dimen>
