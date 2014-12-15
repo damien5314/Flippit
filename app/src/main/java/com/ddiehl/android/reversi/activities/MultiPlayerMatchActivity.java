@@ -126,14 +126,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
 	private void connectGoogleApiClient() {
-		mSignInOnStart = true;
-
 		// Check if Google Play Services are available
 		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		if (result != ConnectionResult.SUCCESS) {
+			setAutoConnectPreference(false);
 			showErrorDialog(result);
 			return;
 		}
+
+		setAutoConnectPreference(true);
 
 		// Show spinner
 		if (mProgressBar != null && mProgressBar.isShowing())
@@ -166,7 +167,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop(): disconnecting");
-        setAutoConnectPreference(mSignInOnStart);
+//        setAutoConnectPreference(mSignInOnStart);
         if (mGoogleApiClient.isConnected()) {
             registerMatchUpdateListener(false);
             mGoogleApiClient.disconnect();
@@ -232,7 +233,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				.setMessage(getString(R.string.dialog_signin_message))
 				.setPositiveButton(getString(R.string.dialog_signin_confirm), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                        mSignInOnStart = true;
                         setAutoConnectPreference(true);
                         connectGoogleApiClient();
                     }
@@ -290,7 +290,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						updateMatch(match);
 					}
 				} else if (resultCode == 10001) { // User signed out
-                    mSignInOnStart = false;
+					setAutoConnectPreference(false);
                     setResult(SettingsActivity.RESULT_SIGN_OUT);
                     finish();
 //                    setAutoConnectPreference(false);
@@ -331,7 +331,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 								}
 							});
 				} else if (resultCode == 10001) { // User signed out
-                    mSignInOnStart = false;
+					setAutoConnectPreference(false);
                     setResult(SettingsActivity.RESULT_SIGN_OUT);
                     finish();
 //                    setAutoConnectPreference(false);
@@ -345,7 +345,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			case RC_SHOW_ACHIEVEMENTS:
 				Log.d(TAG, "Achievement activity result code: " + resultCode);
 				if (resultCode == 10001) { // User signed out
-                    mSignInOnStart = false;
+					setAutoConnectPreference(false);
                     setResult(SettingsActivity.RESULT_SIGN_OUT);
                     finish();
 //                    setAutoConnectPreference(false);
@@ -372,7 +372,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         Toast.makeText(this, R.string.sign_out_confirmation, Toast.LENGTH_SHORT).show();
 
         mSignOutOnConnect = false;
-        mSignInOnStart = false;
         setAutoConnectPreference(false);
         Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
         Games.signOut(mGoogleApiClient);
@@ -1240,6 +1239,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void setAutoConnectPreference(boolean b) {
+		Log.d(TAG, "Setting auto-connect preference: " + b);
+		mSignInOnStart = b;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
     }

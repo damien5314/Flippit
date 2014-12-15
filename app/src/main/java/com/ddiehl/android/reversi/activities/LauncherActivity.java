@@ -83,7 +83,7 @@ public class LauncherActivity extends Activity
 	public void onStop() {
 		super.onStop();
 		Log.d(TAG, "LauncherActivity - onStop");
-		setAutoConnectPreference(mSignInOnStart);
+//		setAutoConnectPreference(mSignInOnStart);
 		if (mGoogleApiClient.isConnected())
 			mGoogleApiClient.disconnect();
 	}
@@ -145,7 +145,7 @@ public class LauncherActivity extends Activity
             case RC_NORMAL:
             case RC_START_MATCH:
                 if (resultCode == SettingsActivity.RESULT_SIGN_OUT) {
-                    mSignInOnStart = false;
+                    setAutoConnectPreference(false);
                 }
                 break;
         }
@@ -157,7 +157,6 @@ public class LauncherActivity extends Activity
 				.setMessage(getString(R.string.dialog_signin_message))
 				.setPositiveButton(getString(R.string.dialog_signin_confirm), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-						mSignInOnStart = true;
 						setAutoConnectPreference(true);
 						connectGoogleApiClient();
 					}
@@ -172,14 +171,16 @@ public class LauncherActivity extends Activity
 
 	private void connectGoogleApiClient() {
 		Log.d(TAG, "LauncherActivity - connectGoogleApiClient()");
-		mSignInOnStart = true;
 
 		// Check if Google Play Services are available
 		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		if (result != ConnectionResult.SUCCESS) {
+			setAutoConnectPreference(false);
 			showErrorDialog(result);
 			return;
 		}
+
+		setAutoConnectPreference(true);
 
 		// Show spinner
 		if (mProgressBar != null && mProgressBar.isShowing())
@@ -238,6 +239,8 @@ public class LauncherActivity extends Activity
 	}
 
 	private void setAutoConnectPreference(boolean b) {
+		Log.d(TAG, "Setting auto-connect preference: " + b);
+		mSignInOnStart = b;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
 	}
