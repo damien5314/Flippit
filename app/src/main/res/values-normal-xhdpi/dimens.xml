@@ -6,12 +6,12 @@
 
     <dimen name="app_title_size">60sp</dimen>
 
-    <dimen name="launcher_call_to_action_text_size">22sp</dimen>
+    <dimen name="call_to_action_text_size">22sp</dimen>
     <dimen name="call_to_action_margin">3dp</dimen>
     <dimen name="call_to_action_border">2dp</dimen>
     <dimen name="call_to_action_corner_radius">16dp</dimen>
-    <dimen name="call_to_action_width">320dp</dimen> <!-- Only used for game board buttons -->
-    <dimen name="call_to_action_height">100dp</dimen> <!-- Only used for game board buttons -->
+    <dimen name="board_panel_width">320dp</dimen> <!-- Only used for game board buttons -->
+    <dimen name="board_panel_height">100dp</dimen> <!-- Only used for game board buttons -->
 
     <dimen name="score_overlay_height">46dp</dimen>
     <dimen name="score_overlay_text_size">16sp</dimen>

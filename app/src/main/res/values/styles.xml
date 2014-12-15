@@ -21,7 +21,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_margin">@dimen/call_to_action_margin</item>
         <item name="android:background">@drawable/launcher_cta</item>
-        <item name="android:textSize">@dimen/launcher_call_to_action_text_size</item>
+        <item name="android:textSize">@dimen/call_to_action_text_size</item>
         <item name="android:textColor">@color/launcher_cta_text_color</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
@@ -88,9 +88,9 @@
     </style>
 
 	<style name="BoardActionPanel">
-		<item name="android:layout_width">@dimen/call_to_action_width</item>
-		<item name="android:layout_height">@dimen/call_to_action_height</item>
-		<item name="android:layout_margin">@dimen/call_to_action_margin</item>
+		<item name="android:layout_width">@dimen/board_panel_width</item>
+		<item name="android:layout_height">@dimen/board_panel_height</item>
+		<item name="android:layout_margin">@dimen/board_panel_margin</item>
 		<item name="android:gravity">center</item>
 		<item name="android:background">@drawable/board_action_panel</item>
 		<item name="android:textSize">@dimen/board_panel_text_size</item>
