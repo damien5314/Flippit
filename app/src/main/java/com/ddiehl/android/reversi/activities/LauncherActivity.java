@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -38,11 +37,13 @@ public class LauncherActivity extends Activity
     public static final int RC_NORMAL = 1003;
 
 	private GoogleApiClient mGoogleApiClient;
+	private TurnBasedMatch mMatchReceived;
+
 	private ProgressDialog mProgressBar;
+
 	private boolean mSignInOnStart = false;
 	private boolean mResolvingError = false;
     private boolean mStartMatchOnStart = false;
-    private TurnBasedMatch mMatchReceived;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,16 +55,6 @@ public class LauncherActivity extends Activity
 		mSignInOnStart = getAutoConnectPreference();
         displayMetrics();
     }
-
-	// Create the Google API Client with access to Plus and Games
-	private void initializeGoogleApiClient() {
-		mGoogleApiClient = new GoogleApiClient.Builder(this)
-				.addConnectionCallbacks(this)
-				.addOnConnectionFailedListener(this)
-				.addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-				.addApi(Games.API).addScope(Games.SCOPE_GAMES)
-				.build();
-	}
 
 	@Override
 	public void onStart() {
@@ -86,7 +77,6 @@ public class LauncherActivity extends Activity
 	public void onStop() {
 		super.onStop();
 		Log.d(TAG, "LauncherActivity - onStop");
-//		setAutoConnectPreference(mSignInOnStart);
 		if (mGoogleApiClient.isConnected())
 			mGoogleApiClient.disconnect();
 	}
@@ -95,7 +85,7 @@ public class LauncherActivity extends Activity
 	public void onConnected(Bundle bundle) {
 		dismissSpinner();
         Log.d(TAG, "Connected to Google Play Services");
-		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
 
         if (bundle != null && bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH))
             mMatchReceived = bundle.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
@@ -114,9 +104,12 @@ public class LauncherActivity extends Activity
 	public void onConnectionFailed(ConnectionResult result) {
         Log.d(TAG, "Failed to connect to Google Play - Error: " + result.getErrorCode());
 		dismissSpinner();
+
 		if (mResolvingError) {
 			return; // Already attempting to resolve an error
-		} else if (result.hasResolution()) {
+		}
+
+		if (result.hasResolution()) {
 			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
 			try {
 				mResolvingError = true;
@@ -154,6 +147,16 @@ public class LauncherActivity extends Activity
         }
     }
 
+	// Create the Google API Client with access to Plus and Games
+	private void initializeGoogleApiClient() {
+		mGoogleApiClient = new GoogleApiClient.Builder(this)
+				.addConnectionCallbacks(this)
+				.addOnConnectionFailedListener(this)
+				.addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
+				.addApi(Games.API).addScope(Games.SCOPE_GAMES)
+				.build();
+	}
+
 	private void displaySignInPrompt() {
 		new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.dialog_signin_title))
@@ -185,14 +188,11 @@ public class LauncherActivity extends Activity
 
 		setAutoConnectPreference(true);
 
-		// Show spinner
-		if (mProgressBar != null && mProgressBar.isShowing())
-			dismissSpinner();
-		showSpinner();
-
 		// Initialize client if null
 		if (mGoogleApiClient == null)
 			initializeGoogleApiClient();
+
+		showSpinner();
 
 		// Call connect() on GoogleApiClient
 		mGoogleApiClient.connect();
@@ -211,7 +211,7 @@ public class LauncherActivity extends Activity
 		}
 	}
 
-    public void startMultiplayerMatch(TurnBasedMatch match) {
+    private void startMultiplayerMatch(TurnBasedMatch match) {
         if (mGoogleApiClient.isConnected()) {
             Intent intent = new Intent(this, MultiPlayerMatchActivity.class);
             intent.putExtra(Multiplayer.EXTRA_TURN_BASED_MATCH, match);
@@ -267,10 +267,14 @@ public class LauncherActivity extends Activity
         String height = String.valueOf(metrics.heightPixels);
 
         String size = "";
-        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) size = "SMALL";
-        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) size = "NORMAL";
-        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) size = "LARGE";
-        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE) size = "XLARGE";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+				== Configuration.SCREENLAYOUT_SIZE_SMALL) size = "SMALL";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+				== Configuration.SCREENLAYOUT_SIZE_NORMAL) size = "NORMAL";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+				== Configuration.SCREENLAYOUT_SIZE_LARGE) size = "LARGE";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
+				== Configuration.SCREENLAYOUT_SIZE_XLARGE) size = "XLARGE";
 
         String density = "";
         if (metrics.density == 0.75f) density = "LDPI (0.75)";

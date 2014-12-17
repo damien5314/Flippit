@@ -136,14 +136,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		setAutoConnectPreference(true);
 
-		// Show spinner
-		if (mProgressBar != null && mProgressBar.isShowing())
-			dismissSpinner();
-		showSpinner(3);
-
 		// Initialize client if null
 		if (mGoogleApiClient == null)
 			initializeGoogleApiClient();
+
+		showSpinner(3);
 
 		// Call connect() on GoogleApiClient
 		mGoogleApiClient.connect();
@@ -178,7 +175,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     public void onConnected(Bundle bundle) {
         dismissSpinner();
 //        Log.d(TAG, "Connected to Google Play Services");
-		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
 
         if (mSignOutOnConnect) {
             signOutFromGooglePlay();
@@ -198,11 +195,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-//        Log.i(TAG, "Failed to connect to Google Play services");
+		Log.d(TAG, "Failed to connect to Google Play - Error: " + result.getErrorCode());
 		dismissSpinner();
+
         if (mResolvingError) {
             return; // Already attempting to resolve an error
-        } else if (result.hasResolution()) {
+        }
+
+		if (result.hasResolution()) {
 			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
                 mResolvingError = true;
