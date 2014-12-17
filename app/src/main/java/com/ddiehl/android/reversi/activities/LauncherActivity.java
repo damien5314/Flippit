@@ -176,8 +176,6 @@ public class LauncherActivity extends Activity
 	}
 
 	private void connectGoogleApiClient() {
-		Log.d(TAG, "LauncherActivity - connectGoogleApiClient()");
-
 		// Check if Google Play Services are available
 		int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		if (result != ConnectionResult.SUCCESS) {
@@ -188,13 +186,9 @@ public class LauncherActivity extends Activity
 
 		setAutoConnectPreference(true);
 
-		// Initialize client if null
 		if (mGoogleApiClient == null)
 			initializeGoogleApiClient();
-
 		showSpinner();
-
-		// Call connect() on GoogleApiClient
 		mGoogleApiClient.connect();
 	}
 

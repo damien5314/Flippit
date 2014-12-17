@@ -492,21 +492,24 @@
 
 		<RelativeLayout
 			android:id="@+id/matchMessage"
-			android:visibility="gone"
+			android:visibility="visible"
 			style="@style/GameMessage">
 
 			<TextView
 				android:id="@+id/matchMessageText"
+				android:text="Test message"
 				style="@style/GameMessageText"/>
 
 			<ImageView
 				android:id="@+id/waiting_icon1"
 				style="@style/GameMessageIcon"
+				android:src="@drawable/board_space_p1"
 				android:layout_toLeftOf="@id/matchMessageText"/>
 
 			<ImageView
 				android:id="@+id/waiting_icon2"
 				style="@style/GameMessageIcon"
+				android:src="@drawable/board_space_p2"
 				android:layout_toRightOf="@id/matchMessageText"/>
 
 		</RelativeLayout>
