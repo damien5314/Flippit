@@ -8,8 +8,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -50,6 +52,7 @@ public class LauncherActivity extends Activity
         setContentView(R.layout.activity_launcher);
 		initializeGoogleApiClient();
 		mSignInOnStart = getAutoConnectPreference();
+        displayMetrics();
     }
 
 	// Create the Google API Client with access to Plus and Games
@@ -256,4 +259,30 @@ public class LauncherActivity extends Activity
 		});
 		dialog.show();
 	}
+
+    public void displayMetrics() {
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+
+        String width = String.valueOf(metrics.widthPixels);
+        String height = String.valueOf(metrics.heightPixels);
+
+        String size = "";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_SMALL) size = "SMALL";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_NORMAL) size = "NORMAL";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_LARGE) size = "LARGE";
+        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) == Configuration.SCREENLAYOUT_SIZE_XLARGE) size = "XLARGE";
+
+        String density = "";
+        if (metrics.density == 0.75f) density = "LDPI (0.75)";
+        if (metrics.density == 1.00f) density = "MDPI (1.00)";
+        if (metrics.density == 1.50f) density = "HDPI (1.50)";
+        if (metrics.density == 2.00f) density = "XHDPI (2.00)";
+        if (metrics.density == 3.00f) density = "XXHDPI (3.00)";
+        if (metrics.density == 4.00f) density = "XXXHDPI (4.00)";
+
+        Log.d(TAG, "WIDTH: " + width);
+        Log.d(TAG, "HEIGHT: " + height);
+        Log.d(TAG, "SIZE: " + size);
+        Log.d(TAG, "DENSITY: " + density);
+    }
 }
