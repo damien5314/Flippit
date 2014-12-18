@@ -90,7 +90,7 @@
 
 	<!-- Match status errors -->
 	<string name="dialog_error_title">Error</string>
-	<string name="dialog_error_message">Issue updating match, please try again.</string>
+	<string name="dialog_error_message">Error updating match, please try again.</string>
 	<string name="dialog_error_confirm">OK</string>
 
 	<string name="google_play_not_connected">Not connected to Play Services</string>
