@@ -2,12 +2,12 @@
 
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:id="@+id/previous"
+    <item android:id="@+id/action_previous"
         android:title="@string/action_htp_previous"
 		android:icon="@drawable/ic_action_navigation_arrow_back"
         android:showAsAction="always"/>
 
-    <item android:id="@+id/next"
+    <item android:id="@+id/action_next"
         android:title="@string/action_htp_next"
 		android:icon="@drawable/ic_action_navigation_arrow_forward"
         android:showAsAction="always" />

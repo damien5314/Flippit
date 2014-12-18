@@ -13,9 +13,9 @@ import com.ddiehl.android.reversi.activities.MatchActivity;
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
     private static Context ctx;
-	private BoardSpace[][] spaces;
-	private int width;
-	private int height;
+	private final BoardSpace[][] spaces;
+	private final int width;
+	private final int height;
 
     private final byte[][] moveDirections = new byte[][] {
             {0,  -1}, // Down
@@ -85,13 +85,12 @@ public class Board {
         this.spaces[y][x] = s;
     }
 
-	public boolean commitPiece(BoardSpace space, ReversiColor playerColor) {
+	public void commitPiece(BoardSpace space, ReversiColor playerColor) {
 		for (byte[] move : moveDirections) {
 			if (moveValueInDirection(space, move[0], move[1], playerColor) != 0) {
 				flipInDirection(space, move[0], move[1], playerColor);
 			}
 		}
-		return true;
 	}
 
 	public int spacesCapturedWithMove(BoardSpace s, ReversiColor playerColor) {
@@ -232,7 +231,7 @@ public class Board {
 
 	public void displayBoard(final MatchActivity a) {
 		a.findViewById(R.id.board_panels).setVisibility(View.GONE);
-		TableLayout grid = (TableLayout) a.findViewById(R.id.MatchGrid);
+		TableLayout grid = (TableLayout) a.findViewById(R.id.match_grid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
 		grid.setLayoutParams(new LinearLayout.LayoutParams(
 				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));

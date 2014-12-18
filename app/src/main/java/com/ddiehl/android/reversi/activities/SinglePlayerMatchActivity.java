@@ -34,10 +34,9 @@ public class SinglePlayerMatchActivity extends MatchActivity {
     private static final String PREF_FIRST_TURN = "pref_firstTurn";
     private static final String PREF_BOARD_STATE = "pref_boardState";
     private Context ctx;
-	protected ReversiPlayer p1, p2, currentPlayer;
-    protected ReversiPlayer firstTurn;
-    protected Board mBoard;
-    protected boolean matchInProgress;
+	private ReversiPlayer p1, p2, currentPlayer, firstTurn;
+    private Board mBoard;
+    private boolean matchInProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +67,7 @@ public class SinglePlayerMatchActivity extends MatchActivity {
     public void onResume() {
         super.onResume();
         p1.setName(getPlayerName());
-        ((TextView)findViewById(R.id.p1_label)).setText(p1.getName());
+        ((TextView)findViewById(R.id.label_p1)).setText(p1.getName());
         if (matchInProgress && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
@@ -113,6 +112,10 @@ public class SinglePlayerMatchActivity extends MatchActivity {
 	private String getPlayerName() {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		return prefs.getString(PREF_PLAYER_NAME, getString(R.string.player1_label_default));
+	}
+
+	public void selectMatch(View v) {
+		// Hidden onCreate of Activity
 	}
 
     public void startNewMatch(View v) {
@@ -163,7 +166,7 @@ public class SinglePlayerMatchActivity extends MatchActivity {
     }
 
     private class ExecuteCPUMove extends AsyncTask<Void, Void, BoardSpace> {
-		long startTime = System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 
         @Override
         protected BoardSpace doInBackground(Void... voids) {
@@ -215,25 +218,28 @@ public class SinglePlayerMatchActivity extends MatchActivity {
         p2.setScore(p2c);
 		updateScoreForPlayer(p1);
 		updateScoreForPlayer(p2);
-        ((ImageView)findViewById(R.id.turnIndicator)).setImageResource(
+        ((ImageView)findViewById(R.id.turn_indicator)).setImageResource(
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
     }
 
 	public void updateScoreForPlayer(ReversiPlayer p) {
 		TextView vScore;
 		if (p == p1) vScore = (TextView) findViewById(R.id.p1_score);
-		else vScore = (TextView) findViewById(R.id.p2_score);
+		else vScore = (TextView) findViewById(R.id.score_p2);
 		vScore.setText(String.valueOf(p.getScore()));
 	}
 
 	public void endMatch() {
-		ReversiPlayer winner = null;
-		if (p1.getScore() != p2.getScore())
+		ReversiPlayer winner;
+		if (p1.getScore() != p2.getScore()) {
 			winner = (p1.getScore() > p2.getScore()) ? p1 : p2;
-		showWinningToast(winner);
-		int diff = 64 - p1.getScore() - p2.getScore();
-		winner.setScore(winner.getScore() + diff);
-		updateScoreForPlayer(winner);
+			showWinningToast(winner);
+			int diff = 64 - p1.getScore() - p2.getScore();
+			winner.setScore(winner.getScore() + diff);
+			updateScoreForPlayer(winner);
+		} else {
+			showWinningToast(null);
+		}
         switchFirstTurn();
         getSharedPreferences(PREF_MATCH_STATE, 0).edit().clear().apply();
         matchInProgress = false;
@@ -273,7 +279,7 @@ public class SinglePlayerMatchActivity extends MatchActivity {
 				settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER);
 				startActivity(settings);
 				return true;
-            case R.id.action_howtoplay:
+            case R.id.action_how_to_play:
                 Intent htp = new Intent(this, HowToPlayActivity.class);
                 startActivity(htp);
                 return true;

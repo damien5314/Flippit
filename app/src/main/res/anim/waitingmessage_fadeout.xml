@@ -6,6 +6,6 @@
     <alpha
         android:fromAlpha="1"
         android:toAlpha="0"
-        android:duration="@integer/waitingMessageFadeOutDuration"/>
+        android:duration="@integer/waiting_message_fade_out_duration"/>
 
 </set>

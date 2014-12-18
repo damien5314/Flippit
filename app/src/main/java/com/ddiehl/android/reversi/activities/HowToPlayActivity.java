@@ -23,10 +23,9 @@ public class HowToPlayActivity extends FragmentActivity {
     private static final String TAG = HowToPlayActivity.class.getSimpleName();
 
     private ViewPager pager;
-	private HowToPlayPageAdapter pageAdapter;
 	private MenuItem previous, next;
 
-	final int[] FRAGMENT_LAYOUT_ID = new int[] {
+	private final int[] FRAGMENT_LAYOUT_ID = new int[] {
 			R.layout.activity_howtoplay_p1,
 			R.layout.activity_howtoplay_p2,
 			R.layout.activity_howtoplay_p3,
@@ -38,7 +37,7 @@ public class HowToPlayActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_howtoplay);
         List<Fragment> fragments = getFragments();
-        pageAdapter = new HowToPlayPageAdapter(getSupportFragmentManager(), fragments);
+		HowToPlayPageAdapter pageAdapter = new HowToPlayPageAdapter(getSupportFragmentManager(), fragments);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pageAdapter);
 		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
@@ -58,7 +57,7 @@ public class HowToPlayActivity extends FragmentActivity {
     }
 
     private List<Fragment> getFragments() {
-        List<Fragment> fragmentList = new ArrayList<Fragment>();
+        List<Fragment> fragmentList = new ArrayList<>();
         for (int id : FRAGMENT_LAYOUT_ID) {
             fragmentList.add(HowToPlayFragment.newInstance(id));
         }
@@ -96,10 +95,10 @@ public class HowToPlayActivity extends FragmentActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.previous:
+            case R.id.action_previous:
 				pager.setCurrentItem(pager.getCurrentItem()-1);
 				break;
-            case R.id.next:
+            case R.id.action_next:
 				pager.setCurrentItem(pager.getCurrentItem()+1);
 				break;
         }

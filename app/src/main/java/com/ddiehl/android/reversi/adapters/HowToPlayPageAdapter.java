@@ -8,7 +8,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import java.util.List;
 
 public class HowToPlayPageAdapter extends FragmentStatePagerAdapter {
-    private List<Fragment> fragments;
+    private final List<Fragment> fragments;
 
     public HowToPlayPageAdapter(FragmentManager fm, List<Fragment> fragments) {
         super(fm);

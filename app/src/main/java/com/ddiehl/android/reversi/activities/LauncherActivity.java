@@ -28,13 +28,13 @@ import com.google.android.gms.plus.Plus;
 
 public class LauncherActivity extends Activity
 		implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-	public static final String TAG = LauncherActivity.class.getSimpleName();
+	private static final String TAG = LauncherActivity.class.getSimpleName();
 
 	private static final String PREF_AUTO_SIGN_IN = "pref_auto_sign_in";
 
-	public static final int RC_RESOLVE_ERROR = 1001;
-    public static final int RC_START_MATCH = 1002;
-    public static final int RC_NORMAL = 1003;
+	private static final int RC_RESOLVE_ERROR = 1001;
+    private static final int RC_START_MATCH = 1002;
+    private static final int RC_NORMAL = 1003;
 
 	private GoogleApiClient mGoogleApiClient;
 	private TurnBasedMatch mMatchReceived;
@@ -159,15 +159,15 @@ public class LauncherActivity extends Activity
 
 	private void displaySignInPrompt() {
 		new AlertDialog.Builder(this)
-				.setTitle(getString(R.string.dialog_signin_title))
-				.setMessage(getString(R.string.dialog_signin_message))
-				.setPositiveButton(getString(R.string.dialog_signin_confirm), new DialogInterface.OnClickListener() {
+				.setTitle(getString(R.string.dialog_sign_in_title))
+				.setMessage(getString(R.string.dialog_sign_in_message))
+				.setPositiveButton(getString(R.string.dialog_sign_in_confirm), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						setAutoConnectPreference(true);
 						connectGoogleApiClient();
 					}
 				})
-				.setNegativeButton(getString(R.string.dialog_signin_cancel), new DialogInterface.OnClickListener() {
+				.setNegativeButton(getString(R.string.dialog_sign_in_cancel), new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 						// User canceled
 					}
@@ -270,7 +270,7 @@ public class LauncherActivity extends Activity
         else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
 				== Configuration.SCREENLAYOUT_SIZE_XLARGE) size = "XLARGE";
 
-        String density = "";
+        String density;
         if (metrics.density == 0.75f) density = "LDPI (0.75)";
         else if (metrics.density == 1.00f) density = "MDPI (1.00)";
         else if (metrics.density == 1.50f) density = "HDPI (1.50)";

@@ -1,14 +1,12 @@
 package com.ddiehl.android.reversi.game;
 
-import com.ddiehl.android.reversi.game.Board;
-import com.ddiehl.android.reversi.game.BoardSpace;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class BoardIterator implements Iterator<BoardSpace> {
-	Board b;
-	int x, y;
+	private final Board b;
+	private int x;
+	private int y;
 
 	public BoardIterator(Board b) {
 		this.b = b;
@@ -17,10 +15,7 @@ public class BoardIterator implements Iterator<BoardSpace> {
 
 	@Override
 	public boolean hasNext() {
-		if (y == b.height())
-			return false;
-
-		return true;
+		return y != b.height();
 	}
 
 	@Override

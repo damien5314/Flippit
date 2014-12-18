@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
 	<LinearLayout
-		android:id="@+id/ScoreOverlay"
+		android:id="@+id/score_overlay"
 		style="@style/ScoreOverlay"
 		android:background="@drawable/border">
 
@@ -15,12 +15,12 @@
             style="@style/ScoreOverlaySection">
 
             <ImageView
-                android:id="@+id/p1_icon"
+                android:id="@+id/icon_p1"
                 style="@style/PlayerIcon"
                 android:background="@drawable/player_icon_p1"/>
 
             <TextView
-                android:id="@+id/p1_label"
+                android:id="@+id/label_p1"
                 style="@style/PlayerLabel"
                 android:gravity="left|center"
                 android:text="Damien Diehl"/>
@@ -33,7 +33,7 @@
         </LinearLayout>
 
         <ImageView
-            android:id="@+id/turnIndicator"
+            android:id="@+id/turn_indicator"
 			android:src="@drawable/ic_turn_indicator_p1"
             style="@style/TurnIndicator"/>
 
@@ -41,18 +41,18 @@
             style="@style/ScoreOverlaySection">
 
             <TextView
-                android:id="@+id/p2_score"
+                android:id="@+id/score_p2"
 				android:text="88"
                 style="@style/ScoreValue"/>
 
             <TextView
-                android:id="@+id/p2_label"
+                android:id="@+id/label_p2"
                 style="@style/PlayerLabel"
                 android:gravity="right|center"
                 android:text="@string/player2_label"/>
 
             <ImageView
-                android:id="@+id/p2_icon"
+                android:id="@+id/icon_p2"
                 style="@style/PlayerIcon"
                 android:background="@drawable/player_icon_p2"/>
 
@@ -61,7 +61,7 @@
 	</LinearLayout>
 
 	<LinearLayout
-		android:id="@+id/gameArea"
+		android:id="@+id/game_area"
 		style="@style/GameArea">
 
 		<LinearLayout
@@ -84,7 +84,7 @@
 		</LinearLayout>
 
 		<TableLayout
-			android:id="@+id/MatchGrid"
+			android:id="@+id/match_grid"
 			style="@style/GameBoardTable" >
 
 			<TableRow>

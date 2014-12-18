@@ -24,9 +24,11 @@ import com.ddiehl.android.reversi.R;
  */
 public class SettingsActivity extends Activity {
 	private static final String TAG = SettingsActivity.class.getSimpleName();
+
 	public static final String EXTRA_SETTINGS_MODE = "settings_mode";
 	public static final String EXTRA_IS_SIGNED_IN = "is_signed_in";
 	public static final String EXTRA_SIGNED_IN_ACCOUNT = "signed_in_account";
+
 	public static final int SETTINGS_MODE_SINGLE_PLAYER = 101;
 	public static final int SETTINGS_MODE_MULTI_PLAYER = 102;
 	public static final int RESULT_SIGN_IN = 201;
@@ -42,7 +44,6 @@ public class SettingsActivity extends Activity {
 		public static Fragment newInstance(Intent intent) {
 			SettingsFragment frag = new SettingsFragment();
 			Bundle args = intent.getExtras();
-//			args.putInt(EXTRA_SETTINGS_MODE, mode);
 			frag.setArguments(args);
 			return frag;
 		}
@@ -50,10 +51,8 @@ public class SettingsActivity extends Activity {
 		@Override
 		public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
-
 			mContext = getActivity();
 
-			// Load the preferences from an XML resource
 			addPreferencesFromResource(R.xml.preferences);
 			PreferenceManager.setDefaultValues(this.getActivity(), R.xml.preferences, false);
 
@@ -80,17 +79,13 @@ public class SettingsActivity extends Activity {
 		@Override
 		public void onResume() {
 			super.onResume();
-			// Set up a listener whenever a key changes
-			getPreferenceScreen().getSharedPreferences()
-					.registerOnSharedPreferenceChangeListener(this);
+			getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
 		}
 
 		@Override
 		public void onPause() {
 			super.onPause();
-			// Unregister the listener whenever a key changes
-			getPreferenceScreen().getSharedPreferences()
-					.unregisterOnSharedPreferenceChangeListener(this);
+			getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
 		}
 
 		private void initSummary(Preference p) {
@@ -161,9 +156,7 @@ public class SettingsActivity extends Activity {
 					})
 					.setNegativeButton(getString(R.string.settings_dialog_sign_in_cancel), new DialogInterface.OnClickListener() {
 						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							// User canceled
-						}
+						public void onClick(DialogInterface dialog, int which) { }
 					})
 					.setCancelable(true)
 					.show();
@@ -182,9 +175,7 @@ public class SettingsActivity extends Activity {
 					})
 					.setNegativeButton(getString(R.string.settings_dialog_sign_out_cancel), new DialogInterface.OnClickListener() {
 						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							// User canceled
-						}
+						public void onClick(DialogInterface dialog, int which) { }
 					})
 					.setCancelable(true)
 					.show();
@@ -199,7 +190,6 @@ public class SettingsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		getFragmentManager().beginTransaction()
 				.replace(android.R.id.content, SettingsFragment.newInstance(getIntent())).commit();
 	}

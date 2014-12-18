@@ -6,6 +6,6 @@
     <alpha
         android:fromAlpha="0"
         android:toAlpha="1"
-        android:duration="@integer/playerMoveFadeInDuration"/>
+        android:duration="@integer/player_move_fade_in_duration"/>
 
 </set>

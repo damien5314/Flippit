@@ -27,12 +27,12 @@
         </activity>
         <activity
             android:name=".activities.SinglePlayerMatchActivity"
-            android:label="@string/app_name"
+            android:label="@string/label_single_player"
 			android:screenOrientation="portrait">
         </activity>
 		<activity
 			android:name=".activities.MultiPlayerMatchActivity"
-			android:label="@string/app_name"
+			android:label="@string/label_multi_player"
 			android:screenOrientation="portrait">
 		</activity>
         <activity

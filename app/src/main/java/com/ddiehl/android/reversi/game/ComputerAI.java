@@ -79,7 +79,7 @@ public class ComputerAI {
      * Finds space which maximizes space value * number of spaces obtained
      */
     public static BoardSpace getBestMove_d3(Board board, ReversiPlayer p, ReversiPlayer o) {
-        HashMap<BoardSpace, Integer> moveValues = new HashMap<BoardSpace, Integer>();
+        HashMap<BoardSpace, Integer> moveValues = new HashMap<>();
         final int spaceValue_weight = 1;
         final int spacesCaptured_weight = 0;
         BoardIterator i = new BoardIterator(board);
@@ -106,7 +106,7 @@ public class ComputerAI {
 
         // Add all of the moves with the best value to a HashSet
         int bestValue = Integer.MIN_VALUE;
-        HashSet<BoardSpace> bestMoves = new HashSet<BoardSpace>();
+        HashSet<BoardSpace> bestMoves = new HashSet<>();
         for (BoardSpace s : moveValues.keySet()) {
             int val = moveValues.get(s);
             if (val > bestValue) {
@@ -135,7 +135,7 @@ public class ComputerAI {
         return best;
     }
 
-    public static int getPossibleMoves(Board board, ReversiPlayer p) {
+    private static int getPossibleMoves(Board board, ReversiPlayer p) {
         int possible = 0;
         BoardIterator i = new BoardIterator(board);
         while (i.hasNext()) {
@@ -147,7 +147,7 @@ public class ComputerAI {
         return possible;
     }
 
-    public static int getSpaceValue(BoardSpace s) {
+    private static int getSpaceValue(BoardSpace s) {
         return spaceValues[s.y][s.x];
     }
 

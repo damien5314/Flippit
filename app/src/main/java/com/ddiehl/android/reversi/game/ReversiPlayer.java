@@ -6,7 +6,6 @@ public class ReversiPlayer {
 	private String name;
 	private int score;
 	private boolean isCPU;
-	private String participantId;
 
 	public ReversiPlayer(ReversiColor color, String name) {
 		this.color = color;
