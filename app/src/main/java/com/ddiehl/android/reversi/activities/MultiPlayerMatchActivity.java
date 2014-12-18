@@ -19,9 +19,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -357,7 +355,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		TurnBasedMatch match = result.getMatch();
 		mMatchData = null;
 
-		if (!checkStatusCode(match, result.getStatus().getStatusCode())) {
+		if (!checkStatusCode(result.getStatus().getStatusCode())) {
 			return;
 		}
 
@@ -372,7 +370,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mMatch = match;
 		mBoard.reset();
 		saveMatchData();
-		displayBoard();
+		mBoard.displayBoard(this);
 		updateScore();
 
 		String participantId = mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
@@ -390,12 +388,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mMatch = result.getMatch();
 		dismissSpinner();
 
-		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
+		if (checkStatusCode(result.getStatus().getStatusCode())) {
             updateMatch(mMatch);
 		} else {
             Log.d(TAG, "UpdateMatchResult failure: " + result.getStatus().getStatusCode());
 //			mBoard = pBoard;
-//			displayBoard();
+//			mBoard.displayBoard(this);
         }
 
         mUpdatingMatch = false;
@@ -418,7 +416,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		byte[] playerData = Arrays.copyOfRange(mMatchData, startIndex, startIndex+64);
 
         mBoard.deserialize(playerData);
-        displayBoard();
+		mBoard.displayBoard(this);
 		updatePlayerNames();
 		dismissSpinner();
 
@@ -712,39 +710,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		return null;
 	}
 
-	private void displayBoard() {
-        findViewById(R.id.board_panels).setVisibility(View.GONE);
-		TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
-		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
-		grid.setLayoutParams(new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
-		grid.removeAllViews();
-
-		int bHeight = (int) getResources().getDimension(R.dimen.space_row_height);
-		int bMargin = (int) getResources().getDimension(R.dimen.space_padding);
-
-		for (int y = 0; y < mBoard.height(); y++) {
-			TableRow row = new TableRow(this);
-			row.setWeightSum(mBoard.width());
-			for (int x = 0; x < mBoard.width(); x++) {
-				BoardSpace space = mBoard.getSpaceAt(x, y);
-				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
-				params.setMargins(bMargin, bMargin, bMargin, bMargin);
-				space.setLayoutParams(params);
-				space.setOnClickListener(
-						new View.OnClickListener() {
-							@Override
-							public void onClick(View v) {
-								claim((BoardSpace) v);
-							}
-						});
-				row.addView(space);
-			}
-			grid.addView(row);
-		}
-        grid.setVisibility(View.VISIBLE);
-	}
-
     private void clearBoard() {
 		mMatch = null;
         TableLayout grid = (TableLayout) findViewById(R.id.MatchGrid);
@@ -807,7 +772,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 	}
 
-	private boolean checkStatusCode(TurnBasedMatch match, int statusCode) {
+	private boolean checkStatusCode(int statusCode) {
 		switch (statusCode) {
 			case GamesStatusCodes.STATUS_OK:
 			case GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED:
@@ -1122,7 +1087,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     private void processResultFinishMatch(TurnBasedMultiplayer.UpdateMatchResult result) {
         mUpdatingMatch = false;
         dismissSpinner();
-        if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
+        if (checkStatusCode(result.getStatus().getStatusCode())) {
 			// Update achievements
 			if (mPlayer.getResult().getResult() == ParticipantResult.MATCH_RESULT_WIN) {
 				Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_first_win));
