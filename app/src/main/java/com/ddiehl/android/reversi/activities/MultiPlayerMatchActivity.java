@@ -394,7 +394,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		if (checkStatusCode(mMatch, result.getStatus().getStatusCode())) {
             updateMatch(mMatch);
 		} else {
-            Log.d(TAG, "Failure status code: " + result.getStatus().getStatusCode());
+            Log.d(TAG, "UpdateMatchResult failure: " + result.getStatus().getStatusCode());
 //			mBoard = pBoard;
 //			displayBoard();
         }
@@ -448,7 +448,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				displayMessage(getString(R.string.match_finding_partner));
 				return;
 			case TurnBasedMatch.MATCH_STATUS_COMPLETE:
-//				displayMessage(getString(R.string.match_complete));
 				endMatch();
 				return;
 		}
@@ -459,11 +458,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				dismissMessage();
 				autoplayIfEnabled();
 				return;
-			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN: // Should return results.
+			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
 				displayMessage(getString(R.string.match_opponent_turn));
-				break;
+				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
 				displayMessage(getString(R.string.match_invite_pending));
+				return;
 		}
 	}
 
@@ -498,7 +498,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				mMatchData[clearIndex] = 0;
 		}
 
-		Log.d(TAG, "Player's match data saved: " + bytesToString(mMatchData));
+//		Log.d(TAG, "Player's match data saved: " + bytesToString(mMatchData));
 	}
 
 	private void processReceivedTurns() {
@@ -521,17 +521,16 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
-		if (mMatch != null) {
-			if (mMatch.getMatchId().equals(match.getMatchId())) {
-				updateMatch(match);
-			}
+		if (mMatch != null && mMatch.getMatchId().equals(match.getMatchId())) {
+			updateMatch(match);
 		}
     }
 
     @Override
     public void onTurnBasedMatchRemoved(String matchId) {
-        // Don't think I actually need to implement this
 		Log.d(TAG, "Match removed: " + matchId);
+		if (mMatch != null && mMatch.getMatchId().equals(matchId))
+			clearBoard();
     }
 
 	public void claim(final BoardSpace s) {
@@ -542,9 +541,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
         if (mMatch.getStatus() != TurnBasedMatch.MATCH_STATUS_ACTIVE ||
                 mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-//				Toast.makeText(this, "Not your turn!", Toast.LENGTH_SHORT).show();
-            Log.d(TAG, "Match Status: " + mMatch.getStatus());
-            Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
+//            Log.d(TAG, "Match Status: " + mMatch.getStatus());
+//            Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
             return;
         }
 
@@ -557,8 +555,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             return;
         }
 
-        ReversiColor playerColor = getCurrentPlayerColor();
-
+		ReversiColor playerColor = getCurrentPlayerColor();
         if (mBoard.spacesCapturedWithMove(s, playerColor) > 0) {
             mUpdatingMatch = true;
             showSpinner(2);
@@ -572,8 +569,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             while (mMatchData[nextIndex] != 0)
                 nextIndex++; // Increase index til we run into an unfilled index
             mMatchData[nextIndex] = mBoard.getSpaceNumber(s);
-            Log.d(TAG, "Queued move for opponent's Board");
-            Log.d(TAG, bytesToString(mMatchData));
+//            Log.d(TAG, "Queued move for opponent's Board");
+//            Log.d(TAG, bytesToString(mMatchData));
 
             updateMatchState();
         } else {
@@ -588,7 +585,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-							Log.d(TAG, "Turn updated, opponent receives turn. Result: " + updateMatchResult.getStatus().getStatusMessage());
 							processResult(updateMatchResult);
 						}
 					});
@@ -598,7 +594,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-							Log.d(TAG, "Turn updated, player keeps turn. Result: " + updateMatchResult.getStatus());
 							processResult(updateMatchResult);
 						}
 					});
@@ -612,7 +607,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void endMatch() {
 		updateScore();
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE) {
-			// Display appropriate match message
 			switch (mPlayer.getResult().getResult()) {
 				case ParticipantResult.MATCH_RESULT_WIN:
 					displayMessage(getString(R.string.winner_you));
@@ -639,7 +633,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						});
 			}
 		} else { // Match is not yet finished
-			// Generate ParticipantResults based on current score
 			ParticipantResult winnerResult, loserResult;
 			if (mLightScore != mDarkScore) {
 				if (mLightScore > mDarkScore) {
