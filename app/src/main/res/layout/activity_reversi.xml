@@ -503,13 +503,11 @@
 			<ImageView
 				android:id="@+id/match_message_icon_1"
 				style="@style/GameMessageIcon"
-				android:src="@drawable/board_space_p1"
 				android:layout_toLeftOf="@id/match_message_text"/>
 
 			<ImageView
 				android:id="@+id/match_message_icon_2"
 				style="@style/GameMessageIcon"
-				android:src="@drawable/board_space_p2"
 				android:layout_toRightOf="@id/match_message_text"/>
 
 		</RelativeLayout>

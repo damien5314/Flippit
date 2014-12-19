@@ -167,7 +167,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     public void onConnected(Bundle bundle) {
         dismissSpinner();
 //        Log.d(TAG, "Connected to Google Play Services");
-		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+//		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
 
 		mIsSignedIn = true;
 
@@ -180,11 +180,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			switch (mQueuedAction) {
 				case NewMatch:
 					mQueuedAction = null;
-					startNewMatch(findViewById(R.id.board_panel_new_game));
+					startNewMatchSelected();
 					return;
 				case SelectMatch:
 					mQueuedAction = null;
-					selectMatch(findViewById(R.id.board_panel_select_game));
+					selectMatchSelected();
 					return;
 				case ForfeitMatch:
 					mQueuedAction = null;
@@ -249,9 +249,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                     }
                 })
 				.setNegativeButton(getString(R.string.dialog_sign_in_cancel), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User canceled
-                    }
+                    public void onClick(DialogInterface dialog, int id) { }
                 })
 				.setOnCancelListener(new DialogInterface.OnCancelListener() {
 					@Override
@@ -977,6 +975,24 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 	}
 
+	private void startNewMatchSelected() {
+		startNewMatch(findViewById(R.id.board_panel_new_game));
+	}
+
+	private void selectMatchSelected() {
+		selectMatch(findViewById(R.id.board_panel_select_game));
+	}
+
+	private void settingsSelected() {
+		Intent settings = new Intent(this, SettingsActivity.class);
+		settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER);
+		boolean isSignedIn = mGoogleApiClient.isConnected();
+		settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn);
+		settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT,
+				isSignedIn ? Plus.AccountApi.getAccountName(mGoogleApiClient) : "");
+		startActivityForResult(settings, RC_SETTINGS);
+	}
+
     private void forfeitMatchSelected() {
 		if (mMatch == null) {
 			Toast.makeText(this, R.string.no_match_selected, Toast.LENGTH_LONG).show();
@@ -1003,7 +1019,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					if (mOpponent == null) {
 						showLeaveMatchDialog();
 					} else {
-						showForfeitMatchDialog();
+						if (mOpponent.getStatus() == Participant.STATUS_JOINED) {
+							showForfeitMatchDialog();
+						} else {
+							showCancelMatchDialog();
+						}
 					}
 				} else {
 					showForfeitMatchForbiddenAlert();
@@ -1012,6 +1032,34 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 
     }
+
+	private void showCancelMatchDialog() {
+		new AlertDialog.Builder(this)
+				.setTitle(getString(R.string.dialog_cancel_match_title))
+				.setMessage(getString(R.string.dialog_cancel_match_message))
+				.setPositiveButton(getString(R.string.dialog_cancel_match_confirm), new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						if (!mGoogleApiClient.isConnected()) {
+							displaySignInPrompt();
+							return;
+						}
+						Games.TurnBasedMultiplayer.cancelMatch(mGoogleApiClient, mMatch.getMatchId())
+								.setResultCallback(new ResultCallback<TurnBasedMultiplayer.CancelMatchResult>() {
+									@Override
+									public void onResult(TurnBasedMultiplayer.CancelMatchResult cancelMatchResult) {
+										processResult(cancelMatchResult);
+									}
+								});
+					}
+				})
+				.setNegativeButton(getString(R.string.dialog_cancel_match_cancel), new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) { }
+				})
+				.setCancelable(true)
+				.show();
+	}
 
 	private void showForfeitMatchDialog() {
 		new AlertDialog.Builder(this)
@@ -1127,10 +1175,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         }
     }
 
-	private int getPlayerScore() {
-		return ((mPlayer == mLightPlayer) ? mLightScore : mDarkScore);
-	}
-
     private void processResultLeaveMatch(TurnBasedMultiplayer.LeaveMatchResult result) {
         Log.d(TAG, "LeaveMatch() result: " + result.getStatus().getStatusCode());
         if (result.getStatus().isSuccess()) {
@@ -1139,6 +1183,19 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			Toast.makeText(this, getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
 		}
     }
+
+	private void processResult(TurnBasedMultiplayer.CancelMatchResult result) {
+		Log.d(TAG, "CancelMatch() result: " + result.getStatus().getStatusCode());
+		if (result.getStatus().isSuccess()) {
+			displayMessage(getString(R.string.match_canceled));
+		} else {
+			Toast.makeText(this, getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
+		}
+	}
+
+	private int getPlayerScore() {
+		return ((mPlayer == mLightPlayer) ? mLightScore : mDarkScore);
+	}
 
 	private void showAchievements() {
 		if (mGoogleApiClient.isConnected()) {
@@ -1168,13 +1225,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-		switch(id) {
+		switch(item.getItemId()) {
 			case R.id.action_create_match:
-				startNewMatch(findViewById(id));
+				startNewMatchSelected();
 				return true;
 			case R.id.action_select_match:
-				selectMatch(findViewById(id));
+				selectMatchSelected();
 				return true;
 			case R.id.action_how_to_play:
 				Intent intent = new Intent(this, HowToPlayActivity.class);
@@ -1190,13 +1246,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				showAchievements();
 				return true;
 			case R.id.action_settings:
-				Intent settings = new Intent(this, SettingsActivity.class);
-				settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER);
-				boolean isSignedIn = mGoogleApiClient.isConnected();
-				settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn);
-				settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT,
-						isSignedIn ? Plus.AccountApi.getAccountName(mGoogleApiClient) : "");
-				startActivityForResult(settings, RC_SETTINGS);
+				settingsSelected();
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
