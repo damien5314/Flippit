@@ -234,7 +234,7 @@ public class Board {
 		TableLayout grid = (TableLayout) a.findViewById(R.id.match_grid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
 		grid.setLayoutParams(new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 		grid.removeAllViews();
 
 		int bHeight = (int) a.getResources().getDimension(R.dimen.space_row_height);
