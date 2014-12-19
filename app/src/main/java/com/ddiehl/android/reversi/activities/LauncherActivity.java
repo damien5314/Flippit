@@ -45,7 +45,7 @@ public class LauncherActivity extends Activity
 	private boolean mResolvingError = false;
     private boolean mStartMatchOnStart = false;
 
-	private QueuedAction queuedAction;
+	private QueuedAction mQueuedAction;
 	private enum QueuedAction {
 		StartMultiplayer, StartMultiplayerMatch
 	}
@@ -95,11 +95,13 @@ public class LauncherActivity extends Activity
         if (bundle != null && bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH))
             mMatchReceived = bundle.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH);
 
-        if ((mStartMatchOnStart && mMatchReceived != null) || queuedAction == QueuedAction.StartMultiplayerMatch) {
+        if ((mStartMatchOnStart && mMatchReceived != null) || mQueuedAction == QueuedAction.StartMultiplayerMatch) {
+			mQueuedAction = null;
             startMultiplayerMatch(mMatchReceived);
         }
 
-		if (queuedAction == QueuedAction.StartMultiplayer) {
+		if (mQueuedAction == QueuedAction.StartMultiplayer) {
+			mQueuedAction = null;
 			startMultiPlayer(findViewById(R.id.button_start_mp));
 		}
 	}
@@ -185,9 +187,9 @@ public class LauncherActivity extends Activity
 				.setOnCancelListener(new DialogInterface.OnCancelListener() {
 					@Override
 					public void onCancel(DialogInterface dialog) {
-						queuedAction = null;
+						mQueuedAction = null;
 					}
-		})
+				})
 				.show();
 	}
 
@@ -215,10 +217,9 @@ public class LauncherActivity extends Activity
 	public void startMultiPlayer(View view) {
 		if (mGoogleApiClient.isConnecting()) return;
 		if (mGoogleApiClient.isConnected()) {
-			queuedAction = null;
 			startActivityForResult(new Intent(this, MultiPlayerMatchActivity.class), RC_NORMAL);
 		} else {
-			queuedAction = QueuedAction.StartMultiplayer;
+			mQueuedAction = QueuedAction.StartMultiplayer;
 			displaySignInPrompt();
 		}
 	}
@@ -228,10 +229,9 @@ public class LauncherActivity extends Activity
             Intent intent = new Intent(this, MultiPlayerMatchActivity.class);
             intent.putExtra(Multiplayer.EXTRA_TURN_BASED_MATCH, match);
             mMatchReceived = null;
-			queuedAction = null;
             startActivityForResult(intent, RC_NORMAL);
         } else {
-			queuedAction = QueuedAction.StartMultiplayerMatch;
+			mQueuedAction = QueuedAction.StartMultiplayerMatch;
             displaySignInPrompt();
         }
     }

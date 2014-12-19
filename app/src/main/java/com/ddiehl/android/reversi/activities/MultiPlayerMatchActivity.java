@@ -80,6 +80,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     private boolean mSignOutOnConnect = false;
     private boolean mResolvingError = false;
 	private boolean mUpdatingMatch = false;
+	private boolean mIsSignedIn = false;
 
 	private Handler mHandler;
 	private List<BoardSpace> mQueuedMoves;
@@ -88,6 +89,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private Animation mLeftFadeOut, mLeftFadeIn, mRightFadeOut, mRightFadeIn;
 	private boolean mWaitingLeftColor = false;
 	private boolean mWaitingRightColor = true;
+
+	private QueuedAction mQueuedAction;
+	private enum QueuedAction {
+		NewMatch, SelectMatch, ShowAchievements, ForfeitMatch
+	}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,7 +156,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     protected void onStop() {
         super.onStop();
         Log.d(TAG, "onStop(): disconnecting");
-//        setAutoConnectPreference(mSignInOnStart);
+		mQueuedAction = null;
         if (mGoogleApiClient.isConnected()) {
             registerMatchUpdateListener(false);
             mGoogleApiClient.disconnect();
@@ -161,12 +167,35 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     public void onConnected(Bundle bundle) {
         dismissSpinner();
 //        Log.d(TAG, "Connected to Google Play Services");
-//		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+
+		mIsSignedIn = true;
 
         if (mSignOutOnConnect) {
             signOutFromGooglePlay();
             return;
         }
+
+		if (mQueuedAction != null) {
+			switch (mQueuedAction) {
+				case NewMatch:
+					mQueuedAction = null;
+					startNewMatch(findViewById(R.id.board_panel_new_game));
+					return;
+				case SelectMatch:
+					mQueuedAction = null;
+					selectMatch(findViewById(R.id.board_panel_select_game));
+					return;
+				case ForfeitMatch:
+					mQueuedAction = null;
+					forfeitMatchSelected();
+					return;
+				case ShowAchievements:
+					mQueuedAction = null;
+					showAchievements();
+					return;
+			}
+		}
 
         registerMatchUpdateListener(true);
 		if (mMatch != null)
@@ -224,12 +253,19 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                         // User canceled
                     }
                 })
+				.setOnCancelListener(new DialogInterface.OnCancelListener() {
+					@Override
+					public void onCancel(DialogInterface dialog) {
+						mQueuedAction = null;
+					}
+				})
 				.show();
 	}
 
 	public void startNewMatch(View v) {
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
+			mQueuedAction = QueuedAction.NewMatch;
 			displaySignInPrompt();
 			return;
 		}
@@ -240,6 +276,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	public void selectMatch(View v) {
 		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
+			mQueuedAction = QueuedAction.SelectMatch;
 			displaySignInPrompt();
 			return;
 		}
@@ -267,9 +304,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						updateMatch(match);
 					}
 				} else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) { // User signed out
-					setAutoConnectPreference(false);
-                    setResult(SettingsActivity.RESULT_SIGN_OUT);
-                    finish();
+					mIsSignedIn = false;
+					signOutFromGooglePlay();
                 } else {
 					showErrorDialog(resultCode);
 				}
@@ -304,9 +340,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 								}
 							});
 				} else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) { // User signed out
-					setAutoConnectPreference(false);
-                    setResult(SettingsActivity.RESULT_SIGN_OUT);
-                    finish();
+					mIsSignedIn = false;
+					signOutFromGooglePlay();
                 } else {
 					showErrorDialog(resultCode);
 				}
@@ -314,9 +349,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 			case RC_SHOW_ACHIEVEMENTS:
 				if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) { // User signed out
-					setAutoConnectPreference(false);
-                    setResult(SettingsActivity.RESULT_SIGN_OUT);
-                    finish();
+					mIsSignedIn = false;
+					signOutFromGooglePlay();
 				}
 				break;
 
@@ -339,11 +373,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
         mSignOutOnConnect = false;
         setAutoConnectPreference(false);
-        Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
-        Games.signOut(mGoogleApiClient);
+		if (mGoogleApiClient.isConnected() && mIsSignedIn) {
+			Plus.AccountApi.clearDefaultAccount(mGoogleApiClient);
+			Games.signOut(mGoogleApiClient);
+		}
+		mIsSignedIn = false;
+		mGoogleApiClient.disconnect();
 
-        setResult(SettingsActivity.RESULT_SIGN_OUT);
-        finish();
+//        setResult(SettingsActivity.RESULT_SIGN_OUT);
+//        finish();
     }
 
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
@@ -455,21 +493,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
 				displayMessage(getString(R.string.match_invite_pending));
-		}
-	}
-
-	// Added for testing full end-to-end multiplayer flow
-	private void autoplayIfEnabled() {
-		if (!mUpdatingMatch && getResources().getBoolean(R.bool.automated_multiplayer)
-				&& mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_ACTIVE
-				&& mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-			mHandler.postDelayed(new Runnable() {
-				@Override
-				public void run() {
-					ReversiPlayer p1 = new ReversiPlayer((mPlayer == mLightPlayer) ? ReversiColor.Light : ReversiColor.Dark, "");
-					claim(ComputerAI.getBestMove_d1(mBoard, p1));
-				}
-			}, 500);
 		}
 	}
 
@@ -943,13 +966,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	/* Creates a dialog for an error message */
 	private void showErrorDialog(int errorCode) {
 		Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_RESOLVE_ERROR);
-		dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-            @Override
-            public void onDismiss(DialogInterface dialog) {
-                mResolvingError = false;
-            }
-        });
-		dialog.show();
+		if (dialog != null) {
+			dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+				@Override
+				public void onDismiss(DialogInterface dialog) {
+					mResolvingError = false;
+				}
+			});
+			dialog.show();
+		}
 	}
 
     private void forfeitMatchSelected() {
@@ -959,6 +984,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 
 		if (!mGoogleApiClient.isConnected()) {
+			mQueuedAction = QueuedAction.ForfeitMatch;
 			displaySignInPrompt();
 			return;
 		}
@@ -1118,6 +1144,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		if (mGoogleApiClient.isConnected()) {
 			startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient), RC_SHOW_ACHIEVEMENTS);
 		} else {
+			mQueuedAction = QueuedAction.ShowAchievements;
 			displaySignInPrompt();
 		}
 	}
@@ -1150,8 +1177,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				selectMatch(findViewById(id));
 				return true;
 			case R.id.action_how_to_play:
-				Intent htp = new Intent(this, HowToPlayActivity.class);
-				startActivity(htp);
+				Intent intent = new Intent(this, HowToPlayActivity.class);
+				startActivity(intent);
 				return true;
             case R.id.action_close_match:
 				clearBoard();
@@ -1173,6 +1200,21 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	// Added for testing full end-to-end multiplayer flow
+	private void autoplayIfEnabled() {
+		if (!mUpdatingMatch && getResources().getBoolean(R.bool.automated_multiplayer)
+				&& mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_ACTIVE
+				&& mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+			mHandler.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					ReversiPlayer p1 = new ReversiPlayer((mPlayer == mLightPlayer) ? ReversiColor.Light : ReversiColor.Dark, "");
+					claim(ComputerAI.getBestMove_d1(mBoard, p1));
+				}
+			}, 500);
+		}
 	}
 
 	// Used for converting Board to debugging text String only
