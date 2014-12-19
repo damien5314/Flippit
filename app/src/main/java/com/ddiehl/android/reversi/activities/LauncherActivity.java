@@ -291,12 +291,13 @@ public class LauncherActivity extends Activity
 				== Configuration.SCREENLAYOUT_SIZE_XLARGE) size = "XLARGE";
 
         String density;
-        if (metrics.density == 0.75f) density = "LDPI (0.75)";
-        else if (metrics.density == 1.00f) density = "MDPI (1.00)";
-        else if (metrics.density == 1.50f) density = "HDPI (1.50)";
-        else if (metrics.density == 2.00f) density = "XHDPI (2.00)";
-        else if (metrics.density == 3.00f) density = "XXHDPI (3.00)";
-        else if (metrics.density == 4.00f) density = "XXXHDPI (4.00)";
+        if (metrics.densityDpi == DisplayMetrics.DENSITY_LOW) density = "LDPI (0.75)";
+        else if (metrics.densityDpi == DisplayMetrics.DENSITY_MEDIUM) density = "MDPI (1.00)";
+        else if (metrics.densityDpi == DisplayMetrics.DENSITY_HIGH) density = "HDPI (1.50)";
+        else if (metrics.densityDpi == DisplayMetrics.DENSITY_XHIGH) density = "XHDPI (2.00)";
+        else if (metrics.densityDpi == DisplayMetrics.DENSITY_XXHIGH) density = "XXHDPI (3.00)";
+        else if (metrics.densityDpi == DisplayMetrics.DENSITY_XXXHIGH) density = "XXXHDPI (4.00)";
+		else if (metrics.densityDpi == DisplayMetrics.DENSITY_TV) density = "TVDPI (1.33)";
         else density = String.valueOf(metrics.density);
 
         Log.d(TAG, "WIDTH: " + width);
