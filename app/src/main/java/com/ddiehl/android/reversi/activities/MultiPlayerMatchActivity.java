@@ -380,8 +380,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mIsSignedIn = false;
 		mGoogleApiClient.disconnect();
 
-//        setResult(SettingsActivity.RESULT_SIGN_OUT);
-//        finish();
+        setResult(SettingsActivity.RESULT_SIGN_OUT);
+        finish();
     }
 
 	private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
