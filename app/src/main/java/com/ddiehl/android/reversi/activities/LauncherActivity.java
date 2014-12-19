@@ -298,7 +298,7 @@ public class LauncherActivity extends Activity
         else if (metrics.densityDpi == DisplayMetrics.DENSITY_XXHIGH) density = "XXHDPI (3.00)";
         else if (metrics.densityDpi == DisplayMetrics.DENSITY_XXXHIGH) density = "XXXHDPI (4.00)";
 		else if (metrics.densityDpi == DisplayMetrics.DENSITY_TV) density = "TVDPI (1.33)";
-        else density = String.valueOf(metrics.density);
+        else density = String.valueOf(metrics.densityDpi);
 
         Log.d(TAG, "WIDTH: " + width);
         Log.d(TAG, "HEIGHT: " + height);
