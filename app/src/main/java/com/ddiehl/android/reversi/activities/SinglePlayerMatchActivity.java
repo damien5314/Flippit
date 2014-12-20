@@ -67,7 +67,8 @@ public class SinglePlayerMatchActivity extends MatchActivity {
     public void onResume() {
         super.onResume();
         p1.setName(getPlayerName());
-        ((TextView)findViewById(R.id.label_p1)).setText(p1.getName());
+		((TextView)findViewById(R.id.label_p1)).setText(p1.getName());
+		((TextView)findViewById(R.id.label_p2)).setText(p2.getName());
         if (matchInProgress && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
