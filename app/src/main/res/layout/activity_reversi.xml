@@ -22,19 +22,16 @@
             <TextView
                 android:id="@+id/label_p1"
                 style="@style/PlayerLabel"
-                android:gravity="left|center"
-                android:text="Damien Diehl"/>
+                android:gravity="left|center"/>
 
             <TextView
                 android:id="@+id/p1_score"
-				android:text="88"
                 style="@style/ScoreValue"/>
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/turn_indicator"
-			android:src="@drawable/ic_turn_indicator_p1"
             style="@style/TurnIndicator"/>
 
         <LinearLayout
@@ -42,14 +39,12 @@
 
             <TextView
                 android:id="@+id/score_p2"
-				android:text="88"
                 style="@style/ScoreValue"/>
 
             <TextView
                 android:id="@+id/label_p2"
                 style="@style/PlayerLabel"
-                android:gravity="right|center"
-                android:text="@string/player2_label"/>
+                android:gravity="right|center"/>
 
             <ImageView
                 android:id="@+id/icon_p2"
@@ -66,7 +61,6 @@
 
 		<LinearLayout
 			android:id="@+id/board_panels"
-			android:visibility="gone"
 			style="@style/BoardActionPanels">
 
 			<Button
@@ -87,6 +81,7 @@
 			android:id="@+id/match_grid"
 			style="@style/GameBoardTable" >
 
+<!--
 			<TableRow>
 				<Button
 					android:layout_width="0dp"
@@ -487,17 +482,16 @@
 					android:layout_margin="@dimen/space_padding"
 					android:background="@drawable/board_space_neutral"/>
 			</TableRow>
+-->
 
 		</TableLayout>
 
 		<RelativeLayout
 			android:id="@+id/match_message"
-			android:visibility="visible"
 			style="@style/GameMessage">
 
 			<TextView
 				android:id="@+id/match_message_text"
-				android:text="Test message"
 				style="@style/GameMessageText"/>
 
 			<ImageView
