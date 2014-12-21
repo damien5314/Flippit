@@ -247,7 +247,7 @@ public class Board {
 //			row.setWeightSum(width());
 			for (int x = 0; x < width(); x++) {
 				BoardSpace space = getSpaceAt(x, y);
-				TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1);
+				TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);
 				space.setLayoutParams(params);
 				space.setOnClickListener(

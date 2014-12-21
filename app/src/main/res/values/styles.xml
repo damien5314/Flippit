@@ -21,8 +21,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_margin">@dimen/call_to_action_margin</item>
         <item name="android:background">@drawable/launcher_cta</item>
-        <!--<item name="android:textSize">@dimen/call_to_action_text_size</item>-->
-		<item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+        <item name="android:textSize">@dimen/call_to_action_text_size</item>
         <item name="android:textColor">@color/launcher_cta_text_color</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
@@ -56,14 +55,14 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">fill_parent</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+		<item name="android:textSize">@dimen/score_overlay_text_size</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="ScoreValue">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">fill_parent</item>
-		<item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+		<item name="android:textSize">@dimen/score_overlay_text_size</item>
         <item name="android:gravity">center</item>
     </style>
 
@@ -100,7 +99,7 @@
 		<item name="android:layout_marginRight">@dimen/activity_horizontal_margin</item>
 		<item name="android:gravity">center</item>
 		<item name="android:background">@drawable/board_action_panel</item>
-		<item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+		<item name="android:textSize">@dimen/board_panel_text_size</item>
 		<item name="android:textColor">@color/board_action_panel_color</item>
 		<item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
 	</style>
@@ -125,7 +124,7 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_centerHorizontal">true</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
+		<item name="android:textSize">@dimen/game_message_text_size</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
 
@@ -152,16 +151,14 @@
         <item name="android:layout_height">wrap_content</item>
         <!--<item name="android:paddingBottom">@dimen/how_to_play_header_padding</item>-->
 		<item name="android:textStyle">bold</item>
-		<item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
-        <!--<item name="android:textSize">@dimen/how_to_play_header_size</item>-->
+        <item name="android:textSize">@dimen/how_to_play_header_size</item>
     </style>
 
     <style name="HowToPlayText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-thin</item>
-        <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
-		<!--<item name="android:textSize">@dimen/how_to_play_text_size</item>-->
+		<item name="android:textSize">@dimen/how_to_play_text_size</item>
     </style>
 
     <style name="HowToPlayImage">
