@@ -8,16 +8,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.ddiehl.android.reversi.R;
+import com.ddiehl.android.reversi.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -58,7 +57,7 @@ public class LauncherActivity extends Activity
         setContentView(R.layout.activity_launcher);
 		initializeGoogleApiClient();
 		mSignInOnStart = getAutoConnectPreference();
-        displayMetrics();
+        Utils.displayMetrics(this);
     }
 
 	@Override
@@ -273,36 +272,4 @@ public class LauncherActivity extends Activity
 		});
 		dialog.show();
 	}
-
-    public void displayMetrics() {
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-
-        String width = String.valueOf(metrics.widthPixels);
-        String height = String.valueOf(metrics.heightPixels);
-
-        String size = "";
-        if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-				== Configuration.SCREENLAYOUT_SIZE_SMALL) size = "SMALL";
-        else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-				== Configuration.SCREENLAYOUT_SIZE_NORMAL) size = "NORMAL";
-        else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-				== Configuration.SCREENLAYOUT_SIZE_LARGE) size = "LARGE";
-        else if ((getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK)
-				== Configuration.SCREENLAYOUT_SIZE_XLARGE) size = "XLARGE";
-
-        String density;
-        if (metrics.densityDpi == DisplayMetrics.DENSITY_LOW) density = "LDPI (0.75)";
-        else if (metrics.densityDpi == DisplayMetrics.DENSITY_MEDIUM) density = "MDPI (1.00)";
-        else if (metrics.densityDpi == DisplayMetrics.DENSITY_HIGH) density = "HDPI (1.50)";
-        else if (metrics.densityDpi == DisplayMetrics.DENSITY_XHIGH) density = "XHDPI (2.00)";
-        else if (metrics.densityDpi == DisplayMetrics.DENSITY_XXHIGH) density = "XXHDPI (3.00)";
-        else if (metrics.densityDpi == DisplayMetrics.DENSITY_XXXHIGH) density = "XXXHDPI (4.00)";
-		else if (metrics.densityDpi == DisplayMetrics.DENSITY_TV) density = "TVDPI (1.33)";
-        else density = String.valueOf(metrics.densityDpi);
-
-        Log.d(TAG, "WIDTH: " + width);
-        Log.d(TAG, "HEIGHT: " + height);
-        Log.d(TAG, "SIZE: " + size);
-        Log.d(TAG, "DENSITY: " + density);
-    }
 }
