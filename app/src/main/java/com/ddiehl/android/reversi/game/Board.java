@@ -233,19 +233,21 @@ public class Board {
 		a.findViewById(R.id.board_panels).setVisibility(View.GONE);
 		TableLayout grid = (TableLayout) a.findViewById(R.id.match_grid);
 		grid.setVisibility(View.GONE); // Hide the view until we finish adding children
-		grid.setLayoutParams(new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 		grid.removeAllViews();
 
-		int bHeight = (int) a.getResources().getDimension(R.dimen.space_row_height);
+		grid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 16));
+//		grid.setWeightSum(8);
+
+//		int bHeight = (int) a.getResources().getDimension(R.dimen.space_row_height);
 		int bMargin = (int) a.getResources().getDimension(R.dimen.space_padding);
 
 		for (int y = 0; y < height(); y++) {
 			TableRow row = new TableRow(a);
-			row.setWeightSum(width());
+			row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, 0, 1));
+//			row.setWeightSum(width());
 			for (int x = 0; x < width(); x++) {
 				BoardSpace space = getSpaceAt(x, y);
-				TableRow.LayoutParams params = new TableRow.LayoutParams(0, bHeight, 1.0f);
+				TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.WRAP_CONTENT, 1);
 				params.setMargins(bMargin, bMargin, bMargin, bMargin);
 				space.setLayoutParams(params);
 				space.setOnClickListener(

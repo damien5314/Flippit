@@ -28,7 +28,8 @@
 
     <style name="ScoreOverlay">
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">@dimen/score_overlay_height</item>
+        <item name="android:layout_height">0dp</item>
+		<item name="android:layout_weight">1</item>
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_gravity">center</item> <!-- Added in refactoring to LinearLayout -->
     </style>
@@ -75,7 +76,8 @@
 
     <style name="GameArea">
         <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_height">0dp</item>
+		<item name="android:layout_weight">10</item>
         <item name="android:orientation">vertical</item>
         <item name="android:background">@color/board_color</item>
     </style>
@@ -88,24 +90,27 @@
     </style>
 
 	<style name="BoardActionPanel">
-		<item name="android:layout_width">@dimen/board_panel_width</item>
-		<item name="android:layout_height">@dimen/board_panel_height</item>
+		<item name="android:layout_width">fill_parent</item>
+		<item name="android:layout_height">0dp</item>
+		<item name="android:layout_weight">1</item>
 		<item name="android:layout_margin">@dimen/board_panel_margin</item>
 		<item name="android:gravity">center</item>
 		<item name="android:background">@drawable/board_action_panel</item>
-		<item name="android:textSize">@dimen/board_panel_text_size</item>
+		<item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
 		<item name="android:textColor">@color/board_action_panel_color</item>
 		<item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
 	</style>
 
     <style name="GameBoardTable">
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_height">0dp</item>
+		<item name="android:layout_weight">8</item>
     </style>
 
     <style name="GameMessage">
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">fill_parent</item>
+        <item name="android:layout_height">0dp</item>
+		<item name="android:layout_weight">3</item>
     </style>
 
     <style name="GameMessageText">

@@ -63,6 +63,11 @@
 			android:id="@+id/board_panels"
 			style="@style/BoardActionPanels">
 
+			<View
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				android:layout_weight="1"/>
+
 			<Button
 				android:id="@+id/board_panel_new_game"
 				style="@style/BoardActionPanel"
@@ -74,6 +79,11 @@
 				style="@style/BoardActionPanel"
 				android:text="@string/multiplayer_select_match"
 				android:onClick="selectMatch"/>
+
+			<View
+				android:layout_width="0dp"
+				android:layout_height="0dp"
+				android:layout_weight="1"/>
 
 		</LinearLayout>
 
