@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<dimen name="activity_horizontal_margin">16dp</dimen>
+	<dimen name="activity_vertical_margin">16dp</dimen>
+
+	<dimen name="app_title_size">52sp</dimen>
+
+	<dimen name="call_to_action_margin">2dp</dimen>
+	<dimen name="call_to_action_border">2dp</dimen>
+	<dimen name="call_to_action_corner_radius">20dp</dimen>
+	<dimen name="call_to_action_text_size">18sp</dimen>
+
+	<dimen name="board_panel_margin">2dp</dimen>
+	<dimen name="board_panel_border">2dp</dimen>
+	<dimen name="board_panel_corner_radius">20dp</dimen>
+	<dimen name="board_panel_width">260dp</dimen> <!-- Only used for game board buttons -->
+	<dimen name="board_panel_height">80dp</dimen> <!-- Only used for game board buttons -->
+	<dimen name="board_panel_text_size">18sp</dimen>
+
+	<dimen name="score_overlay_height">40dp</dimen>
+	<dimen name="score_overlay_text_size">16sp</dimen>
+	<dimen name="score_overlay_view_padding">6dp</dimen>
+
+	<dimen name="player_icon_size">12dp</dimen>
+	<dimen name="player_icon_corner_radius">2dp</dimen>
+
+	<dimen name="space_row_height">34dp</dimen>
+	<dimen name="space_border_width">1dp</dimen>
+	<dimen name="space_corner_radius">6dp</dimen>
+	<dimen name="space_padding">1dp</dimen>
+
+	<dimen name="game_message_text_size">22sp</dimen>
+
+	<dimen name="how_to_play_header_size">30dp</dimen>
+	<dimen name="how_to_play_header_padding">8dp</dimen>
+	<dimen name="how_to_play_text_size">18sp</dimen>
+	<dimen name="how_to_play_image_padding">5dp</dimen>
+
+</resources>
