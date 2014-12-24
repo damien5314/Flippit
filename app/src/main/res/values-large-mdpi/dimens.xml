@@ -8,21 +8,21 @@
 
 	<dimen name="call_to_action_margin">4dp</dimen>
 	<dimen name="call_to_action_border">3dp</dimen>
-	<dimen name="call_to_action_corner_radius">20dp</dimen>
+	<dimen name="call_to_action_corner_radius">38dp</dimen>
 	<dimen name="call_to_action_text_size">44sp</dimen>
 
-	<dimen name="board_panel_margin">4dp</dimen>
+	<dimen name="board_panel_margin">8dp</dimen>
 	<dimen name="board_panel_border">3dp</dimen>
-	<dimen name="board_panel_corner_radius">20dp</dimen>
+	<dimen name="board_panel_corner_radius">38dp</dimen>
 	<dimen name="board_panel_width">520dp</dimen> <!-- Only used for game board buttons -->
 	<dimen name="board_panel_height">160dp</dimen> <!-- Only used for game board buttons -->
 	<dimen name="board_panel_text_size">44sp</dimen>
 
 	<dimen name="score_overlay_height">65dp</dimen>
-	<dimen name="score_overlay_text_size">30sp</dimen>
-	<dimen name="score_overlay_view_padding">10dp</dimen>
+	<dimen name="score_overlay_text_size">38sp</dimen>
+	<dimen name="score_overlay_view_padding">8dp</dimen>
 
-	<dimen name="player_icon_size">16dp</dimen>
+	<dimen name="player_icon_size">22dp</dimen>
 	<dimen name="player_icon_corner_radius">4dp</dimen>
 
 	<dimen name="space_row_height">96dp</dimen>
@@ -30,11 +30,11 @@
 	<dimen name="space_corner_radius">16dp</dimen>
 	<dimen name="space_padding">2dp</dimen>
 
-	<dimen name="game_message_text_size">28sp</dimen>
+	<dimen name="game_message_text_size">44sp</dimen>
 
-	<dimen name="how_to_play_header_size">56sp</dimen>
+	<dimen name="how_to_play_header_size">58sp</dimen>
 	<dimen name="how_to_play_header_padding">12dp</dimen>
-	<dimen name="how_to_play_text_size">42sp</dimen>
-	<dimen name="how_to_play_image_padding">10dp</dimen>
+	<dimen name="how_to_play_text_size">46sp</dimen>
+	<dimen name="how_to_play_image_padding">12dp</dimen>
 
 </resources>
