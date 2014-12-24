@@ -32,7 +32,7 @@
 
 	<dimen name="game_message_text_size">18sp</dimen>
 
-	<dimen name="how_to_play_header_size">34dp</dimen>
+	<dimen name="how_to_play_header_size">34sp</dimen>
 	<dimen name="how_to_play_header_padding">6dp</dimen>
 	<dimen name="how_to_play_text_size">20sp</dimen>
 	<dimen name="how_to_play_image_padding">6dp</dimen>
