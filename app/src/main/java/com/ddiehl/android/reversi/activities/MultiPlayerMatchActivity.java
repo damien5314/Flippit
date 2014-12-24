@@ -825,7 +825,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private void dismissMessage() {
-		findViewById(R.id.match_message).setVisibility(View.GONE);
+		findViewById(R.id.match_message).setVisibility(View.INVISIBLE);
 		((TextView) findViewById(R.id.match_message_text)).setText("");
 		mLeftFadeOut.cancel();
 		mRightFadeOut.cancel();
