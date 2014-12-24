@@ -299,7 +299,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				if (resultCode == Activity.RESULT_OK) {
 					TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
 					if (match != null) {
-						updateMatch(match);
+						if (match.getData() == null) {
+							startMatch(match);
+						} else {
+							updateMatch(match);
+						}
 					}
 				} else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) { // User signed out
 					mIsSignedIn = false;
