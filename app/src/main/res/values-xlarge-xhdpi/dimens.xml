@@ -14,18 +14,14 @@
 	<dimen name="board_panel_margin">8dp</dimen>
 	<dimen name="board_panel_border">5dp</dimen>
 	<dimen name="board_panel_corner_radius">50dp</dimen>
-	<dimen name="board_panel_width">620dp</dimen> <!-- Only used for game board buttons -->
-	<dimen name="board_panel_height">200dp</dimen> <!-- Only used for game board buttons -->
 	<dimen name="board_panel_text_size">56sp</dimen>
 
-	<dimen name="score_overlay_height">96dp</dimen>
 	<dimen name="score_overlay_text_size">40sp</dimen>
 	<dimen name="score_overlay_view_padding">14dp</dimen>
 
 	<dimen name="player_icon_size">22dp</dimen>
 	<dimen name="player_icon_corner_radius">6dp</dimen>
 
-	<dimen name="space_row_height">108dp</dimen>
 	<dimen name="space_border_width">2dp</dimen>
 	<dimen name="space_corner_radius">22dp</dimen>
 	<dimen name="space_padding">2dp</dimen>
@@ -33,7 +29,6 @@
 	<dimen name="game_message_text_size">52sp</dimen>
 
 	<dimen name="how_to_play_header_size">56sp</dimen>
-	<dimen name="how_to_play_header_padding">8dp</dimen>
 	<dimen name="how_to_play_text_size">42sp</dimen>
 	<dimen name="how_to_play_image_padding">8dp</dimen>
 
