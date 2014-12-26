@@ -37,4 +37,18 @@
     <string name="settings_dialog_sign_out_confirm">サインアウト</string>
     <string name="settings_dialog_sign_out_title">サインアウト</string>
     <string name="how_to_play_p4_header">戦略</string>
+    <string name="dialog_error_title">エラー</string>
+    <string name="winner_you">あなたは試合に勝った </string>
+    <string name="winner_light">光が試合に勝った </string>
+    <string name="winner_dark">暗いは試合に勝った </string>
+    <string name="winner_none">勝者ん </string>
+    <string name="winner_p1">あなたは試合に勝った </string>
+    <string name="winner_tie">同点</string>
+    <string name="settings_dialog_sign_in_title">ログイン</string>
+    <string name="settings_dialog_sign_in_confirm">ログイン</string>
+    <string name="settings_dialog_sign_out_cancel">キャンセル</string>
+    <string name="unknown_player">\?</string>
+    <string name="settings_dialog_sign_in_cancel">キャンセル</string>
+    <string name="pref_player_name_title">プレイヤー名</string>
+    <string name="multiplayer_achievements">成果</string>
 </resources>
