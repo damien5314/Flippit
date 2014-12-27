@@ -22,7 +22,7 @@
 	<dimen name="player_icon_size">22dp</dimen>
 	<dimen name="player_icon_corner_radius">6dp</dimen>
 
-	<dimen name="space_border_width">2dp</dimen>
+	<dimen name="space_border_width">3dp</dimen>
 	<dimen name="space_corner_radius">22dp</dimen>
 	<dimen name="space_padding">2dp</dimen>
 
