@@ -225,7 +225,7 @@ public class SinglePlayerMatchActivity extends MatchActivity {
 
 	public void updateScoreForPlayer(ReversiPlayer p) {
 		TextView vScore;
-		if (p == p1) vScore = (TextView) findViewById(R.id.p1_score);
+		if (p == p1) vScore = (TextView) findViewById(R.id.score_p1);
 		else vScore = (TextView) findViewById(R.id.score_p2);
 		vScore.setText(String.valueOf(p.getScore()));
 	}

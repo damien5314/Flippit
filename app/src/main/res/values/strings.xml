@@ -83,7 +83,14 @@
 
 	<!-- Match status errors -->
 	<string name="dialog_error_title">Error</string>
-	<string name="dialog_error_message">Error updating match, please try again.</string>
+    <string name="dialog_error_message_default">Error, please try again.</string>
+    <string name="dialog_error_tester_untrusted">Untrusted tester</string>
+    <string name="dialog_error_already_rematched">Already rematched</string>
+    <string name="dialog_error_network_operation_failed">Issue with network connection, please try again.</string>
+    <string name="dialog_error_reconnect_required">Issue with Google Play connection, please try again.</string>
+    <string name="dialog_error_internal_error">Internal error, please try again.</string>
+    <string name="dialog_error_inactive_match">Match is no longer active</string>
+    <string name="dialog_error_locally_modified">Match was locally modified</string>
 	<string name="dialog_error_confirm">OK</string>
 
 	<!-- Spinner messages -->

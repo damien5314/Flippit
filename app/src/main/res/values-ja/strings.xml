@@ -69,7 +69,7 @@
     <string name="player1_label_default">プレイヤー１</string>
     <string name="cancel_fail">マッチのキャンセルエラー。もう一度お試しください。</string>
     <string name="dialog_forfeit_match_forbidden_title">あなたの番ではありません</string>
-    <string name="dialog_error_message">マッチのアップデートエラー。もう一度お試し下さい。</string>
+    <string name="dialog_error_message_default">マッチのアップデートエラー。もう一度お試し下さい。</string>
     <string name="dialog_leave_match_title">マッチをキャンセルする</string>
     <string name="dialog_leave_match_message">マッチをキャンセルしますか？</string>
     <string name="match_opponent_turn">対戦相手の番</string>
