@@ -300,9 +300,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				if (resultCode == Activity.RESULT_OK) {
 					TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
 					if (match != null) {
+                        Log.d(TAG, "Match returned from VIEW_MATCHES: " + match.getMatchId());
 						if (match.getData() == null) {
+                            Log.d(TAG, "Match data is NULL, calling startMatch()");
 							startMatch(match);
 						} else {
+                            Log.d(TAG, "Match Data: " + bytesToString(match.getData()));
 							updateMatch(match);
 						}
 					}
@@ -406,6 +409,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private void startMatch(TurnBasedMatch match) {
 		mMatch = match;
+        mMatchData = null;
 		mBoard.reset();
 		saveMatchData();
 		mBoard.displayBoard(this);
@@ -447,6 +451,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mLightPlayer = getLightPlayer();
 		mDarkPlayer = getDarkPlayer();
 		mMatchData = match.getData();
+
+        // Debugging
+        Log.d(TAG, "Match ID: " + mMatch.getMatchId());
+        Log.d(TAG, "Game Data: " + bytesToString(mMatchData));
 
         Log.d(TAG, "Match Status: " + mMatch.getStatus());
         Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
@@ -772,10 +780,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mLightScore = mBoard.getNumSpacesForColor(ReversiColor.Light);
 		mDarkScore = mBoard.getNumSpacesForColor(ReversiColor.Dark);
 
-        Log.d(TAG, "Match Status: " + TurnBasedMatch.MATCH_STATUS_COMPLETE);
-        Log.d(TAG, "Updating Match: " + mUpdatingMatch);
 		if (mMatch.getStatus() == TurnBasedMatch.MATCH_STATUS_COMPLETE && !mUpdatingMatch) {
-            Log.d(TAG, "Adding empty spaces to score");
 			// Add remaining spaces to winning count as per Reversi rules
 			if (mLightPlayer.getResult().getResult() == ParticipantResult.MATCH_RESULT_WIN)
 				mLightScore += mBoard.getNumberOfEmptySpaces();
