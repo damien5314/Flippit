@@ -84,6 +84,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	private Handler mHandler;
 	private List<BoardSpace> mQueuedMoves;
+    private Dialog mDisplayedDialog;
 
 	private ImageView mWaiting1, mWaiting2;
 	private Animation mLeftFadeOut, mLeftFadeIn, mRightFadeOut, mRightFadeIn;
@@ -240,7 +241,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
 	private void displaySignInPrompt() {
-		new AlertDialog.Builder(this)
+		showDialog(new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.dialog_sign_in_title))
 				.setMessage(getString(R.string.dialog_sign_in_message))
 				.setPositiveButton(getString(R.string.dialog_sign_in_confirm), new DialogInterface.OnClickListener() {
@@ -257,7 +258,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						mQueuedAction = null;
 					}
 				})
-				.show();
+				.create());
 	}
 
 	public void startNewMatch(View v) {
@@ -867,7 +868,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	private void askForRematch() {
-		new AlertDialog.Builder(this)
+		showDialog(new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.dialog_rematch_title))
 				.setMessage(getString(R.string.dialog_rematch_message))
 				.setPositiveButton(getString(R.string.dialog_rematch_confirm), new DialogInterface.OnClickListener() {
@@ -897,7 +898,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					}
 				})
 				.setIcon(getResources().getDrawable(R.drawable.ic_av_replay_blue))
-				.show();
+                .create());
 	}
 
 	private void initializeWaitingAnimations() {
@@ -982,9 +983,17 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mProgressBar.dismiss();
 	}
 
+    private void showDialog(Dialog dialog) {
+        if (mDisplayedDialog != null && mDisplayedDialog.isShowing()) {
+            mDisplayedDialog.dismiss();
+        }
+        mDisplayedDialog = dialog;
+        mDisplayedDialog.show();
+    }
+
 	// Generic warning/info dialog
 	private void showAlertDialog(String title, String message) {
-		new AlertDialog.Builder(this)
+		showDialog(new AlertDialog.Builder(this)
 				.setTitle(title)
 				.setMessage(message)
 				.setCancelable(false)
@@ -993,7 +1002,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                             @Override
                             public void onClick(DialogInterface dialog, int id) { }
                         })
-				.show();
+				.create());
 	}
 
 	/* Creates a dialog for an error message */
@@ -1069,7 +1078,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
 	private void showCancelMatchDialog() {
-		new AlertDialog.Builder(this)
+		showDialog(new AlertDialog.Builder(this)
 				.setTitle(getString(R.string.dialog_cancel_match_title))
 				.setMessage(getString(R.string.dialog_cancel_match_message))
 				.setPositiveButton(getString(R.string.dialog_cancel_match_confirm), new DialogInterface.OnClickListener() {
@@ -1095,11 +1104,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					public void onClick(DialogInterface dialog, int which) { }
 				})
 				.setCancelable(true)
-				.show();
+				.create());
 	}
 
 	private void showForfeitMatchDialog() {
-		new AlertDialog.Builder(this)
+		showDialog(new AlertDialog.Builder(this)
 				.setTitle(R.string.dialog_forfeit_match_title)
 				.setMessage(R.string.dialog_forfeit_match_message)
 				.setPositiveButton(R.string.dialog_forfeit_match_confirm, new DialogInterface.OnClickListener() {
@@ -1136,11 +1145,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					public void onClick(DialogInterface dialog, int which) { }
 				})
 				.setCancelable(true)
-				.show();
+				.create());
 	}
 
 	private void showForfeitMatchForbiddenAlert() {
-		new AlertDialog.Builder(this)
+		showDialog(new AlertDialog.Builder(this)
 				.setTitle(R.string.dialog_forfeit_match_forbidden_title)
 				.setMessage(R.string.dialog_forfeit_match_forbidden_message)
 				.setPositiveButton(R.string.dialog_forfeit_match_forbidden_confirm, new DialogInterface.OnClickListener() {
@@ -1148,11 +1157,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					public void onClick(DialogInterface dialog, int which) { }
 				})
 				.setCancelable(true)
-				.show();
+				.create());
 	}
 
     private void showLeaveMatchDialog() {
-		new AlertDialog.Builder(this)
+		showDialog(new AlertDialog.Builder(this)
 				.setTitle(R.string.dialog_leave_match_title)
 				.setMessage(R.string.dialog_leave_match_message)
 				.setPositiveButton(R.string.dialog_leave_match_confirm, new DialogInterface.OnClickListener() {
@@ -1191,8 +1200,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 					public void onClick(DialogInterface dialog, int which) { }
 				})
 				.setCancelable(true)
-				.show();
-
+				.create());
     }
 
     private void processResultFinishMatch(TurnBasedMultiplayer.UpdateMatchResult result) {

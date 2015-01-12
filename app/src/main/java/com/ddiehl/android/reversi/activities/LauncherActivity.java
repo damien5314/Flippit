@@ -167,29 +167,35 @@ public class LauncherActivity extends Activity
 				.build();
 	}
 
+    private Dialog mSignInPrompt;
 	private void displaySignInPrompt() {
-		new AlertDialog.Builder(this)
-				.setTitle(getString(R.string.dialog_sign_in_title))
-				.setMessage(getString(R.string.dialog_sign_in_message))
-				.setPositiveButton(getString(R.string.dialog_sign_in_confirm), new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						setAutoConnectPreference(true);
-						connectGoogleApiClient();
-					}
-				})
-				.setNegativeButton(getString(R.string.dialog_sign_in_cancel), new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int id) {
-						// User canceled
-					}
-				})
-				.setOnCancelListener(new DialogInterface.OnCancelListener() {
-					@Override
-					public void onCancel(DialogInterface dialog) {
-						mQueuedAction = null;
-					}
-				})
-				.show();
+        if (mSignInPrompt != null && mSignInPrompt.isShowing()) {
+            // Dialog is already showing
+        } else {
+            mSignInPrompt = new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.dialog_sign_in_title))
+                    .setMessage(getString(R.string.dialog_sign_in_message))
+                    .setPositiveButton(getString(R.string.dialog_sign_in_confirm), new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            setAutoConnectPreference(true);
+                            connectGoogleApiClient();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.dialog_sign_in_cancel), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User canceled
+                        }
+                    })
+                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
+                        @Override
+                        public void onCancel(DialogInterface dialog) {
+                            mQueuedAction = null;
+                        }
+                    })
+                    .create();
+            mSignInPrompt.show();
+        }
 	}
 
 	private void connectGoogleApiClient() {
