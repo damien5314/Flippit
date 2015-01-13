@@ -5,11 +5,11 @@
     <item android:id="@+id/action_previous"
         android:title="@string/action_htp_previous"
 		android:icon="@drawable/ic_action_navigation_arrow_back"
-        android:showAsAction="always"/>
+        android:showAsAction="ifRoom"/>
 
     <item android:id="@+id/action_next"
         android:title="@string/action_htp_next"
 		android:icon="@drawable/ic_action_navigation_arrow_forward"
-        android:showAsAction="always" />
+        android:showAsAction="ifRoom" />
 
 </menu>
