@@ -310,7 +310,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                             Log.d(TAG, "Match data is NULL, calling startMatch()");
 							startMatch(match);
 						} else {
-                            Log.d(TAG, "Match Data: " + bytesToString(match.getData()));
+                            Log.d(TAG, bytesToString(match.getData()));
 							updateMatch(match);
 						}
 					}
@@ -459,7 +459,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
         // Debugging
         Log.d(TAG, "Match ID: " + mMatch.getMatchId());
-        Log.d(TAG, "Game Data: " + bytesToString(mMatchData));
+        Log.d(TAG, bytesToString(mMatchData));
 
         Log.d(TAG, "Match Status: " + mMatch.getStatus());
         Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
@@ -532,7 +532,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				mMatchData[clearIndex] = 0;
 		}
 
-//		Log.d(TAG, "Player's match data saved: " + bytesToString(mMatchData));
+//		Log.d(TAG, bytesToString(mMatchData));
 	}
 
 	private void processReceivedTurns() {
@@ -556,6 +556,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     public void onTurnBasedMatchReceived(TurnBasedMatch match) {
 		if (mMatch != null && mMatch.getMatchId().equals(match.getMatchId())) {
+            if (match.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN) {
+                // Turn still belongs to opponent, wait for another update
+                return;
+            }
 			updateMatch(match);
 		}
     }
@@ -563,8 +567,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     public void onTurnBasedMatchRemoved(String matchId) {
 		Log.d(TAG, "Match removed: " + matchId);
-		if (mMatch != null && mMatch.getMatchId().equals(matchId))
-			clearBoard();
+		if (mMatch != null && mMatch.getMatchId().equals(matchId)) {
+            Toast.makeText(this, R.string.match_removed, Toast.LENGTH_SHORT).show();
+            clearBoard();
+        }
     }
 
 	public void claim(final BoardSpace s) {
@@ -573,10 +579,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             return;
         }
 
+        Log.d(TAG, "Match Status: " + mMatch.getStatus());
+        Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
+
         if (mMatch.getStatus() != TurnBasedMatch.MATCH_STATUS_ACTIVE ||
                 mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-//            Log.d(TAG, "Match Status: " + mMatch.getStatus());
-//            Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
             return;
         }
 
@@ -590,26 +597,24 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         }
 
 		ReversiColor playerColor = getCurrentPlayerColor();
-        if (mBoard.spacesCapturedWithMove(s, playerColor) > 0) {
-            mUpdatingMatch = true;
-            showSpinner(2);
-//            pBoard = mBoard.copy();
-            mBoard.commitPiece(s, playerColor);
-            saveMatchData();
-
-            // Add selected piece to the end of mMatchData array
-            // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
-            int nextIndex = (mPlayer == mLightPlayer) ? 164 : 64;
-            while (mMatchData[nextIndex] != 0)
-                nextIndex++; // Increase index til we run into an unfilled index
-            mMatchData[nextIndex] = mBoard.getSpaceNumber(s);
-//            Log.d(TAG, "Queued move for opponent's Board");
-//            Log.d(TAG, bytesToString(mMatchData));
-
-            updateMatchState();
-        } else {
+        if (mBoard.spacesCapturedWithMove(s, playerColor) == 0) {
             Toast.makeText(this, R.string.bad_move, Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        mUpdatingMatch = true;
+        showSpinner(2);
+        mBoard.commitPiece(s, playerColor);
+        saveMatchData();
+
+        // Add selected piece to the end of mMatchData array
+        // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
+        int nextIndex = (mPlayer == mLightPlayer) ? 164 : 64;
+        while (mMatchData[nextIndex] != 0)
+            nextIndex++; // Increase index til we run into an unfilled index
+        mMatchData[nextIndex] = mBoard.getSpaceNumber(s);
+
+        updateMatchState();
 	}
 
 	private void updateMatchState() {
@@ -1217,6 +1222,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         mUpdatingMatch = false;
         dismissSpinner();
         if (checkStatusCode(result.getStatus().getStatusCode())) {
+            mMatch = result.getMatch();
+            mPlayer = getCurrentPlayer();
 			// Update achievements
 			if (mPlayer.getResult().getResult() == ParticipantResult.MATCH_RESULT_WIN) {
 				Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_first_win));
@@ -1238,7 +1245,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     private void processResultLeaveMatch(TurnBasedMultiplayer.LeaveMatchResult result) {
         Log.d(TAG, "LeaveMatch() result: " + result.getStatus().getStatusCode());
         if (result.getStatus().isSuccess()) {
-			displayMessage(getString(R.string.match_canceled));
+//			displayMessage(getString(R.string.match_canceled));
+            Toast.makeText(this, R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
+            clearBoard();
 		} else {
 			Toast.makeText(this, getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
 		}
@@ -1247,7 +1256,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private void processResult(TurnBasedMultiplayer.CancelMatchResult result) {
 		Log.d(TAG, "CancelMatch() result: " + result.getStatus().getStatusCode());
 		if (result.getStatus().isSuccess()) {
-			displayMessage(getString(R.string.match_canceled));
+//			displayMessage(getString(R.string.match_canceled));
+            Toast.makeText(this, R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
+            clearBoard();
 		} else {
 			Toast.makeText(this, getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
 		}
@@ -1320,8 +1331,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			mHandler.postDelayed(new Runnable() {
 				@Override
 				public void run() {
-					ReversiPlayer p1 = new ReversiPlayer((mPlayer == mLightPlayer) ? ReversiColor.Light : ReversiColor.Dark, "");
-					claim(ComputerAI.getBestMove_d1(mBoard, p1));
+                    ReversiPlayer p1 = new ReversiPlayer((mPlayer == mLightPlayer) ? ReversiColor.Light : ReversiColor.Dark, "");
+                    ReversiPlayer p2 = new ReversiPlayer((mPlayer == mLightPlayer) ? ReversiColor.Dark : ReversiColor.Light, "");
+                    claim(ComputerAI.getBestMove_d3(mBoard, p1, p2));
+//                    claim(ComputerAI.getBestMove_d1(mBoard, p1));
 				}
 			}, 500);
 		}
@@ -1333,8 +1346,27 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             return "";
 
 		StringBuilder buf = new StringBuilder();
-		for (byte b : in)
-			buf.append(String.valueOf(b));
+
+        buf.append("\n");
+        for (int i = 0; i < 64; i++) {
+            buf.append(String.valueOf(in[i]));
+        }
+        buf.append("\n");
+        for (int i = 64; i < 100; i++) {
+            buf.append(String.valueOf(in[i])).append(" ");
+        }
+        buf.append("\n");
+        for (int i = 100; i < 164; i++) {
+            buf.append(String.valueOf(in[i]));
+        }
+        buf.append("\n");
+        for (int i = 164; i < 200; i++) {
+            buf.append(String.valueOf(in[i])).append(" ");
+        }
+
+//		for (byte b : in)
+//			buf.append(String.valueOf(b));
+
 		return buf.toString();
 	}
 }

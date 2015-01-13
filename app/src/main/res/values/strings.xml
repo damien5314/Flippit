@@ -107,6 +107,9 @@
 	<string name="match_opponent_turn">Opponent\'s turn&#8230;</string>
 	<string name="match_invite_pending">Waiting for invitation, be patient!</string>
 
+    <string name="match_canceled_toast">Match canceled</string>
+    <string name="match_removed">Match removed</string>
+
 	<string name="dialog_rematch_title">Match Complete</string>
 	<string name="dialog_rematch_message">Care to rematch?</string>
 	<string name="dialog_rematch_confirm">Sure!</string>
