@@ -15,7 +15,6 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.ddiehl.android.reversi.R;
 
@@ -29,7 +28,11 @@ public class SettingsActivity extends Activity {
 	public static final String EXTRA_IS_SIGNED_IN = "is_signed_in";
 	public static final String EXTRA_SIGNED_IN_ACCOUNT = "signed_in_account";
 
-	public static final int SETTINGS_MODE_SINGLE_PLAYER = 101;
+    public static final String PREF_PLAY_SERVICES_SIGN_IN = "pref_play_services_sign_in";
+    public static final String PREF_PLAYER_NAME = "pref_player_name";
+    public static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
+
+    public static final int SETTINGS_MODE_SINGLE_PLAYER = 101;
 	public static final int SETTINGS_MODE_MULTI_PLAYER = 102;
 	public static final int RESULT_SIGN_IN = 201;
 	public static final int RESULT_SIGN_OUT = 202;
@@ -61,18 +64,16 @@ public class SettingsActivity extends Activity {
 			// Show/Hide different options based on current game mode
 			switch (getArguments().getInt(EXTRA_SETTINGS_MODE)) {
 				case SETTINGS_MODE_SINGLE_PLAYER:
-					getPreferenceScreen().removePreference(findPreference("pref_play_services_sign_in"));
+					getPreferenceScreen().removePreference(findPreference(PREF_PLAY_SERVICES_SIGN_IN));
 					initSummary(getPreferenceScreen());
 					break;
 				case SETTINGS_MODE_MULTI_PLAYER:
-					getPreferenceScreen().removePreference(findPreference("pref_player_name"));
-					getPreferenceScreen().removePreference(findPreference("pref_ai_difficulty"));
-					initializeSignInPreference(findPreference("pref_play_services_sign_in"),
+					getPreferenceScreen().removePreference(findPreference(PREF_PLAYER_NAME));
+					getPreferenceScreen().removePreference(findPreference(PREF_AI_DIFFICULTY));
+					initializeSignInPreference(findPreference(PREF_PLAY_SERVICES_SIGN_IN),
 							extras.getBoolean(EXTRA_IS_SIGNED_IN),
 							extras.getString(EXTRA_SIGNED_IN_ACCOUNT));
 					break;
-				default:
-					Log.d(TAG, "Unrecognized mode: " + extras.getInt(EXTRA_SETTINGS_MODE));
 			}
 		}
 

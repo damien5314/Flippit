@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -90,7 +89,6 @@ public class SinglePlayerMatchActivity extends MatchActivity {
 
 			// TODO Need to convert to new game data format for backward compatibility
 			String savedData = sp.getString(PREF_BOARD_STATE, "");
-			Log.d(TAG, "Raw String: " + savedData);
             mBoard.deserialize(savedData);
             return true;
         }

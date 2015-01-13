@@ -10,13 +10,11 @@ import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
 import com.ddiehl.android.reversi.R;
-import com.ddiehl.android.reversi.utils.Utils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -57,13 +55,12 @@ public class LauncherActivity extends Activity
         setContentView(R.layout.activity_launcher);
 		initializeGoogleApiClient();
 		mSignInOnStart = getAutoConnectPreference();
-        Utils.displayMetrics(this);
+//        Utils.displayMetrics(this);
     }
 
 	@Override
 	public void onStart() {
 		super.onStart();
-		Log.d(TAG, "LauncherActivity - onStart");
 
 		if (mSignInOnStart) {
             mStartMatchOnStart = true;
@@ -74,13 +71,11 @@ public class LauncherActivity extends Activity
 	@Override
 	public void onPause() {
 		super.onPause();
-		Log.d(TAG, "LauncherActivity - onPause");
 	}
 
 	@Override
 	public void onStop() {
 		super.onStop();
-		Log.d(TAG, "LauncherActivity - onStop");
 		if (mGoogleApiClient.isConnected())
 			mGoogleApiClient.disconnect();
 	}
@@ -88,7 +83,6 @@ public class LauncherActivity extends Activity
 	@Override
 	public void onConnected(Bundle bundle) {
 		dismissSpinner();
-        Log.d(TAG, "Connected to Google Play Services");
 //		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
 
         if (bundle != null && bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH))
@@ -112,7 +106,6 @@ public class LauncherActivity extends Activity
 
 	@Override
 	public void onConnectionFailed(ConnectionResult result) {
-        Log.d(TAG, "Failed to connect to Google Play - Error: " + result.getErrorCode());
 		dismissSpinner();
 
 		if (mResolvingError) {
@@ -120,16 +113,13 @@ public class LauncherActivity extends Activity
 		}
 
 		if (result.hasResolution()) {
-			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
 			try {
 				mResolvingError = true;
 				result.startResolutionForResult(this, RC_RESOLVE_ERROR);
 			} catch (IntentSender.SendIntentException e) {
-				Log.e(TAG, "Unable to start resolution intent; Exception: " + e.getMessage());
 				connectGoogleApiClient();
 			}
 		} else {
-			Log.d(TAG, "Unresolvable error (ErrorCode: " + result.getErrorCode() + ")");
 			showErrorDialog(result.getErrorCode());
 			mResolvingError = true;
 		}
@@ -137,7 +127,6 @@ public class LauncherActivity extends Activity
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(TAG, "onActivityResult called: " + requestCode + " " + resultCode);
         switch (requestCode) {
             case RC_RESOLVE_ERROR:
                 mResolvingError = false;
@@ -261,7 +250,6 @@ public class LauncherActivity extends Activity
 	}
 
 	private void setAutoConnectPreference(boolean b) {
-		Log.d(TAG, "Setting auto-connect preference: " + b);
 		mSignInOnStart = b;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
