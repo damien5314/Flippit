@@ -22,8 +22,11 @@
     <string name="winner_none">No winner</string>
     <string name="button_start_1p">Single Player</string>
     <string name="button_start_mp">Multiplayer</string>
+
     <string name="pref_player_name_title">Player Name</string>
     <string name="pref_ai_difficulty">Difficulty</string>
+    <string name="pref_ai_difficulty_easy">Easy</string>
+    <string name="pref_ai_difficulty_hard">Hard</string>
 
 	<string name="dialog_sign_in_title">Sign In Required</string>
 	<string name="dialog_sign_in_message">Google Play sign in is required to use this feature.</string>
