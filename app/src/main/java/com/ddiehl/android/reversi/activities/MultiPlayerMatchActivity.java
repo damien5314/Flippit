@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -140,6 +139,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		if (mGoogleApiClient == null)
 			initializeGoogleApiClient();
+
 		showSpinner(3);
 		mGoogleApiClient.connect();
 	}
@@ -148,7 +148,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     protected void onStart() {
         super.onStart();
 		if (mSignInOnStart) {
-			Log.d(TAG, "onStart(): connecting");
 			connectGoogleApiClient();
 		}
     }
@@ -156,7 +155,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     protected void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop(): disconnecting");
 		mQueuedAction = null;
         if (mGoogleApiClient.isConnected()) {
             registerMatchUpdateListener(false);
@@ -167,9 +165,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     public void onConnected(Bundle bundle) {
         dismissSpinner();
-        Log.d(TAG, "Connected to Google Play Services");
-//		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
-
 		mIsSignedIn = true;
 
         if (mSignOutOnConnect) {
@@ -199,6 +194,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 
         registerMatchUpdateListener(true);
+
 		if (mMatch != null) {
             if (mMatch.getData() == null) {
                 startMatch(mMatch);
@@ -215,7 +211,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-		Log.d(TAG, "Failed to connect to Google Play - Error: " + result.getErrorCode());
+//		Log.d(TAG, "Failed to connect to Google Play - Error: " + result.getErrorCode());
 		dismissSpinner();
 
         if (mResolvingError) {
@@ -223,16 +219,14 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         }
 
 		if (result.hasResolution()) {
-			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
+//			Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
                 mResolvingError = true;
                 result.startResolutionForResult(this, RC_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
-				Log.e(TAG, "Unable to start resolution intent; Exception: " + e.getMessage());
                 connectGoogleApiClient();
             }
-        } else {
-			Log.d(TAG, "Unresolvable error (ErrorCode: " + result.getErrorCode() + ")");
+        } else { // Unresolvable error
             showErrorDialog(result.getErrorCode());
             mResolvingError = true;
         }
@@ -278,13 +272,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	}
 
 	public void selectMatch(View v) {
-		Intent intent;
 		if (!mGoogleApiClient.isConnected()) {
 			mQueuedAction = QueuedAction.SelectMatch;
 			displaySignInPrompt();
 			return;
 		}
-		intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
+		Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
 		startActivityForResult(intent, RC_VIEW_MATCHES);
 	}
 
@@ -305,12 +298,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				if (resultCode == Activity.RESULT_OK) {
 					TurnBasedMatch match = data.getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
 					if (match != null) {
-                        Log.d(TAG, "Match returned from VIEW_MATCHES: " + match.getMatchId());
 						if (match.getData() == null) {
-                            Log.d(TAG, "Match data is NULL, calling startMatch()");
 							startMatch(match);
 						} else {
-                            Log.d(TAG, bytesToString(match.getData()));
 							updateMatch(match);
 						}
 					}
@@ -343,12 +333,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 							.build();
 
 					showSpinner(1);
-                    Log.d(TAG, "CreateMatch() onResult");
 					Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback(
 							new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
 								@Override
 								public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
-                                    Log.d(TAG, "CreateMatch() onResult");
 									processResult(result);
 								}
 							});
@@ -421,13 +409,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		updateScore();
 
 		String participantId = mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
-        Log.d(TAG, "Initial TakeTurn()");
 		Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.getMatchId(),
 				mMatchData, participantId).setResultCallback(
 				new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 					@Override
 					public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
-                        Log.d(TAG, "TakeTurn() onResult");
 						processResult(result);
 					}
 				});
@@ -439,11 +425,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		if (checkStatusCode(result.getStatus().getStatusCode())) {
             updateMatch(mMatch);
-		} else {
-            Log.d(TAG, "UpdateMatchResult failure: " + result.getStatus().getStatusCode());
-//			mBoard = pBoard;
-//			mBoard.displayBoard(this);
-        }
+		}
 
         mUpdatingMatch = false;
 	}
@@ -457,12 +439,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		mDarkPlayer = getDarkPlayer();
 		mMatchData = match.getData();
 
-        // Debugging
-        Log.d(TAG, "Match ID: " + mMatch.getMatchId());
-        Log.d(TAG, bytesToString(mMatchData));
-
-        Log.d(TAG, "Match Status: " + mMatch.getStatus());
-        Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
+//        Log.d(TAG, "Match ID: " + mMatch.getMatchId());
+//        Log.d(TAG, bytesToString(mMatchData));
+//
+//        Log.d(TAG, "Match Status: " + mMatch.getStatus());
+//        Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
 
 		// Grab the appropriate segment from mMatchData based on player's color
 		int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
@@ -478,7 +459,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		startIndex += 64;
 		while (mMatchData[startIndex] != 0) {
 			BoardSpace s = mBoard.getBoardSpaceFromNum(mMatchData[startIndex++]);
-			Log.d(TAG, "Opponent moved @(" + s.x + " " + s.y + ")");
 			mQueuedMoves.add(s);
 		}
 
@@ -487,6 +467,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			processReceivedTurns();
 		updateScore();
 
+        // Check for inactive match states
 		switch (mMatch.getStatus()) {
 			case TurnBasedMatch.MATCH_STATUS_CANCELED:
 				displayMessage(getString(R.string.match_canceled));
@@ -506,7 +487,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		switch (mMatch.getTurnStatus()) {
 			case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
 				dismissMessage();
-				autoplayIfEnabled();
+//				autoplayIfEnabled();
 				return;
 			case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
 				displayMessage(getString(R.string.match_opponent_turn));
@@ -527,12 +508,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			int startIndex = (mPlayer == mLightPlayer) ? 0 : 100;
 			// Copy the serialized Board into the appropriate place in match data
 			System.arraycopy(playerBoard, 0, mMatchData, startIndex, playerBoard.length);
-			// Clear out the first 16 nodes following (which were the other player's previous moves)
+			// Clear out the first 16 nodes following, which were the other player's previous moves
 			for (int clearIndex = startIndex+64; clearIndex < startIndex+64+16; clearIndex++)
 				mMatchData[clearIndex] = 0;
 		}
-
-//		Log.d(TAG, bytesToString(mMatchData));
 	}
 
 	private void processReceivedTurns() {
@@ -547,7 +526,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 else {
                     mUpdatingMatch = false;
                     updateScore();
-                    autoplayIfEnabled();
+//                    autoplayIfEnabled();
                 }
             }
         }, getResources().getInteger(R.integer.cpu_turn_delay));
@@ -566,7 +545,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     @Override
     public void onTurnBasedMatchRemoved(String matchId) {
-		Log.d(TAG, "Match removed: " + matchId);
 		if (mMatch != null && mMatch.getMatchId().equals(matchId)) {
             Toast.makeText(this, R.string.match_removed, Toast.LENGTH_SHORT).show();
             clearBoard();
@@ -575,12 +553,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	public void claim(final BoardSpace s) {
         if (mUpdatingMatch || !mQueuedMoves.isEmpty()) {
-            Log.d(TAG, "Error: Still evaluating last move");
+//            Log.d(TAG, "Error: Still evaluating last move");
             return;
         }
-
-        Log.d(TAG, "Match Status: " + mMatch.getStatus());
-        Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
 
         if (mMatch.getStatus() != TurnBasedMatch.MATCH_STATUS_ACTIVE ||
                 mMatch.getTurnStatus() != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
@@ -591,7 +566,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             return;
 
         if (!mGoogleApiClient.isConnected()) {
-            Log.d(TAG, "GoogleApiClient not connected");
             displaySignInPrompt();
             return;
         }
@@ -624,7 +598,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-                            Log.d(TAG, "TakeTurn() for Opponent");
 							processResult(updateMatchResult);
 						}
 					});
@@ -634,7 +607,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-                            Log.d(TAG, "TakeTurn() for Player");
 							processResult(updateMatchResult);
 						}
 					});
@@ -664,13 +636,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			}
 
 			if (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-                Log.d(TAG, "endMatch && MY_TURN, calling finishMatch()");
 				// Call finishMatch() to close out match for player
 				Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId())
 						.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 							@Override
 							public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-                                Log.d(TAG, "FinishMatch onResult");
 								processResultFinishMatch(updateMatchResult);
 							}
 						});
@@ -699,13 +669,11 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				displayMessage(getString(R.string.winner_tie));
 			}
 
-            Log.d(TAG, "Submitting match results...");
 			// Call finishMatch() with result parameters
 			Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch.getMatchId(), mMatchData, winnerResult, loserResult)
 					.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 						@Override
 						public void onResult(TurnBasedMultiplayer.UpdateMatchResult updateMatchResult) {
-                            Log.d(TAG, "FinishMatch onResult");
 							processResultFinishMatch(updateMatchResult);
 						}
 					});
@@ -715,8 +683,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 	private Participant getCurrentPlayer() {
 		Participant lightPlayer = getLightPlayer();
 		Participant darkPlayer = getDarkPlayer();
-		if (mMatch.getParticipant(mMatch.getParticipantId(
-				Games.Players.getCurrentPlayerId(mGoogleApiClient))) == lightPlayer)
+		if (mMatch.getParticipant(mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient))) == lightPlayer)
 			return lightPlayer;
 		else return darkPlayer;
 	}
@@ -748,11 +715,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 			ArrayList<String> participantIds = mMatch.getParticipantIds();
 			String lightId = mMatch.getCreatorId();
 			String darkId = null;
+
 			for (String id : participantIds) {
 				if (id.equals(lightId))
 					continue;
 				darkId = id;
 			}
+
 			if (darkId != null)
 				return mMatch.getParticipant(darkId);
 		}
@@ -854,7 +823,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 				break;
 			default:
                 showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_message_default));
-				Log.w(TAG, "Unknown status code: " + statusCode);
+//				Log.w(TAG, "Unknown status code: " + statusCode);
 				break;
 		}
 
@@ -867,7 +836,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 		// Start animations for side icons
 		if (mLeftFadeOut != null && mRightFadeOut != null
-				&& !mLeftFadeOut.hasStarted() && !mRightFadeOut.hasStarted()) {
+                && !mLeftFadeOut.hasStarted() && !mRightFadeOut.hasStarted()) {
 			mWaiting1.startAnimation(mLeftFadeOut);
 			mWaiting2.startAnimation(mRightFadeOut);
 		}
@@ -894,12 +863,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                             return;
                         }
 						showSpinner(1);
-                        Log.d(TAG, "Rematch()");
 						Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch.getMatchId())
 								.setResultCallback(new ResultCallback<TurnBasedMultiplayer.InitiateMatchResult>() {
 									@Override
 									public void onResult(TurnBasedMultiplayer.InitiateMatchResult result) {
-                                        Log.d(TAG, "Rematch() onResult");
 										processResult(result);
 									}
 								});
@@ -1103,12 +1070,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 							displaySignInPrompt();
 							return;
 						}
-                        Log.d(TAG, "CancelMatch() onResult");
 						Games.TurnBasedMultiplayer.cancelMatch(mGoogleApiClient, mMatch.getMatchId())
 								.setResultCallback(new ResultCallback<TurnBasedMultiplayer.CancelMatchResult>() {
 									@Override
 									public void onResult(TurnBasedMultiplayer.CancelMatchResult cancelMatchResult) {
-                                        Log.d(TAG, "CancelMatch() onResult");
 										processResult(cancelMatchResult);
 									}
 								});
@@ -1142,11 +1107,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 								.setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
 									@Override
 									public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
-										Log.d(TAG, "FinishMatch() result: " + result.getStatus().getStatusCode());
 										if (result.getStatus().isSuccess()) {
 											Toast.makeText(mContext, getString(R.string.forfeit_success), Toast.LENGTH_LONG).show();
-//											endMatch();
-//                                          updateScore();
                                             updateMatch(result.getMatch());
 										} else {
 											Toast.makeText(mContext, getString(R.string.forfeit_fail), Toast.LENGTH_LONG).show();
@@ -1188,22 +1150,18 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 						}
 
 						if (mMatch.getTurnStatus() == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-							Log.d(TAG, "Leaving match during OWN turn");
 							Games.TurnBasedMultiplayer.leaveMatchDuringTurn(mGoogleApiClient, mMatch.getMatchId(), null)
 									.setResultCallback(new ResultCallback<TurnBasedMultiplayer.LeaveMatchResult>() {
 										@Override
 										public void onResult(TurnBasedMultiplayer.LeaveMatchResult result) {
-                                            Log.d(TAG, "LeaveMatch() onResult");
 											processResultLeaveMatch(result);
 										}
 									});
 						} else {
-							Log.d(TAG, "Leaving match during OPPONENT'S turn");
 							Games.TurnBasedMultiplayer.leaveMatch(mGoogleApiClient, mMatch.getMatchId())
 									.setResultCallback(new ResultCallback<TurnBasedMultiplayer.LeaveMatchResult>() {
 										@Override
 										public void onResult(TurnBasedMultiplayer.LeaveMatchResult result) {
-                                            Log.d(TAG, "LeaveMatch() onResult");
 											processResultLeaveMatch(result);
 										}
 									});
@@ -1243,9 +1201,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void processResultLeaveMatch(TurnBasedMultiplayer.LeaveMatchResult result) {
-        Log.d(TAG, "LeaveMatch() result: " + result.getStatus().getStatusCode());
         if (result.getStatus().isSuccess()) {
-//			displayMessage(getString(R.string.match_canceled));
             Toast.makeText(this, R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
             clearBoard();
 		} else {
@@ -1254,9 +1210,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
 	private void processResult(TurnBasedMultiplayer.CancelMatchResult result) {
-		Log.d(TAG, "CancelMatch() result: " + result.getStatus().getStatusCode());
 		if (result.getStatus().isSuccess()) {
-//			displayMessage(getString(R.string.match_canceled));
             Toast.makeText(this, R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
             clearBoard();
 		} else {
@@ -1282,7 +1236,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void setAutoConnectPreference(boolean b) {
-		Log.d(TAG, "Setting auto-connect preference: " + b);
 		mSignInOnStart = b;
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
@@ -1340,7 +1293,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 	}
 
-	// Used for converting Board to debugging text String only
+	// Used for converting Board to debugging text
 	private String bytesToString(byte[] in) {
         if (in == null)
             return "";
@@ -1363,9 +1316,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         for (int i = 164; i < 200; i++) {
             buf.append(String.valueOf(in[i])).append(" ");
         }
-
-//		for (byte b : in)
-//			buf.append(String.valueOf(b));
 
 		return buf.toString();
 	}
