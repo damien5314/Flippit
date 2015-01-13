@@ -167,7 +167,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     public void onConnected(Bundle bundle) {
         dismissSpinner();
-//        Log.d(TAG, "Connected to Google Play Services");
+        Log.d(TAG, "Connected to Google Play Services");
 //		Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
 
 		mIsSignedIn = true;
@@ -199,8 +199,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 		}
 
         registerMatchUpdateListener(true);
-		if (mMatch != null)
-			updateMatch(mMatch);
+		if (mMatch != null) {
+            if (mMatch.getData() == null) {
+                startMatch(mMatch);
+            } else {
+                updateMatch(mMatch);
+            }
+        }
     }
 
     @Override
@@ -1324,6 +1329,9 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
 	// Used for converting Board to debugging text String only
 	private String bytesToString(byte[] in) {
+        if (in == null)
+            return "";
+
 		StringBuilder buf = new StringBuilder();
 		for (byte b : in)
 			buf.append(String.valueOf(b));
