@@ -87,7 +87,6 @@ public class SinglePlayerMatchActivity extends MatchActivity {
             currentPlayer = (sp.getBoolean(PREF_CURRENT_PLAYER, true) ? p1 : p2);
             firstTurn = (sp.getBoolean(PREF_FIRST_TURN, true) ? p1 : p2);
 
-			// TODO Need to convert to new game data format for backward compatibility
 			String savedData = sp.getString(PREF_BOARD_STATE, "");
             mBoard.deserialize(savedData);
             return true;
