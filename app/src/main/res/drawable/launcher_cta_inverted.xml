@@ -4,7 +4,7 @@
     android:shape="rectangle" >
 
     <stroke android:width="@dimen/call_to_action_border"
-			android:color="@color/launcher_cta_border" />
+            android:color="@color/launcher_cta_border" />
 
     <corners
         android:radius="@dimen/call_to_action_corner_radius" />

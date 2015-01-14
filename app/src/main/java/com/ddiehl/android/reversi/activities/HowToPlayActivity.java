@@ -23,37 +23,37 @@ public class HowToPlayActivity extends FragmentActivity {
     private static final String TAG = HowToPlayActivity.class.getSimpleName();
 
     private ViewPager pager;
-	private MenuItem previous, next;
+    private MenuItem previous, next;
 
-	private final int[] FRAGMENT_LAYOUT_ID = new int[] {
-			R.layout.activity_howtoplay_p1,
-			R.layout.activity_howtoplay_p2,
-			R.layout.activity_howtoplay_p3,
-			R.layout.activity_howtoplay_p4
-	};
+    private final int[] FRAGMENT_LAYOUT_ID = new int[] {
+            R.layout.activity_howtoplay_p1,
+            R.layout.activity_howtoplay_p2,
+            R.layout.activity_howtoplay_p3,
+            R.layout.activity_howtoplay_p4
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_howtoplay);
         List<Fragment> fragments = getFragments();
-		HowToPlayPageAdapter pageAdapter = new HowToPlayPageAdapter(getSupportFragmentManager(), fragments);
+        HowToPlayPageAdapter pageAdapter = new HowToPlayPageAdapter(getSupportFragmentManager(), fragments);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(pageAdapter);
-		pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-			@Override
-			public void onPageSelected(int i) {
-				if (i == 0)
-					previous.setEnabled(false);
-				else
-					previous.setEnabled(true);
+        pager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+            @Override
+            public void onPageSelected(int i) {
+                if (i == 0)
+                    previous.setEnabled(false);
+                else
+                    previous.setEnabled(true);
 
-				if (i == FRAGMENT_LAYOUT_ID.length - 1)
-					next.setEnabled(false);
-				else
-					next.setEnabled(true);
-			}
-		});
+                if (i == FRAGMENT_LAYOUT_ID.length - 1)
+                    next.setEnabled(false);
+                else
+                    next.setEnabled(true);
+            }
+        });
     }
 
     private List<Fragment> getFragments() {
@@ -86,9 +86,9 @@ public class HowToPlayActivity extends FragmentActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.how_to_play, menu);
-		previous = menu.getItem(0);
-		previous.setEnabled(false);
-		next = menu.getItem(1);
+        previous = menu.getItem(0);
+        previous.setEnabled(false);
+        next = menu.getItem(1);
         return true;
     }
 
@@ -96,11 +96,11 @@ public class HowToPlayActivity extends FragmentActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_previous:
-				pager.setCurrentItem(pager.getCurrentItem()-1);
-				break;
+                pager.setCurrentItem(pager.getCurrentItem()-1);
+                break;
             case R.id.action_next:
-				pager.setCurrentItem(pager.getCurrentItem()+1);
-				break;
+                pager.setCurrentItem(pager.getCurrentItem()+1);
+                break;
         }
         return true;
     }

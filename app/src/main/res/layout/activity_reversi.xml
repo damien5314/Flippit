@@ -1,15 +1,15 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-	android:id="@+id/gameScreen"
+    android:id="@+id/gameScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-	android:orientation="vertical"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-	<LinearLayout
-		android:id="@+id/score_overlay"
-		style="@style/ScoreOverlay"
-		android:background="@drawable/border">
+    <LinearLayout
+        android:id="@+id/score_overlay"
+        style="@style/ScoreOverlay"
+        android:background="@drawable/border">
 
         <LinearLayout
             style="@style/ScoreOverlaySection">
@@ -53,66 +53,66 @@
 
         </LinearLayout>
 
-	</LinearLayout>
+    </LinearLayout>
 
-	<LinearLayout
-		android:id="@+id/game_area"
-		style="@style/GameArea">
+    <LinearLayout
+        android:id="@+id/game_area"
+        style="@style/GameArea">
 
-		<LinearLayout
-			android:id="@+id/board_panels"
-			style="@style/BoardActionPanels">
+        <LinearLayout
+            android:id="@+id/board_panels"
+            style="@style/BoardActionPanels">
 
-			<View
-				android:layout_width="0dp"
-				android:layout_height="0dp"
-				android:layout_weight="1"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
 
-			<Button
-				android:id="@+id/board_panel_new_game"
-				style="@style/BoardActionPanel"
-				android:text="@string/multiplayer_new_match"
-				android:onClick="startNewMatch"/>
+            <Button
+                android:id="@+id/board_panel_new_game"
+                style="@style/BoardActionPanel"
+                android:text="@string/multiplayer_new_match"
+                android:onClick="startNewMatch"/>
 
-			<Button
-				android:id="@+id/board_panel_select_game"
-				style="@style/BoardActionPanel"
-				android:text="@string/multiplayer_select_match"
-				android:onClick="selectMatch"/>
+            <Button
+                android:id="@+id/board_panel_select_game"
+                style="@style/BoardActionPanel"
+                android:text="@string/multiplayer_select_match"
+                android:onClick="selectMatch"/>
 
-			<View
-				android:layout_width="0dp"
-				android:layout_height="0dp"
-				android:layout_weight="1"/>
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
 
-		</LinearLayout>
+        </LinearLayout>
 
-		<TableLayout
-			android:id="@+id/match_grid"
-			style="@style/GameBoardTable" >
+        <TableLayout
+            android:id="@+id/match_grid"
+            style="@style/GameBoardTable" >
 
-		</TableLayout>
+        </TableLayout>
 
-		<RelativeLayout
-			android:id="@+id/match_message"
-			style="@style/GameMessage">
+        <RelativeLayout
+            android:id="@+id/match_message"
+            style="@style/GameMessage">
 
-			<TextView
-				android:id="@+id/match_message_text"
-				style="@style/GameMessageText"/>
+            <TextView
+                android:id="@+id/match_message_text"
+                style="@style/GameMessageText"/>
 
-			<ImageView
-				android:id="@+id/match_message_icon_1"
-				style="@style/GameMessageIcon"
-				android:layout_toLeftOf="@id/match_message_text"/>
+            <ImageView
+                android:id="@+id/match_message_icon_1"
+                style="@style/GameMessageIcon"
+                android:layout_toLeftOf="@id/match_message_text"/>
 
-			<ImageView
-				android:id="@+id/match_message_icon_2"
-				style="@style/GameMessageIcon"
-				android:layout_toRightOf="@id/match_message_text"/>
+            <ImageView
+                android:id="@+id/match_message_icon_2"
+                style="@style/GameMessageIcon"
+                android:layout_toRightOf="@id/match_message_text"/>
 
-		</RelativeLayout>
+        </RelativeLayout>
 
-	</LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

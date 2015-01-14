@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<string-array name="pref_ai_difficulty_entries">
-		<item name="pref_ai_difficulty_easy">@string/pref_ai_difficulty_easy</item>
-		<item name="pref_ai_difficulty_hard">@string/pref_ai_difficulty_hard</item>
-	</string-array>
+    <string-array name="pref_ai_difficulty_entries">
+        <item name="pref_ai_difficulty_easy">@string/pref_ai_difficulty_easy</item>
+        <item name="pref_ai_difficulty_hard">@string/pref_ai_difficulty_hard</item>
+    </string-array>
 
-	<string-array name="pref_ai_difficulty_values">
-		<item name="pref_ai_difficulty_easy">1</item>
-		<item name="pref_ai_difficulty_hard">2</item>
-	</string-array>
+    <string-array name="pref_ai_difficulty_values">
+        <item name="pref_ai_difficulty_easy">1</item>
+        <item name="pref_ai_difficulty_hard">2</item>
+    </string-array>
 
 </resources>

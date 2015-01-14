@@ -7,6 +7,6 @@ import com.ddiehl.android.reversi.game.BoardSpace;
 
 public abstract class MatchActivity extends Activity {
 
-	public abstract void claim(BoardSpace s);
+    public abstract void claim(BoardSpace s);
 
 }

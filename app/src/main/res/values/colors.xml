@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-	<color name="board_color">#42A321</color>
-	<color name="transparent">#00000000</color>
+    <color name="board_color">#42A321</color>
+    <color name="transparent">#00000000</color>
 
-	<color name="launcher_cta_border">#000000</color>
-	<color name="launcher_cta_pressed">#000000</color>
-	<color name="board_panel_border">#000000</color>
-	<color name="board_panel_pressed">#000000</color>
+    <color name="launcher_cta_border">#000000</color>
+    <color name="launcher_cta_pressed">#000000</color>
+    <color name="board_panel_border">#000000</color>
+    <color name="board_panel_pressed">#000000</color>
 
 </resources>

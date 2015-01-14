@@ -6,15 +6,15 @@
 
     <dimen name="app_title_size">60sp</dimen>
 
-	<dimen name="call_to_action_margin">2dp</dimen>
-	<dimen name="call_to_action_border">3dp</dimen>
-	<dimen name="call_to_action_corner_radius">20dp</dimen>
-	<dimen name="call_to_action_text_size">22sp</dimen>
+    <dimen name="call_to_action_margin">2dp</dimen>
+    <dimen name="call_to_action_border">3dp</dimen>
+    <dimen name="call_to_action_corner_radius">20dp</dimen>
+    <dimen name="call_to_action_text_size">22sp</dimen>
 
-	<dimen name="board_panel_margin">6dp</dimen>
-	<dimen name="board_panel_border">2dp</dimen>
-	<dimen name="board_panel_corner_radius">24dp</dimen>
-	<dimen name="board_panel_text_size">22sp</dimen>
+    <dimen name="board_panel_margin">6dp</dimen>
+    <dimen name="board_panel_border">2dp</dimen>
+    <dimen name="board_panel_corner_radius">24dp</dimen>
+    <dimen name="board_panel_text_size">22sp</dimen>
 
     <dimen name="score_overlay_text_size">16sp</dimen>
     <dimen name="score_overlay_view_padding">4dp</dimen>
@@ -29,7 +29,7 @@
     <dimen name="game_message_text_size">22sp</dimen>
 
     <dimen name="how_to_play_header_size">20sp</dimen>
-	<dimen name="how_to_play_text_size">20sp</dimen>
-	<dimen name="how_to_play_image_padding">6dp</dimen>
+    <dimen name="how_to_play_text_size">20sp</dimen>
+    <dimen name="how_to_play_image_padding">6dp</dimen>
 
 </resources>

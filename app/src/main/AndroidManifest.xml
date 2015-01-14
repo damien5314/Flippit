@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ddiehl.android.reversi" >
 
-	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
@@ -19,7 +19,7 @@
         <activity
             android:name=".activities.LauncherActivity"
             android:label="@string/activity_launcher_title"
-			android:screenOrientation="portrait">
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -28,22 +28,22 @@
         <activity
             android:name=".activities.SinglePlayerMatchActivity"
             android:label="@string/label_single_player"
-			android:screenOrientation="portrait">
+            android:screenOrientation="portrait">
         </activity>
-		<activity
-			android:name=".activities.MultiPlayerMatchActivity"
-			android:label="@string/label_multi_player"
-			android:screenOrientation="portrait">
-		</activity>
+        <activity
+            android:name=".activities.MultiPlayerMatchActivity"
+            android:label="@string/label_multi_player"
+            android:screenOrientation="portrait">
+        </activity>
         <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/activity_settings_title"
-			android:screenOrientation="portrait">
+            android:screenOrientation="portrait">
         </activity>
         <activity
             android:name=".activities.HowToPlayActivity"
             android:label="@string/activity_howToPlay_title"
-			android:screenOrientation="portrait">
+            android:screenOrientation="portrait">
         </activity>
     </application>
 

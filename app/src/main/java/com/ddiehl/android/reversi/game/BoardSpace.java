@@ -11,20 +11,20 @@ import com.ddiehl.android.reversi.R;
 public class BoardSpace extends Button {
     private Context ctx;
     private ReversiColor color;
-	public int x, y;
+    public int x, y;
 
-	public BoardSpace(Context c) {
-		super(c);
-		ctx = c;
-		setBackgroundResource(R.drawable.board_space_neutral);
-		color = null;
-	}
+    public BoardSpace(Context c) {
+        super(c);
+        ctx = c;
+        setBackgroundResource(R.drawable.board_space_neutral);
+        color = null;
+    }
 
     public BoardSpace(Context c, int x, int y) {
-		super(c);
-		ctx = c;
-		setBackgroundResource(R.drawable.board_space_neutral);
-		color = null;
+        super(c);
+        ctx = c;
+        setBackgroundResource(R.drawable.board_space_neutral);
+        color = null;
         this.x = x;
         this.y = y;
     }

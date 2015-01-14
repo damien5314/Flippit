@@ -4,11 +4,11 @@ Google Play game services IDs.
 Save this file as res/values/games-ids.xml in your project.
 -->
 <resources>
-	<string name="app_id" translatable="false">997613127809</string>
-	<string name="achievement_lets_play_together" translatable="false">CgkIgZGBs4QdEAIQAg</string>
-	<string name="achievement_first_win" translatable="false">CgkIgZGBs4QdEAIQBQ</string>
-	<string name="achievement_up_coming" translatable="false">CgkIgZGBs4QdEAIQBA</string>
-	<string name="achievement_reversi_expert" translatable="false">CgkIgZGBs4QdEAIQBw</string>
-	<string name="achievement_evenly_matched" translatable="false">CgkIgZGBs4QdEAIQAw</string>
-	<string name="achievement_the_perfect_win" translatable="false">CgkIgZGBs4QdEAIQAQ</string>
+    <string name="app_id" translatable="false">997613127809</string>
+    <string name="achievement_lets_play_together" translatable="false">CgkIgZGBs4QdEAIQAg</string>
+    <string name="achievement_first_win" translatable="false">CgkIgZGBs4QdEAIQBQ</string>
+    <string name="achievement_up_coming" translatable="false">CgkIgZGBs4QdEAIQBA</string>
+    <string name="achievement_reversi_expert" translatable="false">CgkIgZGBs4QdEAIQBw</string>
+    <string name="achievement_evenly_matched" translatable="false">CgkIgZGBs4QdEAIQAw</string>
+    <string name="achievement_the_perfect_win" translatable="false">CgkIgZGBs4QdEAIQAQ</string>
 </resources>
