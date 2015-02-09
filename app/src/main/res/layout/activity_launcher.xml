@@ -16,13 +16,11 @@
     <Button
         style="@style/LauncherCTA"
         android:id="@+id/button_start_1p"
-        android:text="@string/button_start_1p"
-        android:onClick="startSinglePlayer" />
+        android:text="@string/button_start_1p" />
 
     <Button
         style="@style/LauncherCTA"
         android:id="@+id/button_start_mp"
-        android:text="@string/button_start_mp"
-        android:onClick="startMultiPlayer" />
+        android:text="@string/button_start_mp" />
 
 </LinearLayout>
