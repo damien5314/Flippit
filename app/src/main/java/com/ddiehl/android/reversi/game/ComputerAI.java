@@ -3,6 +3,7 @@ package com.ddiehl.android.reversi.game;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 
 public class ComputerAI {
     private static final String TAG = ComputerAI.class.getSimpleName();
@@ -24,7 +25,7 @@ public class ComputerAI {
     public static BoardSpace getBestMove_d1(Board board, ReversiPlayer p) {
         BoardSpace best = null;
         int bestVal = 0;
-        BoardIterator i = new BoardIterator(board);
+        Iterator<BoardSpace> i = board.iterator();
         while (i.hasNext()) {
             BoardSpace space = i.next();
             if (!space.isOwned()) {
@@ -49,7 +50,7 @@ public class ComputerAI {
     public static BoardSpace getBestMove_d2(Board board, ReversiPlayer p, ReversiPlayer o) {
         BoardSpace best = null;
         int bestVal = 999;
-        BoardIterator i = new BoardIterator(board);
+        Iterator<BoardSpace> i = board.iterator();
         while (i.hasNext()) {
             BoardSpace space = i.next();
             if (!space.isOwned()) {
@@ -82,7 +83,7 @@ public class ComputerAI {
         HashMap<BoardSpace, Integer> moveValues = new HashMap<>();
         final int spaceValue_weight = 1;
         final int spacesCaptured_weight = 0;
-        BoardIterator i = new BoardIterator(board);
+        Iterator<BoardSpace> i = board.iterator();
         BoardSpace space;
         while (i.hasNext()) {
             space = i.next();
@@ -137,7 +138,7 @@ public class ComputerAI {
 
     private static int getPossibleMoves(Board board, ReversiPlayer p) {
         int possible = 0;
-        BoardIterator i = new BoardIterator(board);
+        Iterator<BoardSpace> i = board.iterator();
         while (i.hasNext()) {
             BoardSpace s = i.next();
             if (!s.isOwned())

@@ -3,6 +3,9 @@ package com.ddiehl.android.reversi.game;
 
 import android.content.Context;
 
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
     private static Context ctx;
@@ -52,7 +55,7 @@ public class Board {
     }
 
     public boolean hasMove(ReversiColor c) {
-        BoardIterator i = new BoardIterator(this);
+        BoardIterator i = iterator();
         while (i.hasNext()) {
             BoardSpace s = i.next();
             if (s.isOwned())
@@ -131,7 +134,7 @@ public class Board {
 
     public int getNumSpacesForColor(ReversiColor c) {
         int count = 0;
-        BoardIterator i = new BoardIterator(this);
+        BoardIterator i = iterator();
         while (i.hasNext()) {
             BoardSpace s = i.next();
             if (s.isOwned() && s.getColor() == c)
@@ -142,7 +145,7 @@ public class Board {
 
     public int getNumberOfEmptySpaces() {
         int count = 0;
-        BoardIterator i = new BoardIterator(this);
+        BoardIterator i = iterator();
         while (i.hasNext()) {
             BoardSpace s = i.next();
             if (!s.isOwned())
@@ -200,7 +203,7 @@ public class Board {
     public byte[] serialize() {
         byte[] out = new byte[64];
         int index = 0;
-        BoardIterator i = new BoardIterator(this);
+        BoardIterator i = iterator();
         while (i.hasNext()) {
             BoardSpace s = i.next();
             if (!s.isOwned())
@@ -221,6 +224,45 @@ public class Board {
         n -= 1;
         return getSpaceAt(n % 8, n / 8);
     }
+
+    public BoardIterator iterator() {
+        return new BoardIterator(this);
+    }
+
+    private static class BoardIterator implements Iterator<BoardSpace> {
+        private Board mBoard;
+        private int x;
+        private int y;
+
+        public BoardIterator(Board b) {
+            mBoard = b;
+            x = 0; y = 0;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return y != mBoard.height();
+        }
+
+        @Override
+        public BoardSpace next() {
+            if (!hasNext())
+                throw new NoSuchElementException();
+
+            BoardSpace s = mBoard.getSpaceAt(x, y);
+            if (++x == mBoard.width()) {
+                y++; x = 0;
+            }
+
+            return s;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
 
     @Override
     public String toString() {

@@ -18,11 +18,12 @@ import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.game.Board;
-import com.ddiehl.android.reversi.game.BoardIterator;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ComputerAI;
 import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.game.ReversiPlayer;
+
+import java.util.Iterator;
 
 public class SinglePlayerMatchFragment extends MatchFragment {
     private static final String TAG = SinglePlayerMatchFragment.class.getSimpleName();
@@ -221,7 +222,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
     public void updateScoreDisplay() {
         int p1c = 0;
         int p2c = 0;
-        BoardIterator i = new BoardIterator(mBoard);
+        Iterator<BoardSpace> i = mBoard.iterator();
         while (i.hasNext()) {
             BoardSpace s = i.next();
             if (s.isOwned()) {
