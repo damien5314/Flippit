@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/HowToPlayLayout">
 
-    <TextView
-        style="@style/HowToPlayText"
-        android:text="@string/how_to_play_p3"/>
+    <LinearLayout android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <ImageView
-        style="@style/HowToPlayImage"
-        android:src="@drawable/no_move_scenario" />
+        <TextView
+            style="@style/HowToPlayText"
+            android:text="@string/how_to_play_p3"/>
 
-</LinearLayout>
+        <ImageView
+            style="@style/HowToPlayImage"
+            android:src="@drawable/no_move_scenario" />
+
+    </LinearLayout>
+
+</ScrollView>
