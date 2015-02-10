@@ -36,7 +36,7 @@ public class HowToPlayActivity extends ActionBarActivity {
 
         mViewPager = new ViewPager(this);
         mViewPager.setId(R.id.view_pager);
-        setContentView(R.layout.activity_howtoplay);
+        setContentView(mViewPager);
 
         FragmentManager fm = getSupportFragmentManager();
         mViewPager.setAdapter(new FragmentStatePagerAdapter(fm) {
@@ -66,7 +66,7 @@ public class HowToPlayActivity extends ActionBarActivity {
             mMenuPrevious.setEnabled(true);
         }
 
-        if (page == mViewPager.getChildCount() - 1) {
+        if (page == FRAGMENT_LAYOUT_ID.length - 1) {
             mMenuNext.setEnabled(false);
         } else {
             mMenuNext.setEnabled(true);

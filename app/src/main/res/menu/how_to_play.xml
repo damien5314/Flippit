@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/action_previous"
         android:title="@string/action_htp_previous"
         android:icon="@drawable/ic_action_navigation_arrow_back"
-        android:showAsAction="ifRoom"/>
+        app:showAsAction="ifRoom"/>
 
     <item android:id="@+id/action_next"
         android:title="@string/action_htp_next"
         android:icon="@drawable/ic_action_navigation_arrow_forward"
-        android:showAsAction="ifRoom" />
+        app:showAsAction="ifRoom" />
 
 </menu>
