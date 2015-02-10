@@ -1,0 +1,204 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/gameScreen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/score_overlay"
+        style="@style/ScoreOverlay"
+        android:background="@drawable/border">
+
+        <LinearLayout
+            style="@style/ScoreOverlaySection">
+
+            <ImageView
+                android:id="@+id/icon_p1"
+                style="@style/PlayerIcon"
+                android:background="@drawable/player_icon_p1"/>
+
+            <TextView
+                android:id="@+id/label_p1"
+                style="@style/PlayerLabel"
+                android:gravity="left|center"/>
+
+            <TextView
+                android:id="@+id/score_p1"
+                style="@style/ScoreValue"/>
+
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/turn_indicator"
+            style="@style/TurnIndicator"/>
+
+        <LinearLayout
+            style="@style/ScoreOverlaySection">
+
+            <TextView
+                android:id="@+id/score_p2"
+                style="@style/ScoreValue"/>
+
+            <TextView
+                android:id="@+id/label_p2"
+                style="@style/PlayerLabel"
+                android:gravity="right|center"/>
+
+            <ImageView
+                android:id="@+id/icon_p2"
+                style="@style/PlayerIcon"
+                android:background="@drawable/player_icon_p2"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/game_area"
+        style="@style/GameArea">
+
+        <LinearLayout
+            android:id="@+id/board_panels"
+            style="@style/BoardActionPanels">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+            <Button
+                android:id="@+id/board_panel_new_game"
+                style="@style/BoardActionPanel"
+                android:text="@string/multiplayer_new_match"/>
+
+            <Button
+                android:id="@+id/board_panel_select_game"
+                style="@style/BoardActionPanel"
+                android:text="@string/multiplayer_select_match"/>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1"/>
+
+        </LinearLayout>
+
+        <TableLayout
+            android:id="@+id/match_grid"
+            style="@style/GameBoardTable" >
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+            <TableRow style="@style/MatchGridRow">
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+            </TableRow>
+
+        </TableLayout>
+
+        <RelativeLayout
+            android:id="@+id/match_message"
+            style="@style/GameMessage">
+
+            <TextView
+                android:id="@+id/match_message_text"
+                style="@style/GameMessageText"/>
+
+            <ImageView
+                android:id="@+id/match_message_icon_1"
+                style="@style/GameMessageIcon"
+                android:layout_toLeftOf="@id/match_message_text"/>
+
+            <ImageView
+                android:id="@+id/match_message_icon_2"
+                style="@style/GameMessageIcon"
+                android:layout_toRightOf="@id/match_message_text"/>
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

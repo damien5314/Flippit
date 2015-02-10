@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.activities;
+package com.ddiehl.android.reversi.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.activities;
+package com.ddiehl.android.reversi.view;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

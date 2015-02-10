@@ -2,6 +2,7 @@ package com.ddiehl.android.reversi.game;
 
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -13,7 +14,7 @@ public class BoardSpace extends Button {
     private ReversiColor color;
     public int x, y;
 
-    public BoardSpace(Context c) {
+    public BoardSpace(Context c, AttributeSet attributeSet) {
         super(c);
         ctx = c;
         setBackgroundResource(R.drawable.board_space_neutral);

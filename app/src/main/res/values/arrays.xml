@@ -6,9 +6,9 @@
         <item name="pref_ai_difficulty_hard">@string/pref_ai_difficulty_hard</item>
     </string-array>
 
-    <string-array name="pref_ai_difficulty_values">
+    <integer-array name="pref_ai_difficulty_values">
         <item name="pref_ai_difficulty_easy">1</item>
         <item name="pref_ai_difficulty_hard">2</item>
-    </string-array>
+    </integer-array>
 
 </resources>

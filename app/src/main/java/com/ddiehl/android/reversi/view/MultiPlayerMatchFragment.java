@@ -1,10 +1,9 @@
-package com.ddiehl.android.reversi.activities;
+package com.ddiehl.android.reversi.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -12,14 +11,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.TableLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
@@ -49,9 +49,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApiClient.ConnectionCallbacks,
+public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, OnTurnBasedMatchUpdateReceivedListener {
-    private final static String TAG = MultiPlayerMatchActivity.class.getSimpleName();
+    private final static String TAG = MultiPlayerMatchFragment.class.getSimpleName();
 
     private static final int RC_RESOLVE_ERROR = 1001;
     private static final int RC_VIEW_MATCHES = 1002;
@@ -61,8 +61,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     private static final int MAXIMUM_SCORE = 64;
 
     private static final String PREF_AUTO_SIGN_IN = "pref_auto_sign_in";
-
-    private Context mContext;
 
     private ProgressDialog mProgressBar;
 
@@ -83,12 +81,6 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private Handler mHandler;
     private List<BoardSpace> mQueuedMoves;
-    private Dialog mDisplayedDialog;
-
-    private ImageView mWaiting1, mWaiting2;
-    private Animation mLeftFadeOut, mLeftFadeIn, mRightFadeOut, mRightFadeIn;
-    private boolean mWaitingLeftColor = false;
-    private boolean mWaitingRightColor = true;
 
     private QueuedAction mQueuedAction;
     private enum QueuedAction {
@@ -96,29 +88,36 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reversi);
-        mContext = this;
-        mBoard = new Board(this);
+
+        mBoard = new Board(getActivity());
         mSignInOnStart = getAutoConnectPreference();
         mHandler = new Handler();
         mQueuedMoves = new ArrayList<>();
         initializeGoogleApiClient();
+
+        if (getActivity().getIntent().hasExtra(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
+            mMatch = getActivity().getIntent().getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+
         initializeWaitingAnimations();
 
         // Clear player names in score overlay
-        ((TextView) findViewById(R.id.label_p1)).setText(R.string.unknown_player);
-        ((TextView) findViewById(R.id.label_p2)).setText(R.string.unknown_player);
+        mPlayerOneLabelTextView.setText(R.string.unknown_player);
+        mPlayerTwoLabelTextView.setText(R.string.unknown_player);
 
-        if (getIntent().hasExtra(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
-            mMatch = getIntent().getParcelableExtra(Multiplayer.EXTRA_TURN_BASED_MATCH);
-        }
+        return v;
     }
 
     // Create the Google API Client with access to Plus and Games
     private void initializeGoogleApiClient() {
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
@@ -128,7 +127,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void connectGoogleApiClient() {
         // Check if Google Play Services are available
-        int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
+        int result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(getActivity());
         if (result != ConnectionResult.SUCCESS) {
             setAutoConnectPreference(false);
             showErrorDialog(result);
@@ -145,7 +144,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     @Override
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         if (mSignInOnStart) {
             connectGoogleApiClient();
@@ -153,7 +152,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
         mQueuedAction = null;
         if (mGoogleApiClient.isConnected()) {
@@ -222,7 +221,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 //            Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
                 mResolvingError = true;
-                result.startResolutionForResult(this, RC_RESOLVE_ERROR);
+                result.startResolutionForResult(getActivity(), RC_RESOLVE_ERROR);
             } catch (IntentSender.SendIntentException e) {
                 connectGoogleApiClient();
             }
@@ -240,7 +239,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void displaySignInPrompt() {
-        showDialog(new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.dialog_sign_in_title))
                 .setMessage(getString(R.string.dialog_sign_in_message))
                 .setPositiveButton(getString(R.string.dialog_sign_in_confirm), new DialogInterface.OnClickListener() {
@@ -260,7 +259,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 .create());
     }
 
-    public void startNewMatch(View v) {
+    public void startNewMatch() {
         Intent intent;
         if (!mGoogleApiClient.isConnected()) {
             mQueuedAction = QueuedAction.NewMatch;
@@ -271,7 +270,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         startActivityForResult(intent, RC_SELECT_PLAYERS);
     }
 
-    public void selectMatch(View v) {
+    public void selectMatch() {
         if (!mGoogleApiClient.isConnected()) {
             mQueuedAction = QueuedAction.SelectMatch;
             displaySignInPrompt();
@@ -282,12 +281,12 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
 
             case RC_RESOLVE_ERROR:
                 mResolvingError = false;
-                if (resultCode == RESULT_OK) {
+                if (resultCode == Activity.RESULT_OK) {
                     if (!mGoogleApiClient.isConnecting() && !mGoogleApiClient.isConnected()) {
                         connectGoogleApiClient();
                     }
@@ -370,7 +369,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void signOutFromGooglePlay() {
-        Toast.makeText(this, R.string.sign_out_confirmation, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.sign_out_confirmation, Toast.LENGTH_SHORT).show();
 
         mSignOutOnConnect = false;
         setAutoConnectPreference(false);
@@ -381,8 +380,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         mIsSignedIn = false;
         mGoogleApiClient.disconnect();
 
-        setResult(SettingsActivity.RESULT_SIGN_OUT);
-        finish();
+        getActivity().setResult(SettingsActivity.RESULT_SIGN_OUT);
+        getActivity().finish();
     }
 
     private void processResult(TurnBasedMultiplayer.InitiateMatchResult result) {
@@ -405,7 +404,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         mMatchData = null;
         mBoard.reset();
         saveMatchData();
-        mBoard.displayBoard(this);
+        displayBoard();
         updateScore();
 
         String participantId = mMatch.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient));
@@ -447,10 +446,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
         // Grab the appropriate segment from mMatchData based on player's color
         int startIndex = (getCurrentPlayer() == getLightPlayer()) ? 0 : 100;
-        byte[] playerData = Arrays.copyOfRange(mMatchData, startIndex, startIndex+64);
+        byte[] playerData = Arrays.copyOfRange(mMatchData, startIndex, startIndex + 64);
 
         mBoard.deserialize(playerData);
-        mBoard.displayBoard(this);
+        displayBoard();
         updatePlayerNames();
         dismissSpinner();
 
@@ -546,7 +545,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     @Override
     public void onTurnBasedMatchRemoved(String matchId) {
         if (mMatch != null && mMatch.getMatchId().equals(matchId)) {
-            Toast.makeText(this, R.string.match_removed, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.match_removed, Toast.LENGTH_SHORT).show();
             clearBoard();
         }
     }
@@ -572,7 +571,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
         ReversiColor playerColor = getCurrentPlayerColor();
         if (mBoard.spacesCapturedWithMove(s, playerColor) == 0) {
-            Toast.makeText(this, R.string.bad_move, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.bad_move, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -602,7 +601,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                         }
                     });
         } else if (mBoard.hasMove(getCurrentPlayerColor())) { // Opponent has no move, keep turn
-            Toast.makeText(this, getString(R.string.no_moves) + mOpponent.getDisplayName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.no_moves) + mOpponent.getDisplayName(), Toast.LENGTH_SHORT).show();
             Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch.getMatchId(), mMatchData, mPlayer.getParticipantId())
                     .setResultCallback(new ResultCallback<TurnBasedMultiplayer.UpdateMatchResult>() {
                         @Override
@@ -728,30 +727,33 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
         return null;
     }
 
+    private void displayBoard() {
+        mMatchGridView.setVisibility(View.GONE);
+        mBoardPanelView.setVisibility(View.VISIBLE);
+    }
+
     private void clearBoard() {
         mMatch = null;
-        TableLayout grid = (TableLayout) findViewById(R.id.match_grid);
-        grid.setVisibility(View.GONE);
-        grid.removeAllViews();
-        ((TextView) findViewById(R.id.label_p1)).setText(R.string.unknown_player);
-        ((TextView) findViewById(R.id.label_p2)).setText(R.string.unknown_player);
-        ((TextView) findViewById(R.id.score_p1)).setText("");
-        ((TextView) findViewById(R.id.score_p2)).setText("");
-        ((ImageView) findViewById(R.id.turn_indicator)).setImageResource(android.R.color.transparent);
-        findViewById(R.id.board_panels).setVisibility(View.VISIBLE);
+        mMatchGridView.setVisibility(View.GONE);
+        mPlayerOneLabelTextView.setText(R.string.unknown_player);
+        mPlayerTwoLabelTextView.setText(R.string.unknown_player);
+        mPlayerOneScoreTextView.setText("");
+        mPlayerTwoScoreTextView.setText("");
+        mTurnIndicator.setImageResource(android.R.color.transparent);
+        mBoardPanelView.setVisibility(View.VISIBLE);
     }
 
     private void updatePlayerNames() {
         if (mLightPlayer != null) {
-            ((TextView) findViewById(R.id.label_p1)).setText(mLightPlayer.getDisplayName());
+            mPlayerOneLabelTextView.setText(mLightPlayer.getDisplayName());
         } else {
-            ((TextView) findViewById(R.id.label_p1)).setText(R.string.unknown_player);
+            mPlayerOneLabelTextView.setText(R.string.unknown_player);
         }
 
         if (mDarkPlayer != null) {
-            ((TextView) findViewById(R.id.label_p2)).setText(mDarkPlayer.getDisplayName());
+            mPlayerTwoLabelTextView.setText(mDarkPlayer.getDisplayName());
         } else {
-            ((TextView) findViewById(R.id.label_p2)).setText(R.string.unknown_player);
+            mPlayerTwoLabelTextView.setText(R.string.unknown_player);
         }
     }
 
@@ -767,25 +769,24 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 mDarkScore += mBoard.getNumberOfEmptySpaces();
         }
 
-        ((TextView) findViewById(R.id.score_p1)).setText(String.valueOf(mLightScore));
-        ((TextView) findViewById(R.id.score_p2)).setText(String.valueOf(mDarkScore));
+        mPlayerOneScoreTextView.setText(String.valueOf(mLightScore));
+        mPlayerTwoScoreTextView.setText(String.valueOf(mDarkScore));
 
         // Update turn indicator
-        ImageView turnIndicator = (ImageView) findViewById(R.id.turn_indicator);
         switch (mMatch.getTurnStatus()) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-                turnIndicator.setImageResource((mPlayer == mLightPlayer) ?
+                mTurnIndicator.setImageResource((mPlayer == mLightPlayer) ?
                         R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
-                turnIndicator.setImageResource((mOpponent == mLightPlayer) ?
+                mTurnIndicator.setImageResource((mOpponent == mLightPlayer) ?
                         R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-                turnIndicator.setImageResource(R.drawable.ic_turn_neutral);
+                mTurnIndicator.setImageResource(R.drawable.ic_turn_neutral);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE:
-                turnIndicator.setImageResource(R.drawable.ic_turn_neutral);
+                mTurnIndicator.setImageResource(R.drawable.ic_turn_neutral);
                 break;
         }
     }
@@ -831,20 +832,20 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void displayMessage(String matchMsg) {
-        ((TextView) findViewById(R.id.match_message_text)).setText(matchMsg);
-        findViewById(R.id.match_message).setVisibility(View.VISIBLE);
+        mMatchMessageTextView.setText(matchMsg);
+        mMatchMessageView.setVisibility(View.VISIBLE);
 
         // Start animations for side icons
         if (mLeftFadeOut != null && mRightFadeOut != null
                 && !mLeftFadeOut.hasStarted() && !mRightFadeOut.hasStarted()) {
-            mWaiting1.startAnimation(mLeftFadeOut);
-            mWaiting2.startAnimation(mRightFadeOut);
+            mMatchMessageIcon1.startAnimation(mLeftFadeOut);
+            mMatchMessageIcon2.startAnimation(mRightFadeOut);
         }
     }
 
     private void dismissMessage() {
-        findViewById(R.id.match_message).setVisibility(View.INVISIBLE);
-        ((TextView) findViewById(R.id.match_message_text)).setText("");
+        mMatchMessageView.setVisibility(View.INVISIBLE);
+        mMatchMessageTextView.setText("");
         mLeftFadeOut.cancel();
         mRightFadeOut.cancel();
         mLeftFadeIn.cancel();
@@ -852,7 +853,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void askForRematch() {
-        showDialog(new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.dialog_rematch_title))
                 .setMessage(getString(R.string.dialog_rematch_message))
                 .setPositiveButton(getString(R.string.dialog_rematch_confirm), new DialogInterface.OnClickListener() {
@@ -884,15 +885,13 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void initializeWaitingAnimations() {
-        mLeftFadeIn = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadein);
-        mLeftFadeOut = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadeout);
-        mRightFadeIn = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadein);
-        mRightFadeOut = AnimationUtils.loadAnimation(this, R.anim.waitingmessage_fadeout);
+        mLeftFadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.waitingmessage_fadein);
+        mLeftFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.waitingmessage_fadeout);
+        mRightFadeIn = AnimationUtils.loadAnimation(getActivity(), R.anim.waitingmessage_fadein);
+        mRightFadeOut = AnimationUtils.loadAnimation(getActivity(), R.anim.waitingmessage_fadeout);
 
-        mWaiting1 = (ImageView) findViewById(R.id.match_message_icon_1);
-        mWaiting2 = (ImageView) findViewById(R.id.match_message_icon_2);
-        mWaiting1.setBackgroundResource(R.drawable.player_icon_p1);
-        mWaiting2.setBackgroundResource(R.drawable.player_icon_p2);
+        mMatchMessageIcon1.setBackgroundResource(R.drawable.player_icon_p1);
+        mMatchMessageIcon2.setBackgroundResource(R.drawable.player_icon_p2);
 
         mRightFadeOut.setAnimationListener(new Animation.AnimationListener() {
             @Override
@@ -904,9 +903,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             @Override
             public void onAnimationEnd(Animation animation) {
                 // Flip background resources & start animation
-                mWaiting2.setBackgroundResource(mWaitingRightColor ? R.drawable.player_icon_p1 : R.drawable.player_icon_p2);
-                mWaitingRightColor = !mWaitingRightColor;
-                mWaiting2.startAnimation(mRightFadeIn);
+                mMatchMessageIcon2.setBackgroundResource(mMatchMessageIcon2Color
+                        ? R.drawable.player_icon_p1 : R.drawable.player_icon_p2);
+                mMatchMessageIcon2Color = !mMatchMessageIcon2Color;
+                mMatchMessageIcon2.startAnimation(mRightFadeIn);
             }
         });
 
@@ -920,9 +920,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             @Override
             public void onAnimationEnd(Animation animation) {
                 // Flip background resources & start animation
-                mWaiting1.setBackgroundResource(mWaitingLeftColor ? R.drawable.player_icon_p1 : R.drawable.player_icon_p2);
-                mWaitingLeftColor = !mWaitingLeftColor;
-                mWaiting1.startAnimation(mLeftFadeIn);
+                mMatchMessageIcon1.setBackgroundResource(mMatchMessageIcon1Color
+                        ? R.drawable.player_icon_p1 : R.drawable.player_icon_p2);
+                mMatchMessageIcon1Color = !mMatchMessageIcon1Color;
+                mMatchMessageIcon1.startAnimation(mLeftFadeIn);
             }
         });
 
@@ -938,8 +939,8 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 mHandler.postDelayed(new Runnable() {
                     @Override
                     public void run() {
-                        mWaiting1.startAnimation(mLeftFadeOut);
-                        mWaiting2.startAnimation(mRightFadeOut);
+                        mMatchMessageIcon1.startAnimation(mLeftFadeOut);
+                        mMatchMessageIcon2.startAnimation(mRightFadeOut);
                     }
                 }, getResources().getInteger(R.integer.waiting_message_fade_delay));
             }
@@ -948,7 +949,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void showSpinner(int spinnerMsg) {
         if (mProgressBar == null) {
-            mProgressBar = new ProgressDialog(this, R.style.ProgressDialog);
+            mProgressBar = new ProgressDialog(getActivity(), R.style.ProgressDialog);
             mProgressBar.setCancelable(false);
             mProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
         }
@@ -975,7 +976,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     // Generic warning/info dialog
     private void showAlertDialog(String title, String message) {
-        showDialog(new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(getActivity())
                 .setTitle(title)
                 .setMessage(message)
                 .setCancelable(false)
@@ -989,7 +990,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     /* Creates a dialog for an error message */
     private void showErrorDialog(int errorCode) {
-        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_RESOLVE_ERROR);
+        Dialog dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, getActivity(), RC_RESOLVE_ERROR);
         if (dialog != null) {
             dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
@@ -1002,15 +1003,15 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void startNewMatchSelected() {
-        startNewMatch(findViewById(R.id.board_panel_new_game));
+        startNewMatch();
     }
 
     private void selectMatchSelected() {
-        selectMatch(findViewById(R.id.board_panel_select_game));
+        selectMatch();
     }
 
     private void settingsSelected() {
-        Intent settings = new Intent(this, SettingsActivity.class);
+        Intent settings = new Intent(getActivity(), SettingsActivity.class);
         settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER);
         boolean isSignedIn = mGoogleApiClient.isConnected();
         settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn);
@@ -1021,7 +1022,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void forfeitMatchSelected() {
         if (mMatch == null) {
-            Toast.makeText(this, R.string.no_match_selected, Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.no_match_selected, Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -1035,7 +1036,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
             case TurnBasedMatch.MATCH_STATUS_COMPLETE:
             case TurnBasedMatch.MATCH_STATUS_CANCELED:
             case TurnBasedMatch.MATCH_STATUS_EXPIRED:
-                Toast.makeText(this, R.string.match_inactive, Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity(), R.string.match_inactive, Toast.LENGTH_SHORT).show();
                 break;
             case TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING:
                 showLeaveMatchDialog();
@@ -1060,7 +1061,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void showCancelMatchDialog() {
-        showDialog(new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(getActivity())
                 .setTitle(getString(R.string.dialog_cancel_match_title))
                 .setMessage(getString(R.string.dialog_cancel_match_message))
                 .setPositiveButton(getString(R.string.dialog_cancel_match_confirm), new DialogInterface.OnClickListener() {
@@ -1088,7 +1089,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void showForfeitMatchDialog() {
-        showDialog(new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_forfeit_match_title)
                 .setMessage(R.string.dialog_forfeit_match_message)
                 .setPositiveButton(R.string.dialog_forfeit_match_confirm, new DialogInterface.OnClickListener() {
@@ -1108,10 +1109,10 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                                     @Override
                                     public void onResult(TurnBasedMultiplayer.UpdateMatchResult result) {
                                         if (result.getStatus().isSuccess()) {
-                                            Toast.makeText(mContext, getString(R.string.forfeit_success), Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getActivity(), getString(R.string.forfeit_success), Toast.LENGTH_LONG).show();
                                             updateMatch(result.getMatch());
                                         } else {
-                                            Toast.makeText(mContext, getString(R.string.forfeit_fail), Toast.LENGTH_LONG).show();
+                                            Toast.makeText(getActivity(), getString(R.string.forfeit_fail), Toast.LENGTH_LONG).show();
                                         }
                                     }
                                 });
@@ -1126,7 +1127,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void showForfeitMatchForbiddenAlert() {
-        showDialog(new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_forfeit_match_forbidden_title)
                 .setMessage(R.string.dialog_forfeit_match_forbidden_message)
                 .setPositiveButton(R.string.dialog_forfeit_match_forbidden_confirm, new DialogInterface.OnClickListener() {
@@ -1138,7 +1139,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private void showLeaveMatchDialog() {
-        showDialog(new AlertDialog.Builder(this)
+        showDialog(new AlertDialog.Builder(getActivity())
                 .setTitle(R.string.dialog_leave_match_title)
                 .setMessage(R.string.dialog_leave_match_message)
                 .setPositiveButton(R.string.dialog_leave_match_confirm, new DialogInterface.OnClickListener() {
@@ -1202,19 +1203,19 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
 
     private void processResultLeaveMatch(TurnBasedMultiplayer.LeaveMatchResult result) {
         if (result.getStatus().isSuccess()) {
-            Toast.makeText(this, R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
             clearBoard();
         } else {
-            Toast.makeText(this, getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
         }
     }
 
     private void processResult(TurnBasedMultiplayer.CancelMatchResult result) {
         if (result.getStatus().isSuccess()) {
-            Toast.makeText(this, R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.match_canceled_toast, Toast.LENGTH_SHORT).show();
             clearBoard();
         } else {
-            Toast.makeText(this, getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.cancel_fail), Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -1232,19 +1233,19 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
     }
 
     private boolean getAutoConnectPreference() {
-        return PreferenceManager.getDefaultSharedPreferences(this).getBoolean(PREF_AUTO_SIGN_IN, false);
+        return PreferenceManager.getDefaultSharedPreferences(getActivity()).getBoolean(PREF_AUTO_SIGN_IN, false);
     }
 
     private void setAutoConnectPreference(boolean b) {
         mSignInOnStart = b;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.multi_player, menu);
-        return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.multi_player, menu);
     }
 
     @Override
@@ -1257,7 +1258,7 @@ public class MultiPlayerMatchActivity extends MatchActivity implements GoogleApi
                 selectMatchSelected();
                 return true;
             case R.id.action_how_to_play:
-                Intent intent = new Intent(this, HowToPlayActivity.class);
+                Intent intent = new Intent(getActivity(), HowToPlayActivity.class);
                 startActivity(intent);
                 return true;
             case R.id.action_close_match:

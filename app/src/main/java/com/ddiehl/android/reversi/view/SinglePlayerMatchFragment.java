@@ -1,18 +1,19 @@
-package com.ddiehl.android.reversi.activities;
+package com.ddiehl.android.reversi.view;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
@@ -23,51 +24,63 @@ import com.ddiehl.android.reversi.game.ComputerAI;
 import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.game.ReversiPlayer;
 
+public class SinglePlayerMatchFragment extends MatchFragment {
+    private static final String TAG = SinglePlayerMatchFragment.class.getSimpleName();
 
-public class SinglePlayerMatchActivity extends MatchActivity {
-    private static final String TAG = SinglePlayerMatchActivity.class.getSimpleName();
     private static final String PREF_PLAYER_NAME = "pref_player_name";
     private static final String PREF_AI_DIFFICULTY = "pref_ai_difficulty";
-    private static final String PREF_MATCH_STATE = "key_gamePrefs";
     private static final String PREF_CURRENT_PLAYER = "pref_currentPlayer";
     private static final String PREF_FIRST_TURN = "pref_firstTurn";
     private static final String PREF_BOARD_STATE = "pref_boardState";
-    private Context ctx;
+
     private ReversiPlayer p1, p2, currentPlayer, firstTurn;
-    private Board mBoard;
     private boolean matchInProgress;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reversi);
-        // Hide select game panel for single player
-        findViewById(R.id.board_panel_select_game).setVisibility(View.GONE);
-        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-        ctx = this;
+
+        PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
         p1 = new ReversiPlayer(ReversiColor.Light, getString(R.string.player1_label_default));
         p2 = new ReversiPlayer(ReversiColor.Dark, getString(R.string.player2_label));
         p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
         p2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
-        mBoard = new Board(this);
+        mBoard = new Board(getActivity());
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View v = super.onCreateView(inflater, container, savedInstanceState);
+
+        mStartNewMatchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startNewMatch();
+            }
+        });
+
+        // Hide select game panel for single player
+        mSelectMatchButton.setVisibility(View.GONE);
 
         if (getSavedMatch()) {
-            mBoard.displayBoard(this);
+            displayBoard();
             updateScoreDisplay();
             matchInProgress = true;
         } else {
             matchInProgress = false;
         }
+
+        return v;
     }
 
     @Override
     public void onResume() {
         super.onResume();
         p1.setName(getPlayerName());
-        ((TextView)findViewById(R.id.label_p1)).setText(p1.getName());
-        ((TextView)findViewById(R.id.label_p2)).setText(p2.getName());
+        mPlayerOneLabelTextView.setText(p1.getName());
+        mPlayerTwoLabelTextView.setText(p2.getName());
         if (matchInProgress && currentPlayer.isCPU())
             new ExecuteCPUMove().execute();
     }
@@ -75,12 +88,14 @@ public class SinglePlayerMatchActivity extends MatchActivity {
     @Override
     public void onPause() {
         super.onPause();
-        if (matchInProgress)
+
+        if (matchInProgress) {
             saveMatchToPrefs();
+        }
     }
 
     public boolean getSavedMatch() {
-        SharedPreferences sp = getSharedPreferences(PREF_MATCH_STATE, 0);
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getActivity());
         if (sp.contains(PREF_CURRENT_PLAYER)
                 && sp.contains(PREF_FIRST_TURN)
                 && sp.contains(PREF_BOARD_STATE)) {
@@ -95,30 +110,27 @@ public class SinglePlayerMatchActivity extends MatchActivity {
     }
 
     public void saveMatchToPrefs() {
-        SharedPreferences sp = getSharedPreferences(PREF_MATCH_STATE, 0);
-        SharedPreferences.Editor e = sp.edit();
-        e.putBoolean(PREF_CURRENT_PLAYER, (currentPlayer == p1));
-        e.putBoolean(PREF_FIRST_TURN, (firstTurn == p1));
         byte[] bytes = mBoard.serialize();
         StringBuilder out = new StringBuilder();
         for (byte b : bytes)
             out.append(b);
-        e.putString(PREF_BOARD_STATE, out.toString());
-        e.apply();
+
+        PreferenceManager.getDefaultSharedPreferences(getActivity()).edit()
+                .putBoolean(PREF_CURRENT_PLAYER, (currentPlayer == p1))
+                .putBoolean(PREF_FIRST_TURN, (firstTurn == p1))
+                .putString(PREF_BOARD_STATE, out.toString())
+                .apply();
     }
 
     private String getPlayerName() {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         return prefs.getString(PREF_PLAYER_NAME, getString(R.string.player1_label_default));
     }
 
-    public void selectMatch(View v) {
-        // Hidden onCreate of Activity
-    }
-
-    public void startNewMatch(View v) {
+    @Override
+    public void startNewMatch() {
         mBoard.reset();
-        mBoard.displayBoard(this);
+        displayBoard();
         switchFirstTurn();
         updateScoreDisplay();
         matchInProgress = true;
@@ -128,11 +140,17 @@ public class SinglePlayerMatchActivity extends MatchActivity {
             new ExecuteCPUMove().execute();
     }
 
+    @Override
+    public void selectMatch() {
+        // Button is hidden
+    }
+
     private void switchFirstTurn() {
-        if (firstTurn == null)
+        if (firstTurn == null){
             firstTurn = p1;
-        else
+        } else {
             firstTurn = (firstTurn == p1) ? p2 : p1;
+        }
         currentPlayer = firstTurn;
     }
 
@@ -143,8 +161,9 @@ public class SinglePlayerMatchActivity extends MatchActivity {
         if (mBoard.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
             mBoard.commitPiece(s, currentPlayer.getColor());
             calculateMatchState();
-        } else
-            Toast.makeText(ctx, R.string.bad_move, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getActivity(), R.string.bad_move, Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void calculateMatchState() {
@@ -152,7 +171,7 @@ public class SinglePlayerMatchActivity extends MatchActivity {
         if (mBoard.hasMove(opponent.getColor())) { // If opponent can make a move, it's his turn
             currentPlayer = opponent;
         } else if (mBoard.hasMove(currentPlayer.getColor())) { // Opponent has no move, keep turn
-            Toast.makeText(this, getString(R.string.no_moves) + opponent.getName(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), getString(R.string.no_moves) + opponent.getName(), Toast.LENGTH_SHORT).show();
         } else { // No moves remaining, end of match
             updateScoreDisplay();
             endMatch();
@@ -168,8 +187,8 @@ public class SinglePlayerMatchActivity extends MatchActivity {
 
         @Override
         protected BoardSpace doInBackground(Void... voids) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-            int difficulty = Integer.valueOf(prefs.getString(PREF_AI_DIFFICULTY, "0"));
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            int difficulty = prefs.getInt(PREF_AI_DIFFICULTY, 0);
             BoardSpace move;
             switch (difficulty) {
                 case 1:
@@ -216,15 +235,13 @@ public class SinglePlayerMatchActivity extends MatchActivity {
         p2.setScore(p2c);
         updateScoreForPlayer(p1);
         updateScoreForPlayer(p2);
-        ((ImageView)findViewById(R.id.turn_indicator)).setImageResource(
+        mTurnIndicator.setImageResource(
                 (currentPlayer == p1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
     }
 
     public void updateScoreForPlayer(ReversiPlayer p) {
-        TextView vScore;
-        if (p == p1) vScore = (TextView) findViewById(R.id.score_p1);
-        else vScore = (TextView) findViewById(R.id.score_p2);
-        vScore.setText(String.valueOf(p.getScore()));
+        (p == p1 ? mPlayerOneScoreTextView : mPlayerTwoScoreTextView)
+                .setText(String.valueOf(p.getScore()));
     }
 
     public void endMatch() {
@@ -239,30 +256,41 @@ public class SinglePlayerMatchActivity extends MatchActivity {
             showWinningToast(null);
         }
         switchFirstTurn();
-        getSharedPreferences(PREF_MATCH_STATE, 0).edit().clear().apply();
+        PreferenceManager.getDefaultSharedPreferences(getActivity())
+                .edit()
+                .remove(PREF_CURRENT_PLAYER)
+                .remove(PREF_FIRST_TURN)
+                .remove(PREF_BOARD_STATE)
+                .apply();
         matchInProgress = false;
+    }
+
+    public void displayBoard() {
+        mBoardPanelView.setVisibility(View.GONE);
+        mMatchGridView.setVisibility(View.VISIBLE);
     }
 
     public void showWinningToast(ReversiPlayer winner) {
         if (winner != null) {
             Toast t;
-            if (winner == p1)
-                t = Toast.makeText(this, getString(R.string.winner_p1), Toast.LENGTH_LONG);
-            else
-                t = Toast.makeText(this, getString(R.string.winner_cpu), Toast.LENGTH_LONG);
+            if (winner == p1) {
+                t = Toast.makeText(getActivity(), getString(R.string.winner_p1), Toast.LENGTH_LONG);
+            } else {
+                t = Toast.makeText(getActivity(), getString(R.string.winner_cpu), Toast.LENGTH_LONG);
+            }
             t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
             t.show();
         } else { // You tied
-            Toast t = Toast.makeText(this, getString(R.string.winner_none), Toast.LENGTH_LONG);
+            Toast t = Toast.makeText(getActivity(), getString(R.string.winner_none), Toast.LENGTH_LONG);
             t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
             t.show();
         }
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.single_player, menu);
-        return true;
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.single_player, menu);
     }
 
     @Override
@@ -270,15 +298,15 @@ public class SinglePlayerMatchActivity extends MatchActivity {
         int id = item.getItemId();
         switch (item.getItemId()) {
             case R.id.action_new_match:
-                startNewMatch(findViewById(id));
+                startNewMatch();
                 return true;
             case R.id.action_settings:
-                Intent settings = new Intent(this, SettingsActivity.class);
+                Intent settings = new Intent(getActivity(), SettingsActivity.class);
                 settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER);
                 startActivity(settings);
                 return true;
             case R.id.action_how_to_play:
-                Intent htp = new Intent(this, HowToPlayActivity.class);
+                Intent htp = new Intent(getActivity(), HowToPlayActivity.class);
                 startActivity(htp);
                 return true;
         }

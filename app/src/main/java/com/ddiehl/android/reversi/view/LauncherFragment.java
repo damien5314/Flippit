@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.activities;
+package com.ddiehl.android.reversi.view;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -64,7 +64,7 @@ public class LauncherFragment extends Fragment
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.activity_launcher, container, false);
+        View v = inflater.inflate(R.layout.fragment_launcher, container, false);
 
         mStartSinglePlayer = (Button) v.findViewById(R.id.button_start_1p);
         mStartSinglePlayer.setOnClickListener(new View.OnClickListener() {

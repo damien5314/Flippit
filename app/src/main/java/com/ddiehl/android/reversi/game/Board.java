@@ -2,13 +2,6 @@ package com.ddiehl.android.reversi.game;
 
 
 import android.content.Context;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TableLayout;
-import android.widget.TableRow;
-
-import com.ddiehl.android.reversi.R;
-import com.ddiehl.android.reversi.activities.MatchActivity;
 
 public class Board {
     private static final String TAG = Board.class.getSimpleName();
@@ -227,41 +220,6 @@ public class Board {
     public BoardSpace getBoardSpaceFromNum(int n) {
         n -= 1;
         return getSpaceAt(n % 8, n / 8);
-    }
-
-    public void displayBoard(final MatchActivity a) {
-        a.findViewById(R.id.board_panels).setVisibility(View.GONE);
-        TableLayout grid = (TableLayout) a.findViewById(R.id.match_grid);
-        grid.setVisibility(View.GONE); // Hide the view until we finish adding children
-        grid.removeAllViews();
-
-        grid.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 0, 16));
-//        grid.setWeightSum(8);
-
-//        int bHeight = (int) a.getResources().getDimension(R.dimen.space_row_height);
-        int bMargin = (int) a.getResources().getDimension(R.dimen.space_padding);
-
-        for (int y = 0; y < height(); y++) {
-            TableRow row = new TableRow(a);
-            row.setLayoutParams(new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT, 0, 1));
-//            row.setWeightSum(width());
-            for (int x = 0; x < width(); x++) {
-                BoardSpace space = getSpaceAt(x, y);
-                TableRow.LayoutParams params = new TableRow.LayoutParams(0, TableRow.LayoutParams.MATCH_PARENT, 1);
-                params.setMargins(bMargin, bMargin, bMargin, bMargin);
-                space.setLayoutParams(params);
-                space.setOnClickListener(
-                        new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                a.claim((BoardSpace) v);
-                            }
-                        });
-                row.addView(space);
-            }
-            grid.addView(row);
-        }
-        grid.setVisibility(View.VISIBLE);
     }
 
     @Override
