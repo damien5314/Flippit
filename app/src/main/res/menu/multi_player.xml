@@ -1,40 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/action_create_match"
         android:icon="@drawable/ic_action_content_add_circle_outline"
-        android:showAsAction="never"
         android:title="@string/multiplayer_new_match"
-        android:titleCondensed="@string/multiplayer_new_match_condensed"/>
+        android:titleCondensed="@string/multiplayer_new_match_condensed"
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_select_match"
         android:icon="@drawable/ic_action_action_view_list"
-        android:showAsAction="never"
         android:title="@string/multiplayer_select_match"
-        android:titleCondensed="@string/multiplayer_select_match_condensed" />
+        android:titleCondensed="@string/multiplayer_select_match_condensed"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/action_close_match"
-          android:showAsAction="never"
-          android:title="@string/multiplayer_close_match"/>
+    <item
+        android:id="@+id/action_close_match"
+        android:title="@string/multiplayer_close_match"
+        app:showAsAction="never"/>
 
-    <item android:id="@+id/action_forfeit_match"
-          android:showAsAction="never"
-          android:title="@string/multiplayer_forfeit_match"/>
+    <item
+        android:id="@+id/action_forfeit_match"
+        android:title="@string/multiplayer_forfeit_match"
+        app:showAsAction="never"/>
 
-    <item android:id="@+id/action_achievements"
-          android:showAsAction="never"
-          android:title="@string/multiplayer_achievements" />
+    <item
+        android:id="@+id/action_achievements"
+        android:title="@string/multiplayer_achievements"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/action_settings"
-          android:showAsAction="never"
-          android:title="@string/multiplayer_settings" />
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/multiplayer_settings"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/action_how_to_play"
-          android:icon="@drawable/ic_action_action_help"
-          android:showAsAction="ifRoom"
-          android:title="@string/action_how_to_play"/>
+    <item
+        android:id="@+id/action_how_to_play"
+        android:icon="@drawable/ic_action_action_help"
+        android:title="@string/action_how_to_play"
+        app:showAsAction="ifRoom"/>
 
 </menu>
