@@ -189,13 +189,13 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         @Override
         protected BoardSpace doInBackground(Void... voids) {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            int difficulty = prefs.getInt(PREF_AI_DIFFICULTY, 0);
+            String difficulty = prefs.getString(PREF_AI_DIFFICULTY, "");
             BoardSpace move;
             switch (difficulty) {
-                case 1:
+                case "1":
                     move = ComputerAI.getBestMove_d1(mBoard, currentPlayer);
                     break;
-                case 2:
+                case "2":
                     move = ComputerAI.getBestMove_d3(mBoard, currentPlayer, (currentPlayer == p1) ? p2 : p1);
                     break;
                 default:
