@@ -67,7 +67,6 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
     private GoogleApiClient mGoogleApiClient;
 
     private TurnBasedMatch mMatch;
-    private Board mBoard;
     private Participant mPlayer, mOpponent;
     private Participant mLightPlayer, mDarkPlayer;
     private byte[] mMatchData;

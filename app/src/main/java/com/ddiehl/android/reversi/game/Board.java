@@ -10,7 +10,7 @@ public class Board {
     private final int width;
     private final int height;
 
-    private final byte[][] moveDirections = new byte[][] {
+    private final byte[][] MOVE_DIRECTIONS = new byte[][] {
             {0,  -1}, // Down
             {1,  0}, // Right
             {-1, 0}, // Left
@@ -56,7 +56,7 @@ public class Board {
             BoardSpace s = i.next();
             if (s.isOwned())
                 continue;
-            for (byte[] move : moveDirections) {
+            for (byte[] move : MOVE_DIRECTIONS) {
                 int value = moveValueInDirection(s, move[0], move[1], c);
                 if (value != 0) {
                     return true;
@@ -66,19 +66,19 @@ public class Board {
         return false;
     }
 
-    public BoardSpace getSpaceAt(int x, int y) {
+    BoardSpace getSpaceAt(int x, int y) {
         if (x >= 0 && x < width && y >= 0 && y < height)
             return spaces[y][x];
 
         return null;
     }
 
-    public void setSpace(int x, int y, BoardSpace s) {
+    void setSpace(int x, int y, BoardSpace s) {
         this.spaces[y][x] = s;
     }
 
     public void commitPiece(BoardSpace space, ReversiColor playerColor) {
-        for (byte[] move : moveDirections) {
+        for (byte[] move : MOVE_DIRECTIONS) {
             if (moveValueInDirection(space, move[0], move[1], playerColor) != 0) {
                 flipInDirection(space, move[0], move[1], playerColor);
             }
@@ -87,7 +87,7 @@ public class Board {
 
     public int spacesCapturedWithMove(BoardSpace s, ReversiColor playerColor) {
         int moveVal = 0;
-        for (byte[] move : moveDirections)
+        for (byte[] move : MOVE_DIRECTIONS)
             moveVal += moveValueInDirection(s, move[0], move[1], playerColor);
         return moveVal;
     }
@@ -251,11 +251,6 @@ public class Board {
             }
 
             return s;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
     }
 
