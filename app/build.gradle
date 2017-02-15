@@ -26,4 +26,16 @@ dependencies {
     compile "com.android.support:support-v4:$project.ext.SUPPORT_LIBRARY_VERSION"
     
     compile "com.google.android.gms:play-services:6.5.87"
+
+    compile "io.reactivex:rxandroid:$project.ext.RXANDROID_VERSION"
+    compile "io.reactivex:rxjava:$project.ext.RXJAVA_VERSION"
+//    compile "io.reactivex.rxjava2:rxandroid:$project.ext.RXANDROID_VERSION"
+//    compile "io.reactivex.rxjava2:rxjava:$project.ext.RXJAVA_VERSION"
+
+    compile "com.jakewharton.rxbinding:rxbinding:$project.ext.RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-support-v4:$project.ext.RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$project.ext.RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-design:$project.ext.RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$project.ext.RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-leanback-v17:$project.ext.RXBINDING_VERSION"
 }
