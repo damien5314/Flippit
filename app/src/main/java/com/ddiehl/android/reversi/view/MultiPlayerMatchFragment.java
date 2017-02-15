@@ -280,6 +280,11 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
     }
 
     @Override
+    void handleSpaceClick(int row, int col) {
+        // TODO
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
 

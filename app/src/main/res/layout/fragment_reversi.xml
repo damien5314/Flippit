@@ -90,91 +90,91 @@
             style="@style/GameBoardTable" >
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
-                <View style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
         </TableLayout>

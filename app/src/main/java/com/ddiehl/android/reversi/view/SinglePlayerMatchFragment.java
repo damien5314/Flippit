@@ -146,6 +146,11 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         // Button is hidden
     }
 
+    @Override
+    void handleSpaceClick(int row, int col) {
+        // TODO
+    }
+
     private void switchFirstTurn() {
         if (firstTurn == null){
             firstTurn = p1;

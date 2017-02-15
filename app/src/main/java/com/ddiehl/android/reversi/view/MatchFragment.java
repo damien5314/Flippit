@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,9 @@ import android.widget.TextView;
 
 import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.game.Board;
+import com.jakewharton.rxbinding.view.RxView;
+
+import rx.functions.Action1;
 
 public abstract class MatchFragment extends Fragment {
     private static final String TAG = MatchFragment.class.getSimpleName();
@@ -48,6 +52,7 @@ public abstract class MatchFragment extends Fragment {
 
         mBoardPanelView = v.findViewById(R.id.board_panels);
         mMatchGridView = (TableLayout) v.findViewById(R.id.match_grid);
+        initMatchGrid(mMatchGridView);
         mMatchGridView.setVisibility(View.GONE);
         mPlayerOneLabelTextView = (TextView) v.findViewById(R.id.label_p1);
         mPlayerTwoLabelTextView = (TextView) v.findViewById(R.id.label_p2);
@@ -78,6 +83,29 @@ public abstract class MatchFragment extends Fragment {
         return v;
     }
 
-    public abstract void startNewMatch();
-    public abstract void selectMatch();
+    protected void initMatchGrid(ViewGroup grid) {
+        for (int i = 0; i < grid.getChildCount(); i++) {
+            ViewGroup row = (ViewGroup) grid.getChildAt(i);
+            for (int j = 0; j < row.getChildCount(); j++) {
+                View space = row.getChildAt(j);
+
+                RxView.clicks(space)
+                        .subscribe(onSpaceClicked(i, j));
+            }
+        }
+    }
+
+    private Action1<Void> onSpaceClicked(final int row, final int col) {
+        return new Action1<Void>() {
+            @Override
+            public void call(Void v) {
+                Log.d(TAG, "Piece clicked @ " + row + " " + col);
+                handleSpaceClick(row, col);
+            }
+        };
+    }
+
+    abstract void startNewMatch();
+    abstract void selectMatch();
+    abstract void handleSpaceClick(int row, int col);
 }
