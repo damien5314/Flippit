@@ -10,6 +10,7 @@ import android.widget.Button;
 import com.ddiehl.android.reversi.R;
 
 public class BoardSpace extends Button {
+
     private Context ctx;
     private ReversiColor color;
     public int x, y;
