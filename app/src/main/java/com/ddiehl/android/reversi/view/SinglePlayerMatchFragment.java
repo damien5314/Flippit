@@ -48,7 +48,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         p1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
         p2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
-        mBoard = new Board(getActivity());
+        mBoard = new Board();
     }
 
     @Override

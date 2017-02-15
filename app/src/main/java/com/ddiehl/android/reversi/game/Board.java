@@ -1,14 +1,11 @@
 package com.ddiehl.android.reversi.game;
 
 
-import android.content.Context;
-
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class Board {
-    private static final String TAG = Board.class.getSimpleName();
-    private static Context ctx;
+
     private final BoardSpace[][] spaces;
     private final int width;
     private final int height;
@@ -24,8 +21,7 @@ public class Board {
             {1,  1} // Top-Right
     };
 
-    public Board(Context c) {
-        ctx = c;
+    public Board() {
         width = 8;
         height = 8;
         spaces = new BoardSpace[height][width];
@@ -33,10 +29,10 @@ public class Board {
     }
 
     public Board copy() {
-        Board copy = new Board(ctx);
+        Board copy = new Board();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                copy.spaces[y][x] = spaces[y][x].copy(ctx);
+                copy.spaces[y][x] = spaces[y][x].copy();
             }
         }
         return copy;
@@ -45,7 +41,7 @@ public class Board {
     public void reset() {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                spaces[y][x] = new BoardSpace(ctx, x, y);
+                spaces[y][x] = new BoardSpace(x, y);
             }
         }
         spaces[3][3].setColorNoAnimation(ReversiColor.Light);
@@ -167,7 +163,7 @@ public class Board {
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 byte c = in[index++];
-                setSpace(x, y, new BoardSpace(ctx, x, y));
+                setSpace(x, y, new BoardSpace(x, y));
                 switch (c) {
                     case 0:
                         break;
@@ -186,7 +182,7 @@ public class Board {
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 char c = in.charAt(index++);
-                setSpace(x, y, new BoardSpace(ctx, x, y));
+                setSpace(x, y, new BoardSpace(x, y));
                 switch (c) {
                     case '0':
                         break;

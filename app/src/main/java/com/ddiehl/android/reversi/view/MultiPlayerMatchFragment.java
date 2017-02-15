@@ -91,7 +91,7 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBoard = new Board(getActivity());
+        mBoard = new Board();
         mSignInOnStart = getAutoConnectPreference();
         mHandler = new Handler();
         mQueuedMoves = new ArrayList<>();
