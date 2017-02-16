@@ -25,6 +25,8 @@ import com.ddiehl.android.reversi.game.ReversiPlayer;
 
 import java.util.Iterator;
 
+import rx.functions.Action1;
+
 public class SinglePlayerMatchFragment extends MatchFragment {
     private static final String TAG = SinglePlayerMatchFragment.class.getSimpleName();
 
@@ -148,7 +150,22 @@ public class SinglePlayerMatchFragment extends MatchFragment {
 
     @Override
     void handleSpaceClick(int row, int col) {
-        // TODO
+        if (currentPlayer.isCPU()) {
+            // do nothing, this isn't a valid state
+        } else {
+            mBoard.requestClaimSpace(row, col, currentPlayer.getColor())
+                    .subscribe(new Action1<Boolean>() {
+                        @Override
+                        public void call(Boolean success) {
+                            calculateMatchState();
+                        }
+                    }, new Action1<Throwable>() {
+                        @Override
+                        public void call(Throwable throwable) {
+                            Toast.makeText(getActivity(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
     }
 
     private void switchFirstTurn() {
@@ -158,18 +175,6 @@ public class SinglePlayerMatchFragment extends MatchFragment {
             firstTurn = (firstTurn == p1) ? p2 : p1;
         }
         currentPlayer = firstTurn;
-    }
-
-    public void claim(final BoardSpace s) {
-        if (s.isOwned() || currentPlayer.isCPU())
-            return;
-
-        if (mBoard.spacesCapturedWithMove(s, currentPlayer.getColor()) > 0) {
-            mBoard.commitPiece(s, currentPlayer.getColor());
-            calculateMatchState();
-        } else {
-            Toast.makeText(getActivity(), R.string.bad_move, Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void calculateMatchState() {

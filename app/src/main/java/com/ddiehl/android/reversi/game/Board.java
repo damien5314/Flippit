@@ -1,8 +1,13 @@
 package com.ddiehl.android.reversi.game;
 
 
+import com.ddiehl.android.reversi.exceptions.IllegalMoveException;
+
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import rx.Observable;
+import rx.functions.Func0;
 
 public class Board {
 
@@ -75,6 +80,28 @@ public class Board {
 
     void setSpace(int x, int y, BoardSpace s) {
         this.spaces[y][x] = s;
+    }
+
+    public Observable<Boolean> requestClaimSpace(final int x, final int y, final ReversiColor color) {
+        return Observable.defer(new Func0<Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call() {
+                BoardSpace space = spaces[x][y];
+
+                // If space is already claimed, return an error
+                if (space.isOwned()) {
+                    return Observable.error(new IllegalMoveException("space is already owned"));
+                }
+
+                int captured = spacesCapturedWithMove(space, color);
+                if (captured <= 0) {
+                    return Observable.error(new IllegalMoveException("move value is <= 0: " + captured));
+                }
+
+                commitPiece(space, color);
+                return Observable.just(true);
+            }
+        });
     }
 
     public void commitPiece(BoardSpace space, ReversiColor playerColor) {
@@ -225,14 +252,13 @@ public class Board {
         return new BoardIterator(this);
     }
 
-    private static class BoardIterator implements Iterator<BoardSpace> {
+    static class BoardIterator implements Iterator<BoardSpace> {
         private Board mBoard;
-        private int x;
-        private int y;
+        private int x = 0;
+        private int y = 0;
 
         public BoardIterator(Board b) {
             mBoard = b;
-            x = 0; y = 0;
         }
 
         @Override
@@ -242,8 +268,7 @@ public class Board {
 
         @Override
         public BoardSpace next() {
-            if (!hasNext())
-                throw new NoSuchElementException();
+            if (!hasNext()) throw new NoSuchElementException();
 
             BoardSpace s = mBoard.getSpaceAt(x, y);
             if (++x == mBoard.width()) {
