@@ -2,11 +2,10 @@ package com.ddiehl.android.reversi.view;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,8 +23,13 @@ import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.game.ReversiPlayer;
 
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func0;
+import rx.schedulers.Schedulers;
 
 public class SinglePlayerMatchFragment extends MatchFragment {
     private static final String TAG = SinglePlayerMatchFragment.class.getSimpleName();
@@ -84,8 +88,9 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         p1.setName(getPlayerName());
         mPlayerOneLabelTextView.setText(p1.getName());
         mPlayerTwoLabelTextView.setText(p2.getName());
-        if (matchInProgress && currentPlayer.isCPU())
-            new ExecuteCPUMove().execute();
+        if (matchInProgress && currentPlayer.isCPU()) {
+            executeCpuMove();
+        }
     }
 
     @Override
@@ -107,6 +112,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
 
             String savedData = sp.getString(PREF_BOARD_STATE, "");
             mBoard.deserialize(savedData);
+            updateBoardUi();
             return true;
         }
         return false;
@@ -139,8 +145,9 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         matchInProgress = true;
 
         // CPU takes first move if it has turn
-        if (currentPlayer.isCPU())
-            new ExecuteCPUMove().execute();
+        if (currentPlayer.isCPU()) {
+            executeCpuMove();
+        }
     }
 
     @Override
@@ -157,6 +164,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
                     .subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean success) {
+                            updateBoardUi();
                             calculateMatchState();
                         }
                     }, new Action1<Throwable>() {
@@ -168,8 +176,34 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         }
     }
 
+    private void updateBoardUi() {
+        for (int i = 0; i < mMatchGridView.getChildCount(); i++) {
+            ViewGroup row = (ViewGroup) mMatchGridView.getChildAt(i);
+            for (int j = 0; j < row.getChildCount(); j++) {
+                View space = row.getChildAt(j);
+                updateSpace(space, mBoard, i, j);
+            }
+        }
+    }
+
+    private void updateSpace(final View view, final Board board, final int row, final int col) {
+        BoardSpace space = board.spaceAt(row, col);
+        if (space.getColor() == null) {
+            view.setBackgroundResource(R.drawable.board_space_neutral);
+        } else {
+            switch (space.getColor()) {
+                case Light:
+                    view.setBackgroundResource(R.drawable.board_space_p1);
+                    break;
+                case Dark:
+                    view.setBackgroundResource(R.drawable.board_space_p2);
+                    break;
+            }
+        }
+    }
+
     private void switchFirstTurn() {
-        if (firstTurn == null){
+        if (firstTurn == null) {
             firstTurn = p1;
         } else {
             firstTurn = (firstTurn == p1) ? p2 : p1;
@@ -189,44 +223,46 @@ public class SinglePlayerMatchFragment extends MatchFragment {
             return;
         }
         updateScoreDisplay();
-        if (currentPlayer.isCPU())
-            new ExecuteCPUMove().execute();
+        if (currentPlayer.isCPU()) {
+            executeCpuMove();
+        }
     }
 
-    private class ExecuteCPUMove extends AsyncTask<Void, Void, BoardSpace> {
-        final long startTime = System.currentTimeMillis();
-
-        @Override
-        protected BoardSpace doInBackground(Void... voids) {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            String difficulty = prefs.getString(PREF_AI_DIFFICULTY, "");
-            BoardSpace move;
-            switch (difficulty) {
-                case "1":
-                    move = ComputerAI.getBestMove_d1(mBoard, currentPlayer);
-                    break;
-                case "2":
-                    move = ComputerAI.getBestMove_d3(mBoard, currentPlayer, (currentPlayer == p1) ? p2 : p1);
-                    break;
-                default:
-                    move = null;
-            }
-
-            return move;
-        }
-
-        @Override
-        protected void onPostExecute(final BoardSpace space) {
-            long tt = System.currentTimeMillis() - startTime;
-            // Add delay to 1 second if calculation takes less
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mBoard.commitPiece(space, currentPlayer.getColor());
-                    calculateMatchState();
+    void executeCpuMove() {
+        Observable.defer(new Func0<Observable<BoardSpace>>() {
+            @Override
+            public Observable<BoardSpace> call() {
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                String difficulty = prefs.getString(PREF_AI_DIFFICULTY, "");
+                BoardSpace move;
+                switch (difficulty) {
+                    case "1":
+                        move = ComputerAI.getBestMove_d1(mBoard, currentPlayer);
+                        break;
+                    case "2":
+                        move = ComputerAI.getBestMove_d3(mBoard, currentPlayer, (currentPlayer == p1) ? p2 : p1);
+                        break;
+                    default:
+                        move = null;
                 }
-            }, Math.max(0, getResources().getInteger(R.integer.cpu_turn_delay) - tt));
-        }
+
+                return Observable.just(move);
+            }
+        })
+                .delay(getResources().getInteger(R.integer.cpu_turn_delay), TimeUnit.MILLISECONDS)
+                .subscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        new Action1<BoardSpace>() {
+                            @Override
+                            public void call(BoardSpace space) {
+                                Log.d(TAG, "CPU move updated");
+                                mBoard.commitPiece(space, currentPlayer.getColor());
+                                updateBoardUi();
+                                calculateMatchState();
+                            }
+                        }
+                );
     }
 
     public void updateScoreDisplay() {
@@ -289,11 +325,11 @@ public class SinglePlayerMatchFragment extends MatchFragment {
             } else {
                 t = Toast.makeText(getActivity(), getString(R.string.winner_cpu), Toast.LENGTH_LONG);
             }
-            t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
+            t.setGravity(Gravity.CENTER | Gravity.CENTER, 0, 0);
             t.show();
         } else { // You tied
             Toast t = Toast.makeText(getActivity(), getString(R.string.winner_none), Toast.LENGTH_LONG);
-            t.setGravity(Gravity.CENTER|Gravity.CENTER, 0, 0);
+            t.setGravity(Gravity.CENTER | Gravity.CENTER, 0, 0);
             t.show();
         }
     }

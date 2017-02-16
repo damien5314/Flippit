@@ -252,6 +252,10 @@ public class Board {
         return new BoardIterator(this);
     }
 
+    public BoardSpace spaceAt(int row, int col) {
+        return spaces[row][col];
+    }
+
     static class BoardIterator implements Iterator<BoardSpace> {
         private Board mBoard;
         private int x = 0;
