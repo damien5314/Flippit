@@ -1,19 +1,21 @@
 package com.ddiehl.android.reversi.game;
 
 
-import android.content.Context;
+import com.ddiehl.android.reversi.exceptions.IllegalMoveException;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import rx.Observable;
+import rx.functions.Func0;
+
 public class Board {
-    private static final String TAG = Board.class.getSimpleName();
-    private static Context ctx;
+
     private final BoardSpace[][] spaces;
     private final int width;
     private final int height;
 
-    private final byte[][] moveDirections = new byte[][] {
+    private final byte[][] MOVE_DIRECTIONS = new byte[][] {
             {0,  -1}, // Down
             {1,  0}, // Right
             {-1, 0}, // Left
@@ -24,8 +26,7 @@ public class Board {
             {1,  1} // Top-Right
     };
 
-    public Board(Context c) {
-        ctx = c;
+    public Board() {
         width = 8;
         height = 8;
         spaces = new BoardSpace[height][width];
@@ -33,10 +34,10 @@ public class Board {
     }
 
     public Board copy() {
-        Board copy = new Board(ctx);
+        Board copy = new Board();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                copy.spaces[y][x] = spaces[y][x].copy(ctx);
+                copy.spaces[y][x] = spaces[y][x].copy();
             }
         }
         return copy;
@@ -45,13 +46,13 @@ public class Board {
     public void reset() {
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                spaces[y][x] = new BoardSpace(ctx, x, y);
+                spaces[y][x] = new BoardSpace(x, y);
             }
         }
-        spaces[3][3].setColorNoAnimation(ReversiColor.Light);
-        spaces[3][4].setColorNoAnimation(ReversiColor.Dark);
-        spaces[4][4].setColorNoAnimation(ReversiColor.Light);
-        spaces[4][3].setColorNoAnimation(ReversiColor.Dark);
+        spaces[3][3].setColor(ReversiColor.Light);
+        spaces[3][4].setColor(ReversiColor.Dark);
+        spaces[4][4].setColor(ReversiColor.Light);
+        spaces[4][3].setColor(ReversiColor.Dark);
     }
 
     public boolean hasMove(ReversiColor c) {
@@ -60,7 +61,7 @@ public class Board {
             BoardSpace s = i.next();
             if (s.isOwned())
                 continue;
-            for (byte[] move : moveDirections) {
+            for (byte[] move : MOVE_DIRECTIONS) {
                 int value = moveValueInDirection(s, move[0], move[1], c);
                 if (value != 0) {
                     return true;
@@ -70,19 +71,41 @@ public class Board {
         return false;
     }
 
-    public BoardSpace getSpaceAt(int x, int y) {
+    BoardSpace getSpaceAt(int x, int y) {
         if (x >= 0 && x < width && y >= 0 && y < height)
             return spaces[y][x];
 
         return null;
     }
 
-    public void setSpace(int x, int y, BoardSpace s) {
+    void setSpace(int x, int y, BoardSpace s) {
         this.spaces[y][x] = s;
     }
 
+    public Observable<Boolean> requestClaimSpace(final int x, final int y, final ReversiColor color) {
+        return Observable.defer(new Func0<Observable<Boolean>>() {
+            @Override
+            public Observable<Boolean> call() {
+                BoardSpace space = spaces[x][y];
+
+                // If space is already claimed, return an error
+                if (space.isOwned()) {
+                    return Observable.error(new IllegalMoveException("space is already owned"));
+                }
+
+                int captured = spacesCapturedWithMove(space, color);
+                if (captured <= 0) {
+                    return Observable.error(new IllegalMoveException("move value is <= 0: " + captured));
+                }
+
+                commitPiece(space, color);
+                return Observable.just(true);
+            }
+        });
+    }
+
     public void commitPiece(BoardSpace space, ReversiColor playerColor) {
-        for (byte[] move : moveDirections) {
+        for (byte[] move : MOVE_DIRECTIONS) {
             if (moveValueInDirection(space, move[0], move[1], playerColor) != 0) {
                 flipInDirection(space, move[0], move[1], playerColor);
             }
@@ -91,22 +114,22 @@ public class Board {
 
     public int spacesCapturedWithMove(BoardSpace s, ReversiColor playerColor) {
         int moveVal = 0;
-        for (byte[] move : moveDirections)
+        for (byte[] move : MOVE_DIRECTIONS)
             moveVal += moveValueInDirection(s, move[0], move[1], playerColor);
         return moveVal;
     }
 
     private int moveValueInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
-        if (s.x+dx < 0 || s.x+dx >= width || s.y+dy < 0 || s.y+dy >= height)
+        if (s.x()+dx < 0 || s.x()+dx >= width || s.y()+dy < 0 || s.y()+dy >= height)
             return 0;
 
         int moveVal = 0;
         ReversiColor opponentColor = (playerColor == ReversiColor.Dark) ? ReversiColor.Light : ReversiColor.Dark;
-        BoardSpace firstPiece = getSpaceAt(s.x + dx, s.y + dy);
+        BoardSpace firstPiece = getSpaceAt(s.x() + dx, s.y() + dy);
 
         if (firstPiece != null && firstPiece.getColor() == opponentColor) {
-            int cx = s.x+dx;
-            int cy = s.y+dy;
+            int cx = s.x()+dx;
+            int cy = s.y()+dy;
             while (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == opponentColor) {
                 moveVal++;
                 cx += dx;
@@ -121,9 +144,9 @@ public class Board {
     }
 
     private void flipInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
-        s.setColorAnimated(playerColor);
-        int cx = s.x + dx;
-        int cy = s.y + dy;
+        s.setColor(playerColor);
+        int cx = s.x() + dx;
+        int cy = s.y() + dy;
 
         while (getSpaceAt(cx, cy).getColor() != playerColor) {
             getSpaceAt(cx, cy).flipColor();
@@ -167,15 +190,15 @@ public class Board {
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 byte c = in[index++];
-                setSpace(x, y, new BoardSpace(ctx, x, y));
+                setSpace(x, y, new BoardSpace(x, y));
                 switch (c) {
                     case 0:
                         break;
                     case 1:
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Light);
+                        getSpaceAt(x, y).setColor(ReversiColor.Light);
                         break;
                     case 2:
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Dark);
+                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
                 }
             }
         }
@@ -186,15 +209,15 @@ public class Board {
         for (int y = 0; y < height(); y++) {
             for (int x = 0; x < width(); x++) {
                 char c = in.charAt(index++);
-                setSpace(x, y, new BoardSpace(ctx, x, y));
+                setSpace(x, y, new BoardSpace(x, y));
                 switch (c) {
                     case '0':
                         break;
                     case '1':
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Light);
+                        getSpaceAt(x, y).setColor(ReversiColor.Light);
                         break;
                     case '2':
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Dark);
+                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
                 }
             }
         }
@@ -217,7 +240,7 @@ public class Board {
     }
 
     public byte getSpaceNumber(BoardSpace s) {
-        return (byte) (s.y * 8 + s.x + 1);
+        return (byte) (s.y() * 8 + s.x() + 1);
     }
 
     public BoardSpace getBoardSpaceFromNum(int n) {
@@ -229,14 +252,17 @@ public class Board {
         return new BoardIterator(this);
     }
 
-    private static class BoardIterator implements Iterator<BoardSpace> {
+    public BoardSpace spaceAt(int row, int col) {
+        return spaces[row][col];
+    }
+
+    static class BoardIterator implements Iterator<BoardSpace> {
         private Board mBoard;
-        private int x;
-        private int y;
+        private int x = 0;
+        private int y = 0;
 
         public BoardIterator(Board b) {
             mBoard = b;
-            x = 0; y = 0;
         }
 
         @Override
@@ -246,8 +272,7 @@ public class Board {
 
         @Override
         public BoardSpace next() {
-            if (!hasNext())
-                throw new NoSuchElementException();
+            if (!hasNext()) throw new NoSuchElementException();
 
             BoardSpace s = mBoard.getSpaceAt(x, y);
             if (++x == mBoard.width()) {
@@ -255,11 +280,6 @@ public class Board {
             }
 
             return s;
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException();
         }
     }
 

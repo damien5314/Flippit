@@ -1,37 +1,34 @@
 package com.ddiehl.android.reversi.game;
 
 
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.Button;
+import android.support.annotation.Nullable;
 
-import com.ddiehl.android.reversi.R;
+public class BoardSpace {
 
-public class BoardSpace extends Button {
-    private Context ctx;
-    private ReversiColor color;
-    public int x, y;
+    private @Nullable ReversiColor color;
+    private int x;
+    private int y;
 
-    public BoardSpace(Context c, AttributeSet attributeSet) {
-        super(c);
-        ctx = c;
-        setBackgroundResource(R.drawable.board_space_neutral);
+    public BoardSpace() {
         color = null;
     }
 
-    public BoardSpace(Context c, int x, int y) {
-        super(c);
-        ctx = c;
-        setBackgroundResource(R.drawable.board_space_neutral);
+    public BoardSpace(int x, int y) {
         color = null;
         this.x = x;
         this.y = y;
     }
 
-    protected BoardSpace copy(Context context) {
-        BoardSpace copy = new BoardSpace(context, x, y);
+    public int x() {
+        return x;
+    }
+
+    public int y() {
+        return y;
+    }
+
+    protected BoardSpace copy() {
+        BoardSpace copy = new BoardSpace(x, y);
         copy.color = color;
         return copy;
     }
@@ -40,46 +37,20 @@ public class BoardSpace extends Button {
         return color != null;
     }
 
-    public ReversiColor getColor() {
+    public @Nullable ReversiColor getColor() {
         return color;
     }
 
-    public void setColorNoAnimation(ReversiColor c) {
+    public void setColor(@Nullable ReversiColor c) {
         color = c;
-        updateBackgroundResource();
     }
 
-    public void setColorAnimated(ReversiColor c) {
-        color = c;
-        animateBackgroundChange();
-    }
-
-    public void flipColor() {
-        color = (color == ReversiColor.Dark) ? ReversiColor.Light : ReversiColor.Dark;
-        animateBackgroundChange();
-    }
-
-    private void animateBackgroundChange() {
-        final Animation fadeOut = AnimationUtils.loadAnimation(ctx, R.anim.playermove_fadeout);
-        final Animation fadeIn = AnimationUtils.loadAnimation(ctx, R.anim.playermove_fadein);
-        fadeOut.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) { }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) { }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                updateBackgroundResource();
-                startAnimation(fadeIn);
-            }
-        });
-        startAnimation(fadeOut);
-    }
-
-    private void updateBackgroundResource() {
-        setBackgroundResource((color == ReversiColor.Light)
-                ? R.drawable.board_space_p1 : R.drawable.board_space_p2);
+    public ReversiColor flipColor() {
+        if (color == null) {
+            return null;
+        } else {
+            color = (color == ReversiColor.Dark) ? ReversiColor.Light : ReversiColor.Dark;
+            return color;
+        }
     }
 }

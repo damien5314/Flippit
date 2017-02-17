@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".view.MultiPlayerMatchActivity">
 
     <LinearLayout
         android:id="@+id/score_overlay"
@@ -90,91 +90,91 @@
             style="@style/GameBoardTable" >
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
             <TableRow style="@style/MatchGridRow">
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
-                <com.ddiehl.android.reversi.game.BoardSpace style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
+                <Button style="@style/MatchGridSpace"/>
             </TableRow>
 
         </TableLayout>

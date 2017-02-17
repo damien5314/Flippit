@@ -67,7 +67,6 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
     private GoogleApiClient mGoogleApiClient;
 
     private TurnBasedMatch mMatch;
-    private Board mBoard;
     private Participant mPlayer, mOpponent;
     private Participant mLightPlayer, mDarkPlayer;
     private byte[] mMatchData;
@@ -91,7 +90,7 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mBoard = new Board(getActivity());
+        mBoard = new Board();
         mSignInOnStart = getAutoConnectPreference();
         mHandler = new Handler();
         mQueuedMoves = new ArrayList<>();
@@ -278,6 +277,11 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
         }
         Intent intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient);
         startActivityForResult(intent, RC_VIEW_MATCHES);
+    }
+
+    @Override
+    void handleSpaceClick(int row, int col) {
+        // TODO
     }
 
     @Override
