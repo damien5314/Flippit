@@ -38,4 +38,7 @@ dependencies {
 //    compile "com.jakewharton.rxbinding:rxbinding-design:$project.ext.RXBINDING_VERSION"
 //    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$project.ext.RXBINDING_VERSION"
 //    compile "com.jakewharton.rxbinding:rxbinding-leanback-v17:$project.ext.RXBINDING_VERSION"
+
+    compile "com.jakewharton:butterknife:$project.ext.BUTTER_KNIFE_VERSION"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$project.ext.BUTTER_KNIFE_VERSION"
 }
