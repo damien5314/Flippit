@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,6 +14,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
 import com.ddiehl.android.reversi.R;
@@ -200,6 +203,26 @@ public class SinglePlayerMatchFragment extends MatchFragment {
                     break;
             }
         }
+    }
+
+    private void animateBackgroundChange(final @NonNull View view) {
+        final Animation fadeOut = AnimationUtils.loadAnimation(getContext(), R.anim.playermove_fadeout);
+        final Animation fadeIn = AnimationUtils.loadAnimation(getContext(), R.anim.playermove_fadein);
+
+        fadeOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                view.startAnimation(fadeIn);
+            }
+        });
+
+        view.startAnimation(fadeOut);
     }
 
     private void switchFirstTurn() {

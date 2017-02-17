@@ -49,10 +49,10 @@ public class Board {
                 spaces[y][x] = new BoardSpace(x, y);
             }
         }
-        spaces[3][3].setColorNoAnimation(ReversiColor.Light);
-        spaces[3][4].setColorNoAnimation(ReversiColor.Dark);
-        spaces[4][4].setColorNoAnimation(ReversiColor.Light);
-        spaces[4][3].setColorNoAnimation(ReversiColor.Dark);
+        spaces[3][3].setColor(ReversiColor.Light);
+        spaces[3][4].setColor(ReversiColor.Dark);
+        spaces[4][4].setColor(ReversiColor.Light);
+        spaces[4][3].setColor(ReversiColor.Dark);
     }
 
     public boolean hasMove(ReversiColor c) {
@@ -120,16 +120,16 @@ public class Board {
     }
 
     private int moveValueInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
-        if (s.x+dx < 0 || s.x+dx >= width || s.y+dy < 0 || s.y+dy >= height)
+        if (s.x()+dx < 0 || s.x()+dx >= width || s.y()+dy < 0 || s.y()+dy >= height)
             return 0;
 
         int moveVal = 0;
         ReversiColor opponentColor = (playerColor == ReversiColor.Dark) ? ReversiColor.Light : ReversiColor.Dark;
-        BoardSpace firstPiece = getSpaceAt(s.x + dx, s.y + dy);
+        BoardSpace firstPiece = getSpaceAt(s.x() + dx, s.y() + dy);
 
         if (firstPiece != null && firstPiece.getColor() == opponentColor) {
-            int cx = s.x+dx;
-            int cy = s.y+dy;
+            int cx = s.x()+dx;
+            int cy = s.y()+dy;
             while (getSpaceAt(cx, cy) != null && getSpaceAt(cx, cy).getColor() == opponentColor) {
                 moveVal++;
                 cx += dx;
@@ -144,9 +144,9 @@ public class Board {
     }
 
     private void flipInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
-        s.setColorAnimated(playerColor);
-        int cx = s.x + dx;
-        int cy = s.y + dy;
+        s.setColor(playerColor);
+        int cx = s.x() + dx;
+        int cy = s.y() + dy;
 
         while (getSpaceAt(cx, cy).getColor() != playerColor) {
             getSpaceAt(cx, cy).flipColor();
@@ -195,10 +195,10 @@ public class Board {
                     case 0:
                         break;
                     case 1:
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Light);
+                        getSpaceAt(x, y).setColor(ReversiColor.Light);
                         break;
                     case 2:
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Dark);
+                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
                 }
             }
         }
@@ -214,10 +214,10 @@ public class Board {
                     case '0':
                         break;
                     case '1':
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Light);
+                        getSpaceAt(x, y).setColor(ReversiColor.Light);
                         break;
                     case '2':
-                        getSpaceAt(x, y).setColorNoAnimation(ReversiColor.Dark);
+                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
                 }
             }
         }
@@ -240,7 +240,7 @@ public class Board {
     }
 
     public byte getSpaceNumber(BoardSpace s) {
-        return (byte) (s.y * 8 + s.x + 1);
+        return (byte) (s.y() * 8 + s.x() + 1);
     }
 
     public BoardSpace getBoardSpaceFromNum(int n) {

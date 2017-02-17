@@ -58,7 +58,7 @@ public class ComputerAI {
                     // Copy board to identical object
                     Board copy = board.copy();
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
+                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y()), p.getColor());
                     // Count possible moves for Player's opponent
                     int movesOpened = getPossibleMoves(copy, o);
                     if (movesOpened < bestVal) {
@@ -93,7 +93,7 @@ public class ComputerAI {
                     // Copy board to identical object
                     Board copy = board.copy();
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.getColor());
+                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y()), p.getColor());
                     int movesOpenedForOpponent = getPossibleMoves(copy, o);
                     if (movesOpenedForOpponent == 0)
                         moveValue = 999;
@@ -149,7 +149,6 @@ public class ComputerAI {
     }
 
     private static int getSpaceValue(BoardSpace s) {
-        return spaceValues[s.y][s.x];
+        return spaceValues[s.y()][s.x()];
     }
-
 }
