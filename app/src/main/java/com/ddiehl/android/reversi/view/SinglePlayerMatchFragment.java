@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -22,7 +23,6 @@ import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.game.Board;
 import com.ddiehl.android.reversi.game.BoardSpace;
 import com.ddiehl.android.reversi.game.ComputerAI;
-import com.ddiehl.android.reversi.game.ReversiColor;
 import com.ddiehl.android.reversi.game.ReversiPlayer;
 
 import java.util.Iterator;
@@ -34,6 +34,8 @@ import rx.functions.Action1;
 import rx.functions.Func0;
 import rx.schedulers.Schedulers;
 
+import static com.ddiehl.android.reversi.game.ReversiColor.Dark;
+import static com.ddiehl.android.reversi.game.ReversiColor.Light;
 import static com.ddiehl.android.reversi.view.SettingsActivity.EXTRA_SETTINGS_MODE;
 import static com.ddiehl.android.reversi.view.SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER;
 
@@ -56,8 +58,8 @@ public class SinglePlayerMatchFragment extends MatchFragment {
 
         PreferenceManager.setDefaultValues(getActivity(), R.xml.preferences, false);
 
-        mP1 = new ReversiPlayer(ReversiColor.Light, getString(R.string.player1_label_default));
-        mP2 = new ReversiPlayer(ReversiColor.Dark, getString(R.string.player2_label));
+        mP1 = new ReversiPlayer(Light, getString(R.string.player1_label_default));
+        mP2 = new ReversiPlayer(Dark, getString(R.string.player2_label));
         mP1.isCPU(getResources().getBoolean(R.bool.p1_cpu));
         mP2.isCPU(getResources().getBoolean(R.bool.p2_cpu));
 
@@ -112,7 +114,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
 
             String savedData = sp.getString(PREF_BOARD_STATE, "");
             mBoard = new Board(mBoard.height(), mBoard.width(), savedData);
-            updateBoardUi();
+            updateBoardUi(false);
             return true;
         }
         return false;
@@ -164,7 +166,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
                     .subscribe(new Action1<Boolean>() {
                         @Override
                         public void call(Boolean success) {
-                            updateBoardUi();
+                            updateBoardUi(true);
                             calculateMatchState();
                         }
                     }, new Action1<Throwable>() {
@@ -176,33 +178,54 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         }
     }
 
-    private void updateBoardUi() {
+    private void updateBoardUi(boolean animate) {
         for (int i = 0; i < mMatchGridView.getChildCount(); i++) {
             ViewGroup row = (ViewGroup) mMatchGridView.getChildAt(i);
             for (int j = 0; j < row.getChildCount(); j++) {
                 View space = row.getChildAt(j);
-                updateSpace(space, mBoard, i, j);
+                updateSpace(space, mBoard, i, j, animate);
             }
         }
     }
 
-    private void updateSpace(final View view, final Board board, final int row, final int col) {
+    private void updateSpace(final View view, final Board board, final int row, final int col, final boolean animate) {
         BoardSpace space = board.spaceAt(row, col);
         if (space.getColor() == null) {
-            view.setBackgroundResource(R.drawable.board_space_neutral);
+            if (view.getTag() == null || (int) view.getTag() != 0) {
+                view.setTag(0);
+                if (animate) {
+                    animateBackgroundChange(view, R.drawable.board_space_neutral);
+                } else {
+                    view.setBackgroundResource(R.drawable.board_space_neutral);
+                }
+            }
         } else {
             switch (space.getColor()) {
                 case Light:
-                    view.setBackgroundResource(R.drawable.board_space_p1);
+                    if (view.getTag() == null || (int) view.getTag() != 1) {
+                        view.setTag(1);
+                        if (animate) {
+                            animateBackgroundChange(view, R.drawable.board_space_p1);
+                        } else {
+                            view.setBackgroundResource(R.drawable.board_space_p1);
+                        }
+                    }
                     break;
                 case Dark:
-                    view.setBackgroundResource(R.drawable.board_space_p2);
+                    if (view.getTag() == null || (int) view.getTag() != 2) {
+                        view.setTag(2);
+                        if (animate) {
+                            animateBackgroundChange(view, R.drawable.board_space_p2);
+                        } else {
+                            view.setBackgroundResource(R.drawable.board_space_p2);
+                        }
+                    }
                     break;
             }
         }
     }
 
-    private void animateBackgroundChange(final @NonNull View view) {
+    private void animateBackgroundChange(final @NonNull View view, final @DrawableRes int resId) {
         final Animation fadeOut = AnimationUtils.loadAnimation(getContext(), R.anim.playermove_fadeout);
         final Animation fadeIn = AnimationUtils.loadAnimation(getContext(), R.anim.playermove_fadein);
 
@@ -215,6 +238,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                view.setBackgroundResource(resId);
                 view.startAnimation(fadeIn);
             }
         });
@@ -278,7 +302,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
                             public void call(BoardSpace space) {
                                 Log.d(TAG, "CPU move updated");
                                 mBoard.commitPiece(space, mCurrentPlayer.getColor());
-                                updateBoardUi();
+                                updateBoardUi(true);
                                 calculateMatchState();
                             }
                         }
@@ -292,7 +316,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         while (i.hasNext()) {
             BoardSpace s = i.next();
             if (s.isOwned()) {
-                if (s.getColor() == ReversiColor.Light)
+                if (s.getColor() == Light)
                     p1c++;
                 else
                     p2c++;
