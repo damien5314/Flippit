@@ -80,7 +80,7 @@ public abstract class MatchFragment extends Fragment {
         return view;
     }
 
-    @OnClick()
+    @OnClick(R.id.board_panel_new_game)
     void onStartNewMatchClicked() {
         startNewMatch();
     }
