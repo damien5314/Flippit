@@ -2,28 +2,16 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-    </style>
-
-    <style name="ApplicationTitle">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">4</item>
-        <item name="android:gravity">center</item>
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-thin</item>
-        <item name="android:textSize">@dimen/app_title_size</item>
-    </style>
-
-    <style name="LauncherCTA">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_margin">@dimen/call_to_action_margin</item>
-        <item name="android:background">@drawable/launcher_cta</item>
-        <item name="android:textSize">@dimen/call_to_action_text_size</item>
-        <item name="android:textColor">@color/launcher_cta_text_color</item>
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_dark</item>
+        <item name="colorAccent">@color/accent</item>
+        <!-- to remove the default action -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item> <!-- For 2.x version -->
+        <item name="android:windowActionModeOverlay">true</item>
+        <!-- app background color -->
+        <item name="android:windowBackground">@color/white</item>
     </style>
 
     <style name="ScoreOverlay">
