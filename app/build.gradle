@@ -23,7 +23,7 @@ android {
 
 dependencies {
     compile "com.android.support:appcompat-v7:$project.ext.SUPPORT_LIBRARY_VERSION"
-    compile "com.android.support:support-v4:$project.ext.SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support:design:$project.ext.SUPPORT_LIBRARY_VERSION"
     
     compile "com.google.android.gms:play-services:6.5.87"
 

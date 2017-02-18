@@ -14,12 +14,10 @@
         <item name="android:windowBackground">@color/white</item>
     </style>
 
-    <style name="ScoreOverlay">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:orientation">horizontal</item>
-        <item name="android:layout_gravity">center</item> <!-- Added in refactoring to LinearLayout -->
+    <!-- Base application theme. -->
+    <style name="GameBG" parent="AppTheme">
+        <!-- app background color -->
+        <item name="android:windowBackground">@color/primary_dark</item>
     </style>
 
     <style name="ScoreOverlaySection">
@@ -60,14 +58,6 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_centerHorizontal">true</item>
-    </style>
-
-    <style name="GameArea">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">10</item>
-        <item name="android:orientation">vertical</item>
-        <item name="android:background">@color/board_color</item>
     </style>
 
     <style name="BoardActionPanels">

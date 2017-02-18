@@ -1,204 +1,294 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/gameScreen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".view.MultiPlayerMatchActivity">
 
     <LinearLayout
-        android:id="@+id/score_overlay"
-        style="@style/ScoreOverlay"
-        android:background="@drawable/border">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.AppBarLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </android.support.design.widget.AppBarLayout>
 
         <LinearLayout
-            style="@style/ScoreOverlaySection">
+            android:id="@+id/score_overlay"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:background="@drawable/border">
+
+            <LinearLayout
+                style="@style/ScoreOverlaySection">
+
+                <ImageView
+                    android:id="@+id/icon_p1"
+                    style="@style/PlayerIcon"
+                    android:background="@drawable/player_icon_p1"/>
+
+                <TextView
+                    android:id="@+id/label_p1"
+                    style="@style/PlayerLabel"
+                    android:gravity="left|center"/>
+
+                <TextView
+                    android:id="@+id/score_p1"
+                    style="@style/ScoreValue"/>
+
+            </LinearLayout>
 
             <ImageView
-                android:id="@+id/icon_p1"
-                style="@style/PlayerIcon"
-                android:background="@drawable/player_icon_p1"/>
+                android:id="@+id/turn_indicator"
+                style="@style/TurnIndicator"
+                android:contentDescription="@null"/>
 
-            <TextView
-                android:id="@+id/label_p1"
-                style="@style/PlayerLabel"
-                android:gravity="left|center"/>
+            <LinearLayout
+                style="@style/ScoreOverlaySection">
 
-            <TextView
-                android:id="@+id/score_p1"
-                style="@style/ScoreValue"/>
+                <TextView
+                    android:id="@+id/score_p2"
+                    style="@style/ScoreValue"/>
+
+                <TextView
+                    android:id="@+id/label_p2"
+                    style="@style/PlayerLabel"
+                    android:gravity="right|center"/>
+
+                <ImageView
+                    android:id="@+id/icon_p2"
+                    style="@style/PlayerIcon"
+                    android:background="@drawable/player_icon_p2"/>
+
+            </LinearLayout>
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/turn_indicator"
-            style="@style/TurnIndicator"/>
-
+        <!--android:background="@color/board_color"-->
         <LinearLayout
-            style="@style/ScoreOverlaySection">
+            android:id="@+id/game_area"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="10"
+            android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/score_p2"
-                style="@style/ScoreValue"/>
+            <LinearLayout
+                android:id="@+id/board_panels"
+                style="@style/BoardActionPanels">
 
-            <TextView
-                android:id="@+id/label_p2"
-                style="@style/PlayerLabel"
-                android:gravity="right|center"/>
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
 
-            <ImageView
-                android:id="@+id/icon_p2"
-                style="@style/PlayerIcon"
-                android:background="@drawable/player_icon_p2"/>
+                <Button
+                    android:id="@+id/board_panel_new_game"
+                    style="@style/BoardActionPanel"
+                    android:text="@string/multiplayer_new_match"/>
+
+                <Button
+                    android:id="@+id/board_panel_select_game"
+                    style="@style/BoardActionPanel"
+                    android:text="@string/multiplayer_select_match"/>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"/>
+
+            </LinearLayout>
+
+            <TableLayout
+                android:id="@+id/match_grid"
+                style="@style/GameBoardTable">
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+                <TableRow style="@style/MatchGridRow">
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+
+                    <Button style="@style/MatchGridSpace"/>
+                </TableRow>
+
+            </TableLayout>
+
+            <RelativeLayout
+                android:id="@+id/match_message"
+                style="@style/GameMessage">
+
+                <TextView
+                    android:id="@+id/match_message_text"
+                    style="@style/GameMessageText"/>
+
+                <ImageView
+                    android:id="@+id/match_message_icon_1"
+                    style="@style/GameMessageIcon"
+                    android:layout_toLeftOf="@id/match_message_text"/>
+
+                <ImageView
+                    android:id="@+id/match_message_icon_2"
+                    style="@style/GameMessageIcon"
+                    android:layout_toRightOf="@id/match_message_text"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
-        android:id="@+id/game_area"
-        style="@style/GameArea">
-
-        <LinearLayout
-            android:id="@+id/board_panels"
-            style="@style/BoardActionPanels">
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-            <Button
-                android:id="@+id/board_panel_new_game"
-                style="@style/BoardActionPanel"
-                android:text="@string/multiplayer_new_match"/>
-
-            <Button
-                android:id="@+id/board_panel_select_game"
-                style="@style/BoardActionPanel"
-                android:text="@string/multiplayer_select_match"/>
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"/>
-
-        </LinearLayout>
-
-        <TableLayout
-            android:id="@+id/match_grid"
-            style="@style/GameBoardTable" >
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-            <TableRow style="@style/MatchGridRow">
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-                <Button style="@style/MatchGridSpace"/>
-            </TableRow>
-
-        </TableLayout>
-
-        <RelativeLayout
-            android:id="@+id/match_message"
-            style="@style/GameMessage">
-
-            <TextView
-                android:id="@+id/match_message_text"
-                style="@style/GameMessageText"/>
-
-            <ImageView
-                android:id="@+id/match_message_icon_1"
-                style="@style/GameMessageIcon"
-                android:layout_toLeftOf="@id/match_message_text"/>
-
-            <ImageView
-                android:id="@+id/match_message_icon_2"
-                style="@style/GameMessageIcon"
-                android:layout_toRightOf="@id/match_message_text"/>
-
-        </RelativeLayout>
-
-    </LinearLayout>
-
-</LinearLayout>
+</android.support.design.widget.CoordinatorLayout>
