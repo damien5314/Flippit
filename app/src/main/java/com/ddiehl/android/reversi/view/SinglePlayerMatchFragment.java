@@ -359,6 +359,7 @@ public class SinglePlayerMatchFragment extends MatchFragment {
     public void displayBoard() {
         mBoardPanelView.setVisibility(View.GONE);
         mMatchGridView.setVisibility(View.VISIBLE);
+        updateBoardUi(false);
     }
 
     public void showWinningToast(ReversiPlayer winner) {
