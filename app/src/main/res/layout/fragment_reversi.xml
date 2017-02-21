@@ -17,59 +17,97 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"/>
 
         </android.support.design.widget.AppBarLayout>
 
         <LinearLayout
             android:id="@+id/score_overlay"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:background="@drawable/border">
+            android:minHeight="48dp"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
             <LinearLayout
-                style="@style/ScoreOverlaySection">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:divider="@drawable/spacer_8dp_h"
+                android:orientation="horizontal"
+                android:showDividers="middle">
 
                 <ImageView
                     android:id="@+id/icon_p1"
                     style="@style/PlayerIcon"
-                    android:background="@drawable/player_icon_p1"/>
+                    android:background="@drawable/player_icon_p1"
+                    android:contentDescription="@string/player1_icon_content_description"/>
 
                 <TextView
                     android:id="@+id/label_p1"
                     style="@style/PlayerLabel"
-                    android:gravity="left|center"/>
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:gravity="left|center"
+                    tools:text="jlawjklwakljwakljwalawkljwalk"/>
 
                 <TextView
                     android:id="@+id/score_p1"
-                    style="@style/ScoreValue"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="@dimen/score_overlay_text_size"
+                    android:textColor="@color/primary_text"
+                    tools:text="88"/>
 
             </LinearLayout>
 
             <ImageView
                 android:id="@+id/turn_indicator"
-                style="@style/TurnIndicator"
-                android:contentDescription="@null"/>
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:contentDescription="@null"
+                android:tint="@color/primary_text"
+                tools:src="@drawable/ic_turn_indicator_p1"/>
 
             <LinearLayout
-                style="@style/ScoreOverlaySection">
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/score_p2"
-                    style="@style/ScoreValue"/>
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/score_overlay_text_size"
+                    tools:text="88"/>
 
                 <TextView
                     android:id="@+id/label_p2"
                     style="@style/PlayerLabel"
-                    android:gravity="right|center"/>
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="8dp"
+                    android:layout_marginRight="8dp"
+                    android:layout_weight="1"
+                    android:gravity="right|center"
+                    tools:text="jkhkjhjwajhkwahjkwhawhjk"/>
 
                 <ImageView
                     android:id="@+id/icon_p2"
                     style="@style/PlayerIcon"
-                    android:background="@drawable/player_icon_p2"/>
+                    android:background="@drawable/player_icon_p2"
+                    android:contentDescription="@string/player2_icon_content_description"/>
 
             </LinearLayout>
 

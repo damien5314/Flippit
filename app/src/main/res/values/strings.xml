@@ -142,5 +142,7 @@
     <string name="no_match_selected">No match selected</string>
     <string name="match_inactive">Inactive match</string>
     <string name="cancel_fail">Error canceling match, please try again</string>
+    <string name="player2_icon_content_description">dark player</string>
+    <string name="player1_icon_content_description">light player</string>
 
 </resources>
