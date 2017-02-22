@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
@@ -29,16 +30,14 @@ public abstract class MatchFragment extends Fragment {
 
     @BindView(R.id.match_grid)
     protected TableLayout mMatchGridView;
-    @BindView(R.id.label_p1)
-    protected TextView mPlayerOneLabelTextView;
-    @BindView(R.id.label_p2)
-    protected TextView mPlayerTwoLabelTextView;
     @BindView(R.id.score_p1)
     protected TextView mPlayerOneScoreTextView;
     @BindView(R.id.score_p2)
     protected TextView mPlayerTwoScoreTextView;
-    @BindView(R.id.turn_indicator)
-    protected ImageView mTurnIndicator;
+    @BindView(R.id.p1_waiting_bar)
+    protected ProgressBar mP1WaitingBar;
+    @BindView(R.id.p2_waiting_bar)
+    protected ProgressBar mP2WaitingBar;
     @BindView(R.id.board_panels)
     protected View mBoardPanelView;
     @BindView(R.id.board_panel_new_game)
@@ -110,6 +109,11 @@ public abstract class MatchFragment extends Fragment {
                 handleSpaceClick(row, col);
             }
         };
+    }
+
+    protected void showWaitingIndicator(boolean p1, boolean p2) {
+        mP1WaitingBar.setVisibility(p1 ? View.VISIBLE : View.GONE);
+        mP2WaitingBar.setVisibility(p2 ? View.VISIBLE : View.GONE);
     }
 
     abstract void startNewMatch();

@@ -97,8 +97,6 @@ public class SinglePlayerMatchFragment extends MatchFragment {
     public void onResume() {
         super.onResume();
         mP1.setName(getPlayerName());
-        mPlayerOneLabelTextView.setText(mP1.getName());
-        mPlayerTwoLabelTextView.setText(mP2.getName());
         if (mMatchInProgress && mCurrentPlayer.isCPU()) {
             executeCpuMove();
         }
@@ -335,8 +333,12 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         mP2.setScore(p2c);
         updateScoreForPlayer(mP1);
         updateScoreForPlayer(mP2);
-        mTurnIndicator.setImageResource(
-                (mCurrentPlayer == mP1) ? R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
+
+        if (mCurrentPlayer == mP1) {
+            showWaitingIndicator(false, false);
+        } else {
+            showWaitingIndicator(false, true);
+        }
     }
 
     public void updateScoreForPlayer(ReversiPlayer p) {

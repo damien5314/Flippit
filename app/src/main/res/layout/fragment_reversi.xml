@@ -26,16 +26,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_margin="16dp"
             android:minHeight="48dp"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:divider="@drawable/spacer_8dp_h"
+                android:divider="@drawable/spacer_16dp_v"
                 android:orientation="horizontal"
                 android:showDividers="middle">
 
@@ -46,68 +45,60 @@
                     android:contentDescription="@string/player1_icon_content_description"/>
 
                 <TextView
-                    android:id="@+id/label_p1"
-                    style="@style/PlayerLabel"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:gravity="left|center"
-                    tools:text="jlawjklwakljwakljwalawkljwalk"/>
-
-                <TextView
                     android:id="@+id/score_p1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:textSize="@dimen/score_overlay_text_size"
                     android:textColor="@color/primary_text"
+                    android:textSize="@dimen/score_overlay_text_size"
                     tools:text="88"/>
 
-            </LinearLayout>
+                <ProgressBar
+                    android:id="@+id/p1_waiting_bar"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/white"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
 
-            <ImageView
-                android:id="@+id/turn_indicator"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:contentDescription="@null"
-                android:tint="@color/primary_text"
-                tools:src="@drawable/ic_turn_indicator_p1"/>
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
                 android:layout_weight="1"
-                android:orientation="horizontal">
+                android:divider="@drawable/spacer_16dp_v"
+                android:gravity="end"
+                android:orientation="horizontal"
+                android:showDividers="middle">
+
+                <ProgressBar
+                    android:id="@+id/p2_waiting_bar"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/white"
+                    android:indeterminate="true"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
 
                 <TextView
                     android:id="@+id/score_p2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:layout_gravity="end"
+                    android:drawableEnd="@drawable/player_icon_p2"
+                    android:drawableRight="@drawable/player_icon_p2"
                     android:textColor="@color/primary_text"
                     android:textSize="@dimen/score_overlay_text_size"
                     tools:text="88"/>
-
-                <TextView
-                    android:id="@+id/label_p2"
-                    style="@style/PlayerLabel"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_weight="1"
-                    android:gravity="right|center"
-                    tools:text="jkhkjhjwajhkwahjkwhawhjk"/>
 
                 <ImageView
                     android:id="@+id/icon_p2"
                     style="@style/PlayerIcon"
                     android:background="@drawable/player_icon_p2"
-                    android:contentDescription="@string/player2_icon_content_description"/>
+                    android:contentDescription="@string/player1_icon_content_description"/>
 
             </LinearLayout>
 
@@ -149,7 +140,10 @@
 
             <TableLayout
                 android:id="@+id/match_grid"
-                style="@style/GameBoardTable">
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="16"
+                android:padding="8dp">
 
                 <TableRow style="@style/MatchGridRow">
 

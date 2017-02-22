@@ -14,7 +14,6 @@
     <string name="action_htp_next">Next</string>
     <string name="player1_label_default">Player 1</string>
     <string name="player2_label">Computer</string>
-    <string name="unknown_player">\?</string>
     <string name="bad_move">Invalid Move</string>
     <string name="no_moves">No moves for\u0020</string> <!-- Use \u0020 to add a space at end -->
     <string name="winner_p1">You win</string>
@@ -142,7 +141,6 @@
     <string name="no_match_selected">No match selected</string>
     <string name="match_inactive">Inactive match</string>
     <string name="cancel_fail">Error canceling match, please try again</string>
-    <string name="player2_icon_content_description">dark player</string>
     <string name="player1_icon_content_description">light player</string>
 
 </resources>

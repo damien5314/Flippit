@@ -23,26 +23,9 @@
     <style name="PlayerIcon">
         <item name="android:layout_width">@dimen/player_icon_size</item>
         <item name="android:layout_height">@dimen/player_icon_size</item>
-        <item name="android:layout_marginLeft">@dimen/score_overlay_view_padding</item>
-        <item name="android:layout_marginRight">@dimen/score_overlay_view_padding</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:radius">@dimen/player_icon_corner_radius</item>
-    </style>
-
-    <style name="Autoscroll">
-        <item name="android:singleLine">true</item>
-        <item name="android:ellipsize">end</item>
-        <!--<item name="android:marqueeRepeatLimit">marquee_forever</item>-->
-        <item name="android:focusable">true</item>
-        <item name="android:focusableInTouchMode">true</item>
-        <item name="android:scrollHorizontally">true</item>
-    </style>
-
-    <style name="PlayerLabel" parent="Autoscroll">
-        <item name="android:textSize">@dimen/score_overlay_text_size</item>
-        <item name="android:textColor">@color/primary_text</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
     <style name="BoardActionPanels">
@@ -65,12 +48,6 @@
         <item name="android:textSize">@dimen/board_panel_text_size</item>
         <item name="android:textColor">@color/board_action_panel_color</item>
         <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
-    </style>
-
-    <style name="GameBoardTable">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">16</item>
     </style>
 
     <style name="MatchGridRow">
@@ -96,8 +73,6 @@
     <style name="GameMessageText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingLeft">@dimen/score_overlay_view_padding</item>
-        <item name="android:paddingRight">@dimen/score_overlay_view_padding</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_centerHorizontal">true</item>

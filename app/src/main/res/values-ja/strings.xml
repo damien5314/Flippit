@@ -44,7 +44,6 @@
     <string name="settings_dialog_sign_in_title">ログイン</string>
     <string name="settings_dialog_sign_in_confirm">ログイン</string>
     <string name="settings_dialog_sign_out_cancel">キャンセル</string>
-    <string name="unknown_player">\?</string>
     <string name="settings_dialog_sign_in_cancel">キャンセル</string>
     <string name="pref_player_name_title">プレイヤー名</string>
     <string name="multiplayer_achievements">成果</string>

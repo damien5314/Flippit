@@ -114,10 +114,6 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initializeWaitingAnimations();
-
-        // Clear player names in score overlay
-        mPlayerOneLabelTextView.setText(R.string.unknown_player);
-        mPlayerTwoLabelTextView.setText(R.string.unknown_player);
     }
 
     private void connectGoogleApiClient() {
@@ -454,7 +450,6 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
 
         mBoard = new Board(mBoard.height(), mBoard.width(), playerData);
         displayBoard();
-        updatePlayerNames();
         dismissSpinner();
 
         // Commit opponent's moves to the deserialized Board object
@@ -739,26 +734,10 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
     private void clearBoard() {
         mMatch = null;
         mMatchGridView.setVisibility(View.GONE);
-        mPlayerOneLabelTextView.setText(R.string.unknown_player);
-        mPlayerTwoLabelTextView.setText(R.string.unknown_player);
         mPlayerOneScoreTextView.setText("");
         mPlayerTwoScoreTextView.setText("");
-        mTurnIndicator.setImageResource(android.R.color.transparent);
+        showWaitingIndicator(false, false);
         mBoardPanelView.setVisibility(View.VISIBLE);
-    }
-
-    private void updatePlayerNames() {
-        if (mLightPlayer != null) {
-            mPlayerOneLabelTextView.setText(mLightPlayer.getDisplayName());
-        } else {
-            mPlayerOneLabelTextView.setText(R.string.unknown_player);
-        }
-
-        if (mDarkPlayer != null) {
-            mPlayerTwoLabelTextView.setText(mDarkPlayer.getDisplayName());
-        } else {
-            mPlayerTwoLabelTextView.setText(R.string.unknown_player);
-        }
     }
 
     private void updateScore() {
@@ -779,18 +758,16 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
         // Update turn indicator
         switch (mMatch.getTurnStatus()) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-                mTurnIndicator.setImageResource((mPlayer == mLightPlayer) ?
-                        R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
+                showWaitingIndicator(false, false);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
-                mTurnIndicator.setImageResource((mOpponent == mLightPlayer) ?
-                        R.drawable.ic_turn_indicator_p1 : R.drawable.ic_turn_indicator_p2);
+                showWaitingIndicator(false, true);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-                mTurnIndicator.setImageResource(R.drawable.ic_turn_neutral);
+                showWaitingIndicator(false, false);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE:
-                mTurnIndicator.setImageResource(R.drawable.ic_turn_neutral);
+                showWaitingIndicator(false, false);
                 break;
         }
     }
