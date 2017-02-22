@@ -23,7 +23,7 @@ android {
 
 dependencies {
     compile "com.android.support:appcompat-v7:$project.ext.SUPPORT_LIBRARY_VERSION"
-    compile "com.android.support:support-v4:$project.ext.SUPPORT_LIBRARY_VERSION"
+    compile "com.android.support:design:$project.ext.SUPPORT_LIBRARY_VERSION"
     
     compile "com.google.android.gms:play-services:6.5.87"
 
@@ -38,4 +38,7 @@ dependencies {
 //    compile "com.jakewharton.rxbinding:rxbinding-design:$project.ext.RXBINDING_VERSION"
 //    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$project.ext.RXBINDING_VERSION"
 //    compile "com.jakewharton.rxbinding:rxbinding-leanback-v17:$project.ext.RXBINDING_VERSION"
+
+    compile "com.jakewharton:butterknife:$project.ext.BUTTER_KNIFE_VERSION"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$project.ext.BUTTER_KNIFE_VERSION"
 }

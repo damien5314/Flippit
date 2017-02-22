@@ -18,22 +18,44 @@ import com.ddiehl.android.reversi.R;
 import com.ddiehl.android.reversi.game.Board;
 import com.jakewharton.rxbinding.view.RxView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import rx.functions.Action1;
 
 public abstract class MatchFragment extends Fragment {
+
     private static final String TAG = MatchFragment.class.getSimpleName();
 
+    @BindView(R.id.match_grid)
     protected TableLayout mMatchGridView;
-    protected TextView mPlayerOneLabelTextView, mPlayerTwoLabelTextView;
-    protected TextView mPlayerOneScoreTextView, mPlayerTwoScoreTextView;
+    @BindView(R.id.label_p1)
+    protected TextView mPlayerOneLabelTextView;
+    @BindView(R.id.label_p2)
+    protected TextView mPlayerTwoLabelTextView;
+    @BindView(R.id.score_p1)
+    protected TextView mPlayerOneScoreTextView;
+    @BindView(R.id.score_p2)
+    protected TextView mPlayerTwoScoreTextView;
+    @BindView(R.id.turn_indicator)
     protected ImageView mTurnIndicator;
+    @BindView(R.id.board_panels)
     protected View mBoardPanelView;
-    protected Button mStartNewMatchButton, mSelectMatchButton;
+    @BindView(R.id.board_panel_new_game)
+    protected Button mStartNewMatchButton;
+    @BindView(R.id.board_panel_select_game)
+    protected Button mSelectMatchButton;
+    @BindView(R.id.match_message)
+    protected View mMatchMessageView;
+    @BindView(R.id.match_message_text)
+    protected TextView mMatchMessageTextView;
+    @BindView(R.id.match_message_icon_1)
+    protected ImageView mMatchMessageIcon1;
+    @BindView(R.id.match_message_icon_2)
+    protected ImageView mMatchMessageIcon2;
+
     protected Dialog mDisplayedDialog;
 
-    protected View mMatchMessageView;
-    protected TextView mMatchMessageTextView;
-    protected ImageView mMatchMessageIcon1, mMatchMessageIcon2;
     protected Animation mLeftFadeOut, mLeftFadeIn, mRightFadeOut, mRightFadeIn;
     protected boolean mMatchMessageIcon1Color = false;
     protected boolean mMatchMessageIcon2Color = true;
@@ -47,40 +69,25 @@ public abstract class MatchFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_reversi, container, false);
+    public View onCreateView(
+            LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_reversi, container, false);
+        ButterKnife.bind(this, view);
 
-        mBoardPanelView = v.findViewById(R.id.board_panels);
-        mMatchGridView = (TableLayout) v.findViewById(R.id.match_grid);
         initMatchGrid(mMatchGridView);
         mMatchGridView.setVisibility(View.GONE);
-        mPlayerOneLabelTextView = (TextView) v.findViewById(R.id.label_p1);
-        mPlayerTwoLabelTextView = (TextView) v.findViewById(R.id.label_p2);
-        mPlayerOneScoreTextView = (TextView) v.findViewById(R.id.score_p1);
-        mPlayerTwoScoreTextView = (TextView) v.findViewById(R.id.score_p2);
-        mTurnIndicator = (ImageView) v.findViewById(R.id.turn_indicator);
-        mMatchMessageView = v.findViewById(R.id.match_message);
-        mMatchMessageTextView = (TextView) v.findViewById(R.id.match_message_text);
-        mMatchMessageIcon1 = (ImageView) v.findViewById(R.id.match_message_icon_1);
-        mMatchMessageIcon2 = (ImageView) v.findViewById(R.id.match_message_icon_2);
 
-        mStartNewMatchButton = (Button) v.findViewById(R.id.board_panel_new_game);
-        mStartNewMatchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startNewMatch();
-            }
-        });
+        return view;
+    }
 
-        mSelectMatchButton = (Button) v.findViewById(R.id.board_panel_select_game);
-        mSelectMatchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectMatch();
-            }
-        });
+    @OnClick(R.id.board_panel_new_game)
+    void onStartNewMatchClicked() {
+        startNewMatch();
+    }
 
-        return v;
+    @OnClick(R.id.board_panel_select_game)
+    void onSelectMatchClicked() {
+        selectMatch();
     }
 
     protected void initMatchGrid(ViewGroup grid) {

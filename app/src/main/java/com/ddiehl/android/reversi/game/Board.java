@@ -12,8 +12,8 @@ import rx.functions.Func0;
 public class Board {
 
     private final BoardSpace[][] spaces;
-    private final int width;
-    private final int height;
+    private final int columns;
+    private final int rows;
 
     private final byte[][] MOVE_DIRECTIONS = new byte[][] {
             {0,  -1}, // Down
@@ -26,17 +26,59 @@ public class Board {
             {1,  1} // Top-Right
     };
 
-    public Board() {
-        width = 8;
-        height = 8;
-        spaces = new BoardSpace[height][width];
+    public Board(int rows, int columns) {
+        this.columns = columns;
+        this.rows = rows;
+        spaces = new BoardSpace[rows][columns];
         reset();
     }
 
+    public Board(int rows, int cols, byte[] in) {
+        this(rows, cols);
+
+        int index = 0;
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                byte c = in[index++];
+
+                switch (c) {
+                    case 0:
+                        break;
+                    case 1:
+                        getSpaceAt(x, y).setColor(ReversiColor.Light);
+                        break;
+                    case 2:
+                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
+                }
+            }
+        }
+    }
+
+    public Board(int rows, int cols, String in) {
+        this(rows, cols);
+
+        int index = 0;
+        for (int y = 0; y < height(); y++) {
+            for (int x = 0; x < width(); x++) {
+                char c = in.charAt(index++);
+
+                switch (c) {
+                    case '0':
+                        break;
+                    case '1':
+                        getSpaceAt(x, y).setColor(ReversiColor.Light);
+                        break;
+                    case '2':
+                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
+                }
+            }
+        }
+    }
+
     public Board copy() {
-        Board copy = new Board();
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        Board copy = new Board(rows, columns);
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < columns; x++) {
                 copy.spaces[y][x] = spaces[y][x].copy();
             }
         }
@@ -44,8 +86,8 @@ public class Board {
     }
 
     public void reset() {
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < columns; x++) {
                 spaces[y][x] = new BoardSpace(x, y);
             }
         }
@@ -72,14 +114,10 @@ public class Board {
     }
 
     BoardSpace getSpaceAt(int x, int y) {
-        if (x >= 0 && x < width && y >= 0 && y < height)
+        if (x >= 0 && x < columns && y >= 0 && y < rows)
             return spaces[y][x];
 
         return null;
-    }
-
-    void setSpace(int x, int y, BoardSpace s) {
-        this.spaces[y][x] = s;
     }
 
     public Observable<Boolean> requestClaimSpace(final int x, final int y, final ReversiColor color) {
@@ -120,7 +158,7 @@ public class Board {
     }
 
     private int moveValueInDirection(BoardSpace s, int dx, int dy, ReversiColor playerColor) {
-        if (s.x()+dx < 0 || s.x()+dx >= width || s.y()+dy < 0 || s.y()+dy >= height)
+        if (s.x()+dx < 0 || s.x()+dx >= columns || s.y()+dy < 0 || s.y()+dy >= rows)
             return 0;
 
         int moveVal = 0;
@@ -178,49 +216,11 @@ public class Board {
     }
 
     public int width() {
-        return width;
+        return columns;
     }
 
     public int height() {
-        return height;
-    }
-
-    public void deserialize(byte[] in) {
-        int index = 0;
-        for (int y = 0; y < height(); y++) {
-            for (int x = 0; x < width(); x++) {
-                byte c = in[index++];
-                setSpace(x, y, new BoardSpace(x, y));
-                switch (c) {
-                    case 0:
-                        break;
-                    case 1:
-                        getSpaceAt(x, y).setColor(ReversiColor.Light);
-                        break;
-                    case 2:
-                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
-                }
-            }
-        }
-    }
-
-    public void deserialize(String in) {
-        int index = 0;
-        for (int y = 0; y < height(); y++) {
-            for (int x = 0; x < width(); x++) {
-                char c = in.charAt(index++);
-                setSpace(x, y, new BoardSpace(x, y));
-                switch (c) {
-                    case '0':
-                        break;
-                    case '1':
-                        getSpaceAt(x, y).setColor(ReversiColor.Light);
-                        break;
-                    case '2':
-                        getSpaceAt(x, y).setColor(ReversiColor.Dark);
-                }
-            }
-        }
+        return rows;
     }
 
     public byte[] serialize() {
@@ -288,8 +288,8 @@ public class Board {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n");
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < columns; x++) {
                 BoardSpace s = getSpaceAt(x, y);
                 if (!s.isOwned())
                     sb.append("0 ");
