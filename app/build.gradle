@@ -42,4 +42,6 @@ dependencies {
 
     compile "com.jakewharton:butterknife:$project.ext.BUTTER_KNIFE_VERSION"
     annotationProcessor "com.jakewharton:butterknife-compiler:$project.ext.BUTTER_KNIFE_VERSION"
+
+    compile "com.jakewharton.timber:timber:${TIMBER_VERSION}"
 }
