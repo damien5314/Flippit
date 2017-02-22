@@ -939,20 +939,20 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
 
         mLeftFadeIn.setAnimationListener(
                 new Animation.AnimationListener() {
-            @Override public void onAnimationStart(Animation animation) { }
-            @Override public void onAnimationRepeat(Animation animation) { }
+                    @Override public void onAnimationStart(Animation animation) { }
+                    @Override public void onAnimationRepeat(Animation animation) { }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                mHandler.postDelayed(new Runnable() {
                     @Override
-                    public void run() {
-                        mMatchMessageIcon1.startAnimation(mLeftFadeOut);
-                        mMatchMessageIcon2.startAnimation(mRightFadeOut);
+                    public void onAnimationEnd(Animation animation) {
+                        mHandler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mMatchMessageIcon1.startAnimation(mLeftFadeOut);
+                                mMatchMessageIcon2.startAnimation(mRightFadeOut);
+                            }
+                        }, getResources().getInteger(R.integer.waiting_message_fade_delay));
                     }
-                }, getResources().getInteger(R.integer.waiting_message_fade_delay));
-            }
-        });
+                });
     }
 
     private void showSpinner(int spinnerMsg) {
