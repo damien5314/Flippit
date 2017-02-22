@@ -333,8 +333,12 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         mP2.setScore(p2c);
         updateScoreForPlayer(mP1);
         updateScoreForPlayer(mP2);
-        mTurnIndicator.setImageResource(
-                (mCurrentPlayer == mP1) ? R.drawable.ic_action_navigation_arrow_back : R.drawable.ic_arrow_forward_black_24dp);
+
+        if (mCurrentPlayer == mP1) {
+            showWaitingIndicator(false, false);
+        } else {
+            showWaitingIndicator(false, true);
+        }
     }
 
     public void updateScoreForPlayer(ReversiPlayer p) {

@@ -736,7 +736,7 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
         mMatchGridView.setVisibility(View.GONE);
         mPlayerOneScoreTextView.setText("");
         mPlayerTwoScoreTextView.setText("");
-        mTurnIndicator.setImageResource(android.R.color.transparent);
+        showWaitingIndicator(false, false);
         mBoardPanelView.setVisibility(View.VISIBLE);
     }
 
@@ -758,18 +758,16 @@ public class MultiPlayerMatchFragment extends MatchFragment implements GoogleApi
         // Update turn indicator
         switch (mMatch.getTurnStatus()) {
             case TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN:
-                mTurnIndicator.setImageResource((mPlayer == mLightPlayer) ?
-                        R.drawable.ic_arrow_back_black_24dp : R.drawable.ic_arrow_forward_black_24dp);
+                showWaitingIndicator(false, false);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN:
-                mTurnIndicator.setImageResource((mOpponent == mLightPlayer) ?
-                        R.drawable.ic_arrow_back_black_24dp : R.drawable.ic_arrow_forward_black_24dp);
+                showWaitingIndicator(false, true);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_INVITED:
-                mTurnIndicator.setImageResource(R.drawable.ic_turn_neutral);
+                showWaitingIndicator(false, false);
                 break;
             case TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE:
-                mTurnIndicator.setImageResource(R.drawable.ic_turn_neutral);
+                showWaitingIndicator(false, false);
                 break;
         }
     }
