@@ -14,7 +14,7 @@
     <dimen name="board_panel_corner_radius">24dp</dimen>
     <dimen name="board_panel_text_size">22sp</dimen>
 
-    <dimen name="score_overlay_text_size">42sp</dimen>
+    <dimen name="score_overlay_text_size">36sp</dimen>
 
     <dimen name="player_icon_size">16dp</dimen>
     <dimen name="player_icon_corner_radius">3dp</dimen>
