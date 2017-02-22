@@ -3,13 +3,12 @@ package com.ddiehl.android.reversi.view;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 
 import com.ddiehl.android.reversi.R;
 
 
-public abstract class SingleFragmentActivity extends ActionBarActivity {
-    protected abstract Fragment createFragment();
+public abstract class SingleFragmentActivity extends AppCompatActivity {
 
     protected int getLayoutResourceId() {
         return R.layout.activity_fragment;
@@ -30,4 +29,6 @@ public abstract class SingleFragmentActivity extends ActionBarActivity {
                     .commit();
         }
     }
+
+    protected abstract Fragment createFragment();
 }
