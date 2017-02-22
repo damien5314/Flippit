@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -28,6 +30,7 @@ import com.ddiehl.android.reversi.game.ReversiPlayer;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+import butterknife.BindView;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
@@ -51,6 +54,9 @@ public class SinglePlayerMatchFragment extends MatchFragment {
     private ReversiPlayer mP1, mP2;
     private ReversiPlayer mCurrentPlayer, mPlayerWithFirstTurn;
     private boolean mMatchInProgress;
+
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,6 +86,9 @@ public class SinglePlayerMatchFragment extends MatchFragment {
         } else {
             mMatchInProgress = false;
         }
+
+        // Set Action bar
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
 
         return v;
     }
