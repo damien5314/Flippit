@@ -29,10 +29,6 @@ public abstract class MatchFragment extends Fragment {
 
     @BindView(R.id.match_grid)
     protected TableLayout mMatchGridView;
-    @BindView(R.id.label_p1)
-    protected TextView mPlayerOneLabelTextView;
-    @BindView(R.id.label_p2)
-    protected TextView mPlayerTwoLabelTextView;
     @BindView(R.id.score_p1)
     protected TextView mPlayerOneScoreTextView;
     @BindView(R.id.score_p2)
