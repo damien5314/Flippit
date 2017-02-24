@@ -24,6 +24,7 @@ subprojects {
         GMS_LIBRARY_VERSION = "10.2.0"
         RXANDROID_VERSION = "1.1.0"
         RXJAVA_VERSION = "1.1.3"
+        RXJAVA_PROGUARD_VERSION = "1.1.3.0"
 //        RXANDROID_VERSION = "2.0.1"
 //        RXJAVA_VERSION = "2.0.6"
         RXBINDING_VERSION = "1.0.0"
