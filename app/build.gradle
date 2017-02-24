@@ -8,8 +8,8 @@ android {
         applicationId "com.ddiehl.android.reversi"
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 3
-        versionName "1.2"
+        versionCode 4
+        versionName "2.0"
     }
 
     signingConfigs {
@@ -22,6 +22,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            debuggable true
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-dev"
+            minifyEnabled false
+        }
         release {
             debuggable false
             signingConfig signingConfigs.release
