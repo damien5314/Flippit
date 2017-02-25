@@ -1,7 +1,7 @@
 package com.ddiehl.android.reversi.game
 
 
-import com.ddiehl.android.reversi.exceptions.IllegalMoveException
+import com.ddiehl.android.reversi.IllegalMoveException
 import rx.Observable
 import rx.functions.Func0
 import java.util.*
@@ -35,8 +35,7 @@ class Board(private val rows: Int, private val columns: Int) {
                 val c = `in`[index++]
 
                 when (c) {
-                    0.toByte() -> {
-                    }
+                    0.toByte() -> { }
                     1.toByte() -> getSpaceAt(x, y)!!.color = ReversiColor.Light
                     2.toByte() -> getSpaceAt(x, y)!!.color = ReversiColor.Dark
                 }
