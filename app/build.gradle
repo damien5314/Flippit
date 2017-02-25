@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -60,4 +61,5 @@ dependencies {
     annotationProcessor "com.jakewharton:butterknife-compiler:$project.ext.BUTTER_KNIFE_VERSION"
 
     compile "com.jakewharton.timber:timber:${TIMBER_VERSION}"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 }
