@@ -28,6 +28,16 @@ import java.util.concurrent.TimeUnit
 
 class SinglePlayerMatchFragment : MatchFragment() {
 
+    companion object {
+        private val TAG = SinglePlayerMatchFragment::class.java.simpleName
+
+        private val PREF_PLAYER_NAME = "pref_player_name"
+        private val PREF_AI_DIFFICULTY = "pref_ai_difficulty"
+        private val PREF_CURRENT_PLAYER = "pref_currentPlayer"
+        private val PREF_FIRST_TURN = "pref_firstTurn"
+        private val PREF_BOARD_STATE = "pref_boardState"
+    }
+
     private var mP1: ReversiPlayer? = null
     private var mP2: ReversiPlayer? = null
     private var mCurrentPlayer: ReversiPlayer? = null
@@ -50,8 +60,8 @@ class SinglePlayerMatchFragment : MatchFragment() {
         mBoard = Board(8, 8)
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val v = super.onCreateView(inflater, container, savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Hide select match panel for single player
         mSelectMatchButton!!.visibility = View.GONE
@@ -66,8 +76,6 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
         // Set Action bar
         (activity as AppCompatActivity).setSupportActionBar(mToolbar)
-
-        return v
     }
 
     override fun onResume() {
@@ -96,7 +104,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
                 mPlayerWithFirstTurn = if (sp.getBoolean(PREF_FIRST_TURN, true)) mP1 else mP2
 
                 val savedData = sp.getString(PREF_BOARD_STATE, "")
-                mBoard = Board(mBoard!!.height(), mBoard!!.width(), savedData)
+                mBoard = Board(mBoard!!.height, mBoard!!.width, savedData)
                 updateBoardUi(false)
                 return true
             }
@@ -139,15 +147,20 @@ class SinglePlayerMatchFragment : MatchFragment() {
         // Button is hidden
     }
 
-    internal override fun handleSpaceClick(row: Int, col: Int) {
+    override fun handleSpaceClick(row: Int, col: Int) {
         if (mCurrentPlayer!!.isCPU) {
             // do nothing, this isn't a valid state
         } else {
             mBoard!!.requestClaimSpace(row, col, mCurrentPlayer!!.color)
-                    .subscribe({
-                        updateBoardUi(true)
-                        calculateMatchState()
-                    }) { throwable -> Toast.makeText(activity, throwable.message, Toast.LENGTH_SHORT).show() }
+                    .subscribe(
+                            { result ->
+                                updateBoardUi(true)
+                                calculateMatchState()
+                            },
+                            { throwable ->
+                                Toast.makeText(activity, throwable.message, Toast.LENGTH_SHORT).show()
+                            }
+                    )
         }
     }
 
@@ -359,15 +372,5 @@ class SinglePlayerMatchFragment : MatchFragment() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    companion object {
-        private val TAG = SinglePlayerMatchFragment::class.java.simpleName
-
-        private val PREF_PLAYER_NAME = "pref_player_name"
-        private val PREF_AI_DIFFICULTY = "pref_ai_difficulty"
-        private val PREF_CURRENT_PLAYER = "pref_currentPlayer"
-        private val PREF_FIRST_TURN = "pref_firstTurn"
-        private val PREF_BOARD_STATE = "pref_boardState"
     }
 }

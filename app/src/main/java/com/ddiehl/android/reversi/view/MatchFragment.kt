@@ -15,9 +15,12 @@ import butterknife.OnClick
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.game.Board
 import com.jakewharton.rxbinding.view.RxView
-import rx.functions.Action1
 
 abstract class MatchFragment : Fragment() {
+
+    companion object {
+        private val TAG = MatchFragment::class.java.simpleName
+    }
 
     @BindView(R.id.match_grid)
     lateinit var mMatchGridView: TableLayout
@@ -60,15 +63,15 @@ abstract class MatchFragment : Fragment() {
         setHasOptionsMenu(true)
     }
 
-    override fun onCreateView(
-            inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater!!.inflate(R.layout.fragment_reversi, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+            inflater.inflate(R.layout.fragment_reversi, container, false)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         ButterKnife.bind(this, view)
 
-        initMatchGrid(mMatchGridView!!)
-        mMatchGridView!!.visibility = View.GONE
-
-        return view
+        initMatchGrid(mMatchGridView)
+        mMatchGridView.visibility = View.GONE
     }
 
     @OnClick(R.id.board_panel_new_game)
@@ -81,23 +84,21 @@ abstract class MatchFragment : Fragment() {
         selectMatch()
     }
 
-    protected fun initMatchGrid(grid: ViewGroup) {
+    private fun initMatchGrid(grid: ViewGroup) {
         for (i in 0..grid.childCount - 1) {
             val row = grid.getChildAt(i) as ViewGroup
             for (j in 0..row.childCount - 1) {
                 val space = row.getChildAt(j)
 
                 RxView.clicks(space)
-                        .subscribe(onSpaceClicked(i, j))
+                        .subscribe({ onSpaceClicked(i, j) })
             }
         }
     }
 
-    private fun onSpaceClicked(row: Int, col: Int): Action1<Void> {
-        return Action1 {
-            Log.d(TAG, "Piece clicked @ $row $col")
-            handleSpaceClick(row, col)
-        }
+    private fun onSpaceClicked(row: Int, col: Int) {
+        Log.d(TAG, "Piece clicked @ $row $col")
+        handleSpaceClick(row, col)
     }
 
     protected fun showWaitingIndicator(p1: Boolean, p2: Boolean) {
@@ -108,9 +109,4 @@ abstract class MatchFragment : Fragment() {
     internal abstract fun startNewMatch()
     internal abstract fun selectMatch()
     internal abstract fun handleSpaceClick(row: Int, col: Int)
-
-    companion object {
-
-        private val TAG = MatchFragment::class.java.simpleName
-    }
 }
