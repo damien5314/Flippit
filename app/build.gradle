@@ -57,9 +57,9 @@ dependencies {
 //    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$project.ext.RXBINDING_VERSION"
 //    compile "com.jakewharton.rxbinding:rxbinding-leanback-v17:$project.ext.RXBINDING_VERSION"
 
-    compile "com.jakewharton:butterknife:$project.ext.BUTTER_KNIFE_VERSION"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$project.ext.BUTTER_KNIFE_VERSION"
+    compile "com.jakewharton:butterknife:$BUTTER_KNIFE_VERSION"
+    kapt "com.jakewharton:butterknife-compiler:$BUTTER_KNIFE_VERSION"
 
-    compile "com.jakewharton.timber:timber:${TIMBER_VERSION}"
+    compile "com.jakewharton.timber:timber:$TIMBER_VERSION"
     compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
 }
