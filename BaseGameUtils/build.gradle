@@ -1,0 +1,18 @@
+apply plugin: 'com.android.library'
+
+dependencies {
+    provided "com.android.support:appcompat-v7:${SUPPORT_LIBRARY_VERSION}"
+    compile "com.android.support:support-v4:${SUPPORT_LIBRARY_VERSION}"
+    compile "com.google.android.gms:play-services-games:${GMS_LIBRARY_VERSION}"
+    compile "com.google.android.gms:play-services-plus:${GMS_LIBRARY_VERSION}"
+}
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion TARGET_SDK_VERSION
+    }
+}

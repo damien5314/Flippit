@@ -2,20 +2,26 @@ package com.ddiehl.android.reversi.view;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.view.Window;
-import android.view.WindowManager;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AppCompatActivity;
 
-public class LauncherActivity extends SingleFragmentActivity {
+import com.ddiehl.android.reversi.R;
+
+public class LauncherActivity extends AppCompatActivity {
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         super.onCreate(savedInstanceState);
-    }
+        setContentView(R.layout.activity_fragment);
 
-    @Override
-    protected Fragment createFragment() {
-        return new LauncherFragment();
+        FragmentManager fm = getSupportFragmentManager();
+        Fragment fragment = fm.findFragmentById(R.id.fragment_container);
+
+        if (fragment == null) {
+            fragment = new LauncherFragment();
+            fm.beginTransaction()
+                    .add(R.id.fragment_container, fragment)
+                    .commit();
+        }
     }
 }

@@ -1,34 +1,51 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "21.1.2"
+    compileSdkVersion COMPILE_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
 
     defaultConfig {
         applicationId "com.ddiehl.android.reversi"
         minSdkVersion 16
-        targetSdkVersion 25
-        versionCode 3
-        versionName "1.2"
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode 4
+        versionName "2.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile file(KEYSTORE_PATH)
+            storePassword KEYSTORE_PWD
+            keyAlias KEY_ALIAS
+            keyPassword KEY_PWD
+        }
     }
 
     buildTypes {
+        debug {
+            debuggable true
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-dev"
+            minifyEnabled false
+        }
         release {
-            minifyEnabled true
             debuggable false
+            signingConfig signingConfigs.release
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 
 dependencies {
+    compile project(':BaseGameUtils')
+
     compile "com.android.support:appcompat-v7:$project.ext.SUPPORT_LIBRARY_VERSION"
     compile "com.android.support:design:$project.ext.SUPPORT_LIBRARY_VERSION"
-    
-    compile "com.google.android.gms:play-services:6.5.87"
 
-    compile "io.reactivex:rxandroid:$project.ext.RXANDROID_VERSION"
-    compile "io.reactivex:rxjava:$project.ext.RXJAVA_VERSION"
+    compile "io.reactivex:rxandroid:${RXANDROID_VERSION}"
+    compile "io.reactivex:rxjava:${RXJAVA_VERSION}"
+    compile "com.artemzin.rxjava:proguard-rules:${RXJAVA_PROGUARD_VERSION}"
 //    compile "io.reactivex.rxjava2:rxandroid:$project.ext.RXANDROID_VERSION"
 //    compile "io.reactivex.rxjava2:rxjava:$project.ext.RXJAVA_VERSION"
 
@@ -41,4 +58,6 @@ dependencies {
 
     compile "com.jakewharton:butterknife:$project.ext.BUTTER_KNIFE_VERSION"
     annotationProcessor "com.jakewharton:butterknife-compiler:$project.ext.BUTTER_KNIFE_VERSION"
+
+    compile "com.jakewharton.timber:timber:${TIMBER_VERSION}"
 }
