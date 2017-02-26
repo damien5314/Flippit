@@ -12,6 +12,9 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import butterknife.BindView
+import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
+import com.ddiehl.android.reversi.P1_CPU
+import com.ddiehl.android.reversi.P2_CPU
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.game.Board
 import com.ddiehl.android.reversi.game.BoardSpace
@@ -54,8 +57,8 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
         mP1 = ReversiPlayer(Light, getString(R.string.player1_label_default))
         mP2 = ReversiPlayer(Dark, getString(R.string.player2_label))
-        mP1!!.isCPU(resources.getBoolean(R.bool.p1_cpu))
-        mP2!!.isCPU(resources.getBoolean(R.bool.p2_cpu))
+        mP1!!.isCPU(P1_CPU)
+        mP2!!.isCPU(P2_CPU)
 
         mBoard = Board(8, 8)
     }
@@ -131,7 +134,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
         }
 
     public override fun startNewMatch() {
-        mBoard = Board(8, 8)
+        mBoard!!.reset()
         displayBoard()
         switchFirstTurn()
         updateScoreDisplay()
@@ -264,7 +267,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
             Observable.just(move)
         }
-                .delay(resources.getInteger(R.integer.cpu_turn_delay).toLong(), TimeUnit.MILLISECONDS)
+                .delay(CPU_TURN_DELAY_MS, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ space ->

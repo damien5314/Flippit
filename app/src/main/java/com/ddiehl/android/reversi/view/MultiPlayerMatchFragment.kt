@@ -17,6 +17,8 @@ import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import com.ddiehl.android.reversi.AUTOMATED_MULTIPLAYER
+import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.game.*
 import com.google.android.gms.common.ConnectionResult
@@ -474,7 +476,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 updateScore()
                 //                    autoplayIfEnabled();
             }
-        }, resources.getInteger(R.integer.cpu_turn_delay).toLong())
+        }, CPU_TURN_DELAY_MS)
     }
 
     override fun onTurnBasedMatchReceived(match: TurnBasedMatch) {
@@ -1084,14 +1086,13 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     // Added for testing full end-to-end multiplayer flow
     private fun autoplayIfEnabled() {
-        if (!mUpdatingMatch && resources.getBoolean(R.bool.automated_multiplayer)
+        if (!mUpdatingMatch && AUTOMATED_MULTIPLAYER
                 && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
                 && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             mHandler!!.postDelayed({
                 val p1 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.Light else ReversiColor.Dark, "")
                 val p2 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.Dark else ReversiColor.Light, "")
                 claim(ComputerAI.getBestMove_d3(mBoard!!, p1, p2))
-                //                    claim(ComputerAI.getBestMove_d1(mBoard, p1));
             }, 500)
         }
     }

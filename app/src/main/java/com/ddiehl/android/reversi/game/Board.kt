@@ -31,6 +31,14 @@ class Board(val height: Int, val width: Int) {
             }
 
     fun reset() {
+        // Set the color of each space to null first
+        spaces.forEach { row ->
+            row.forEach { space ->
+                space.color = null
+            }
+        }
+
+        // Then set the center 4 spaces to the starting configuration
         spaces[3][3].color = ReversiColor.Light
         spaces[3][4].color = ReversiColor.Dark
         spaces[4][4].color = ReversiColor.Light
@@ -85,12 +93,17 @@ class Board(val height: Int, val width: Int) {
             val space = iterator.next()
             if (!space.isOwned) {
                 MOVE_DIRECTIONS
+                        .filter { move -> !isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
                         .map { move -> moveValueInDirection(space, move.dx, move.dy, c) }
                         .filter { value -> value != 0 }
                         .forEach { return true }
             }
         }
         return false
+    }
+
+    fun isWithinBounds(x: Int, y: Int): Boolean {
+        return x >= 0 && x < width && y >= 0 && y < height
     }
 
     fun getSpaceAt(x: Int, y: Int): BoardSpace =

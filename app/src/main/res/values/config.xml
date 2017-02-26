@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <integer name="cpu_turn_delay">1000</integer>
-    <bool name="p1_cpu">false</bool>
-    <bool name="p2_cpu">true</bool>
-    <bool name="automated_multiplayer">false</bool>
     <integer name="player_move_fade_out_duration">150</integer>
     <integer name="player_move_fade_in_duration">150</integer>
     <integer name="waiting_message_fade_delay">2000</integer>
