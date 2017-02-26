@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.game
+package com.ddiehl.android.reversi.model
 
 
 import com.ddiehl.android.reversi.IllegalMoveException
@@ -39,10 +39,10 @@ class Board(val height: Int, val width: Int) {
         }
 
         // Then set the center 4 spaces to the starting configuration
-        spaces[3][3].color = ReversiColor.Light
-        spaces[3][4].color = ReversiColor.Dark
-        spaces[4][4].color = ReversiColor.Light
-        spaces[4][3].color = ReversiColor.Dark
+        spaces[3][3].color = ReversiColor.LIGHT
+        spaces[3][4].color = ReversiColor.DARK
+        spaces[4][4].color = ReversiColor.LIGHT
+        spaces[4][3].color = ReversiColor.DARK
     }
 
     constructor(rows: Int, cols: Int, saved: ByteArray) : this(rows, cols) {
@@ -54,8 +54,8 @@ class Board(val height: Int, val width: Int) {
 
                 when (c) {
                     0.toByte() -> { }
-                    1.toByte() -> getSpaceAt(x, y).color = ReversiColor.Light
-                    2.toByte() -> getSpaceAt(x, y).color = ReversiColor.Dark
+                    1.toByte() -> getSpaceAt(x, y).color = ReversiColor.LIGHT
+                    2.toByte() -> getSpaceAt(x, y).color = ReversiColor.DARK
                 }
             }
         }
@@ -70,8 +70,8 @@ class Board(val height: Int, val width: Int) {
 
                 when (c) {
                     '0' -> { }
-                    '1' -> getSpaceAt(x, y).color = ReversiColor.Light
-                    '2' -> getSpaceAt(x, y).color = ReversiColor.Dark
+                    '1' -> getSpaceAt(x, y).color = ReversiColor.LIGHT
+                    '2' -> getSpaceAt(x, y).color = ReversiColor.DARK
                 }
             }
         }
@@ -151,7 +151,7 @@ class Board(val height: Int, val width: Int) {
 
         // Otherwise, calculate how many spaces we can capture in that direction
         var moveVal = 0
-        val opponentColor = if (playerColor == ReversiColor.Dark) ReversiColor.Light else ReversiColor.Dark
+        val opponentColor = if (playerColor == ReversiColor.DARK) ReversiColor.LIGHT else ReversiColor.DARK
         val firstPiece = getSpaceAt(s.x() + dx, s.y() + dy)
 
         if (firstPiece.color == opponentColor) {
@@ -213,7 +213,7 @@ class Board(val height: Int, val width: Int) {
             val s = i.next()
             if (!s.isOwned)
                 out[index++] = 0
-            else if (s.color == ReversiColor.Light)
+            else if (s.color == ReversiColor.LIGHT)
                 out[index++] = 1
             else
                 out[index++] = 2
@@ -269,7 +269,7 @@ class Board(val height: Int, val width: Int) {
                     .forEach {
                         if (!it.isOwned)
                             sb.append("0 ")
-                        else if (it.color == ReversiColor.Light)
+                        else if (it.color == ReversiColor.LIGHT)
                             sb.append("1 ")
                         else
                             sb.append("2 ")

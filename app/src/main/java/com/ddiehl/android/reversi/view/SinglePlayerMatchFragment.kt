@@ -16,12 +16,12 @@ import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
 import com.ddiehl.android.reversi.P1_CPU
 import com.ddiehl.android.reversi.P2_CPU
 import com.ddiehl.android.reversi.R
-import com.ddiehl.android.reversi.game.Board
-import com.ddiehl.android.reversi.game.BoardSpace
-import com.ddiehl.android.reversi.game.ComputerAI
-import com.ddiehl.android.reversi.game.ReversiColor.Dark
-import com.ddiehl.android.reversi.game.ReversiColor.Light
-import com.ddiehl.android.reversi.game.ReversiPlayer
+import com.ddiehl.android.reversi.model.Board
+import com.ddiehl.android.reversi.model.BoardSpace
+import com.ddiehl.android.reversi.model.ComputerAI
+import com.ddiehl.android.reversi.model.ReversiColor.DARK
+import com.ddiehl.android.reversi.model.ReversiColor.LIGHT
+import com.ddiehl.android.reversi.model.ReversiPlayer
 import com.ddiehl.android.reversi.view.SettingsActivity.Companion.EXTRA_SETTINGS_MODE
 import com.ddiehl.android.reversi.view.SettingsActivity.Companion.SETTINGS_MODE_SINGLE_PLAYER
 import rx.Observable
@@ -55,8 +55,8 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
         PreferenceManager.setDefaultValues(activity, R.xml.preferences, false)
 
-        mP1 = ReversiPlayer(Light, getString(R.string.player1_label_default))
-        mP2 = ReversiPlayer(Dark, getString(R.string.player2_label))
+        mP1 = ReversiPlayer(LIGHT, getString(R.string.player1_label_default))
+        mP2 = ReversiPlayer(DARK, getString(R.string.player2_label))
         mP1!!.isCPU(P1_CPU)
         mP2!!.isCPU(P2_CPU)
 
@@ -190,7 +190,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
             }
         } else {
             when (space.color) {
-                Light -> if (view.tag == null || view.tag as Int != 1) {
+                LIGHT -> if (view.tag == null || view.tag as Int != 1) {
                     view.tag = 1
                     if (animate) {
                         animateBackgroundChange(view, R.drawable.board_space_p1)
@@ -198,7 +198,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
                         view.setBackgroundResource(R.drawable.board_space_p1)
                     }
                 }
-                Dark -> if (view.tag == null || view.tag as Int != 2) {
+                DARK -> if (view.tag == null || view.tag as Int != 2) {
                     view.tag = 2
                     if (animate) {
                         animateBackgroundChange(view, R.drawable.board_space_p2)
@@ -285,7 +285,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
         while (i.hasNext()) {
             val s = i.next()
             if (s.isOwned) {
-                if (s.color == Light)
+                if (s.color == LIGHT)
                     p1c++
                 else
                     p2c++

@@ -13,7 +13,7 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.ddiehl.android.reversi.R
-import com.ddiehl.android.reversi.game.Board
+import com.ddiehl.android.reversi.model.Board
 import com.jakewharton.rxbinding.view.RxView
 
 abstract class MatchFragment : Fragment() {

@@ -20,7 +20,7 @@ import android.widget.Toast
 import com.ddiehl.android.reversi.AUTOMATED_MULTIPLAYER
 import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
 import com.ddiehl.android.reversi.R
-import com.ddiehl.android.reversi.game.*
+import com.ddiehl.android.reversi.model.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
@@ -613,17 +613,17 @@ class MultiPlayerMatchFragment : MatchFragment(),
     private val currentPlayerColor: ReversiColor
         get() {
             if (mPlayer === mLightPlayer)
-                return ReversiColor.Light
+                return ReversiColor.LIGHT
             else
-                return ReversiColor.Dark
+                return ReversiColor.DARK
         }
 
     private val opponentColor: ReversiColor
         get() {
             if (mOpponent === mLightPlayer)
-                return ReversiColor.Light
+                return ReversiColor.LIGHT
             else
-                return ReversiColor.Dark
+                return ReversiColor.DARK
         }
 
     private val lightPlayer: Participant?
@@ -667,8 +667,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun updateScore() {
-        mLightScore = mBoard!!.getNumSpacesForColor(ReversiColor.Light)
-        mDarkScore = mBoard!!.getNumSpacesForColor(ReversiColor.Dark)
+        mLightScore = mBoard!!.getNumSpacesForColor(ReversiColor.LIGHT)
+        mDarkScore = mBoard!!.getNumSpacesForColor(ReversiColor.DARK)
 
         if (mMatch!!.status == TurnBasedMatch.MATCH_STATUS_COMPLETE && !mUpdatingMatch) {
             // Add remaining spaces to winning count as per Reversi rules
@@ -1090,8 +1090,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
                 && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             mHandler!!.postDelayed({
-                val p1 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.Light else ReversiColor.Dark, "")
-                val p2 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.Dark else ReversiColor.Light, "")
+                val p1 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK, "")
+                val p2 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.DARK else ReversiColor.LIGHT, "")
                 claim(ComputerAI.getBestMove_d3(mBoard!!, p1, p2))
             }, 500)
         }

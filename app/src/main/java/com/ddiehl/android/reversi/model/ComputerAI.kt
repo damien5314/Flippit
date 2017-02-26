@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.game
+package com.ddiehl.android.reversi.model
 
 
 import java.util.*

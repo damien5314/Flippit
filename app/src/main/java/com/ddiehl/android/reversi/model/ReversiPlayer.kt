@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.game
+package com.ddiehl.android.reversi.model
 
 class ReversiPlayer(val color: ReversiColor, var name: String?) {
     var score: Int = 0

@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.game
+package com.ddiehl.android.reversi.model
 
 class BoardSpace(private val row: Int, private val col: Int) {
 
@@ -25,7 +25,7 @@ class BoardSpace(private val row: Int, private val col: Int) {
         if (color == null) {
             return null
         } else {
-            color = if (color == ReversiColor.Dark) ReversiColor.Light else ReversiColor.Dark
+            color = if (color == ReversiColor.DARK) ReversiColor.LIGHT else ReversiColor.DARK
             return color
         }
     }
