@@ -131,7 +131,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
         }
 
     public override fun startNewMatch() {
-        mBoard!!.reset()
+        mBoard = Board(8, 8)
         displayBoard()
         switchFirstTurn()
         updateScoreDisplay()
@@ -262,17 +262,17 @@ class SinglePlayerMatchFragment : MatchFragment() {
                 else -> move = null
             }
 
-            Observable.just<BoardSpace>(move)
+            Observable.just(move)
         }
                 .delay(resources.getInteger(R.integer.cpu_turn_delay).toLong(), TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { space ->
+                .subscribe({ space ->
                     Log.d(TAG, "CPU move updated")
-                    mBoard!!.commitPiece(space, mCurrentPlayer!!.color)
+                    mBoard!!.commitPiece(space!!, mCurrentPlayer!!.color)
                     updateBoardUi(true)
                     calculateMatchState()
-                }
+                })
     }
 
     fun updateScoreDisplay() {

@@ -1,27 +1,19 @@
 package com.ddiehl.android.reversi.game
 
-class BoardSpace {
+class BoardSpace(private val row: Int, private val col: Int) {
 
     var color: ReversiColor? = null
-    private val x: Int
-    private val y: Int
-
-    constructor(x: Int, y: Int) {
-        color = null
-        this.x = x
-        this.y = y
-    }
 
     fun x(): Int {
-        return x
+        return col
     }
 
     fun y(): Int {
-        return y
+        return row
     }
 
     fun copy(): BoardSpace {
-        val copy = BoardSpace(x, y)
+        val copy = BoardSpace(row, col)
         copy.color = color
         return copy
     }

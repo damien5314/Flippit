@@ -8,16 +8,18 @@ import java.util.*
 
 class Board(val height: Int, val width: Int) {
 
+    data class MoveDirection(val dx: Int, val dy: Int)
+
     companion object {
-        private val MOVE_DIRECTIONS = arrayOf(
-                byteArrayOf(0, -1), // Down
-                byteArrayOf(1, 0), // Right
-                byteArrayOf(-1, 0), // Left
-                byteArrayOf(0, 1), // Up
-                byteArrayOf(-1, -1), // Down-Left
-                byteArrayOf(1, -1), // Down-Right
-                byteArrayOf(-1, 1), // Top-Left
-                byteArrayOf(1, 1) // Top-Right
+        private val MOVE_DIRECTIONS = listOf(
+                MoveDirection(0, -1), // Down
+                MoveDirection(1, 0), // Right
+                MoveDirection(-1, 0), // Left
+                MoveDirection(0, 1), // Up
+                MoveDirection(-1, -1), // Down-Left
+                MoveDirection(1, -1), // Down-Right
+                MoveDirection(-1, 1), // Top-Left
+                MoveDirection(1, 1) // Top-Right
         )
     }
 
@@ -83,9 +85,9 @@ class Board(val height: Int, val width: Int) {
             val space = iterator.next()
             if (!space.isOwned) {
                 MOVE_DIRECTIONS
-                        .map { moveValueInDirection(space, it[0].toInt(), it[1].toInt(), c) }
+                        .map { move -> moveValueInDirection(space, move.dx, move.dy, c) }
                         .filter { value -> value != 0 }
-                        .first { return true }
+                        .forEach { return true }
             }
         }
         return false
@@ -119,32 +121,35 @@ class Board(val height: Int, val width: Int) {
 
     fun commitPiece(space: BoardSpace, playerColor: ReversiColor) {
         MOVE_DIRECTIONS
-                .filter { moveValueInDirection(space, it[0].toInt(), it[1].toInt(), playerColor) != 0 }
-                .forEach { flipInDirection(space, it[0].toInt(), it[1].toInt(), playerColor) }
+                .filter { move -> moveValueInDirection(space, move.dx, move.dy, playerColor) != 0 }
+                .forEach { move -> flipInDirection(space, move.dx, move.dy, playerColor) }
     }
 
-    fun spacesCapturedWithMove(s: BoardSpace, playerColor: ReversiColor): Int =
-        MOVE_DIRECTIONS.sumBy {
-            moveValueInDirection(s, it[0].toInt(), it[1].toInt(), playerColor)
+    fun spacesCapturedWithMove(space: BoardSpace, playerColor: ReversiColor): Int =
+        MOVE_DIRECTIONS.sumBy { move ->
+            moveValueInDirection(space, move.dx, move.dy, playerColor)
         }
 
     private fun moveValueInDirection(s: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {
-        if (s.x() + dx < 0 || s.x() + dx >= width || s.y() + dy < 0 || s.y() + dy >= height)
+        // If the move would bring us out of bounds of the board area, just return 0
+        if (s.x() + dx < 0 || s.x() + dx >= width || s.y() + dy < 0 || s.y() + dy >= height) {
             return 0
+        }
 
+        // Otherwise, calculate how many spaces we can capture in that direction
         var moveVal = 0
         val opponentColor = if (playerColor == ReversiColor.Dark) ReversiColor.Light else ReversiColor.Dark
         val firstPiece = getSpaceAt(s.x() + dx, s.y() + dy)
 
         if (firstPiece.color == opponentColor) {
-            var cx = s.x() + dx
-            var cy = s.y() + dy
-            while (getSpaceAt(cx, cy).color == opponentColor) {
+            var currentX = s.x() + dx
+            var currentY = s.y() + dy
+            while (getSpaceAt(currentX, currentY).color == opponentColor) {
                 moveVal++
-                cx += dx
-                cy += dy
+                currentX += dx
+                currentY += dy
             }
-            if (getSpaceAt(cx, cy).color == playerColor) {
+            if (getSpaceAt(currentX, currentY).color == playerColor) {
                 return moveVal
             }
         }

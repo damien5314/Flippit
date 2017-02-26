@@ -4,52 +4,59 @@ package com.ddiehl.android.reversi.game
 import java.util.*
 
 object ComputerAI {
-    private val TAG = ComputerAI::class.java.simpleName
 
-    private val spaceValues = arrayOf(intArrayOf(99, -8, 8, 6, 6, 8, -8, 99), intArrayOf(-8, -24, -4, -3, -3, -4, -24, -8), intArrayOf(8, -4, 7, 4, 4, 7, -4, 8), intArrayOf(6, -3, 4, 0, 0, 4, -3, 6), intArrayOf(6, -3, 4, 0, 0, 4, -3, 6), intArrayOf(8, -4, 7, 4, 4, 7, -4, 8), intArrayOf(-8, -24, -4, -3, -3, -4, -24, -8), intArrayOf(99, -8, 8, 6, 6, 8, -8, 99))
+    private val spaceValues = arrayOf(
+            intArrayOf(99, -8, 8, 6, 6, 8, -8, 99),
+            intArrayOf(-8, -24, -4, -3, -3, -4, -24, -8),
+            intArrayOf(8, -4, 7, 4, 4, 7, -4, 8),
+            intArrayOf(6, -3, 4, 0, 0, 4, -3, 6),
+            intArrayOf(6, -3, 4, 0, 0, 4, -3, 6),
+            intArrayOf(8, -4, 7, 4, 4, 7, -4, 8),
+            intArrayOf(-8, -24, -4, -3, -3, -4, -24, -8),
+            intArrayOf(99, -8, 8, 6, 6, 8, -8, 99)
+    )
 
     /**
      * Finds the space on the board which would capture the most spaces for Player p.
      */
-    fun getBestMove_d1(board: Board, p: ReversiPlayer): BoardSpace {
+    fun getBestMove_d1(board: Board, player: ReversiPlayer): BoardSpace? {
         var best: BoardSpace? = null
-        var bestVal = 0
-        val i = board.iterator()
-        while (i.hasNext()) {
-            val space = i.next()
+        var bestValue = 0
+
+        val iterator = board.iterator()
+
+        while (iterator.hasNext()) {
+            val space = iterator.next()
             if (!space.isOwned) {
-                val `val` = board.spacesCapturedWithMove(space, p.color)
-                if (`val` > bestVal) {
+                val value = board.spacesCapturedWithMove(space, player.color)
+                if (value > bestValue) {
                     best = space
-                    bestVal = `val`
+                    bestValue = value
                 }
             }
         }
 
-        //        if (best != null)
-        //            Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") has value of " + bestVal);
-
-        return best!!
+        return best
     }
 
     /**
      * Finds the space on the board which would result in a board configuration leaving the
      * opposing player with the least choices.
      */
-    fun getBestMove_d2(board: Board, p: ReversiPlayer, o: ReversiPlayer): BoardSpace {
+    fun getBestMove_d2(board: Board, player: ReversiPlayer, opponent: ReversiPlayer): BoardSpace {
         var best: BoardSpace? = null
         var bestVal = 999
         val i = board.iterator()
         while (i.hasNext()) {
             val space = i.next()
             if (!space.isOwned) {
-                if (board.spacesCapturedWithMove(space, p.color) > 0) {
+                if (board.spacesCapturedWithMove(space, player.color) > 0) {
                     // Copy board to identical object
                     val copy = board.copy()
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y())!!, p.color)
+                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y()), player.color)
                     // Count possible moves for Player's opponent
-                    val movesOpened = getPossibleMoves(copy, o)
+                    val movesOpened = getPossibleMoves(copy, opponent)
                     if (movesOpened < bestVal) {
                         best = space
                         bestVal = movesOpened
@@ -57,10 +64,6 @@ object ComputerAI {
                 }
             }
         }
-
-        //        if (best != null)
-        //            Log.i(TAG, "Best move @(" + best.x + "," + best.y + ") reduces "
-        //                    + o.getName() + " to " + bestVal + " moves");
 
         return best!!
     }
@@ -82,12 +85,14 @@ object ComputerAI {
                     // Copy board to identical object
                     val copy = board.copy()
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y())!!, p.color)
+                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y()), p.color)
                     val movesOpenedForOpponent = getPossibleMoves(copy, o)
                     if (movesOpenedForOpponent == 0)
                         moveValue = 999
                     else
-                        moveValue = getSpaceValue(space) * spaceValue_weight + board.spacesCapturedWithMove(space, p.color) * spacesCaptured_weight
+                        moveValue =
+                                getSpaceValue(space) * spaceValue_weight +
+                                board.spacesCapturedWithMove(space, p.color) * spacesCaptured_weight
                     moveValues.put(space, moveValue)
                 }
             }
@@ -117,9 +122,6 @@ object ComputerAI {
                     best = s
             }
         }
-
-        //        if (best != null)
-        //            Log.i(TAG, p.getName() + ": " + "Best move @(" + best.x + "," + best.y + "); Value = " + moveValues.get(best));
 
         return best!!
     }
