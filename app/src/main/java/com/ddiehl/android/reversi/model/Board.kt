@@ -87,18 +87,17 @@ class Board(val height: Int, val width: Int) {
         return copy
     }
 
-    fun hasMove(c: ReversiColor): Boolean {
+    fun hasMove(color: ReversiColor): Boolean {
         val iterator = iterator()
         while (iterator.hasNext()) {
             val space = iterator.next()
-            if (!space.isOwned) {
-                // FIXME some bug here causing no moves to be available
-                MOVE_DIRECTIONS
-                        .filter { move -> isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
-                        .map { move -> moveValueInDirection(space, move.dx, move.dy, c) }
-                        .filter { value -> value != 0 }
-                        .forEach { return true }
-            }
+            // FIXME some bug here causing no moves to be available
+            MOVE_DIRECTIONS
+                    .filter { !space.isOwned }
+                    .filter { move -> isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
+                    .map { move -> moveValueInDirection(space, move.dx, move.dy, color) }
+                    .filter { value -> value > 0 }
+                    .forEach { return true }
         }
         return false
     }
@@ -108,7 +107,7 @@ class Board(val height: Int, val width: Int) {
     }
 
     fun getSpaceAt(x: Int, y: Int): BoardSpace =
-            if (x >= 0 && x < width && y >= 0 && y < height) {
+            if (isWithinBounds(x, y)) {
                 spaces[y][x]
             } else {
                 throw NullPointerException("Space @ $x $y is null")
@@ -140,9 +139,11 @@ class Board(val height: Int, val width: Int) {
     }
 
     fun spacesCapturedWithMove(space: BoardSpace, playerColor: ReversiColor): Int =
-        MOVE_DIRECTIONS.sumBy { move ->
-            moveValueInDirection(space, move.dx, move.dy, playerColor)
-        }
+            MOVE_DIRECTIONS
+                    .filter { move -> isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
+                    .sumBy { move ->
+                        moveValueInDirection(space, move.dx, move.dy, playerColor)
+                    }
 
     private fun moveValueInDirection(s: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {
         // If the move would bring us out of bounds of the board area, just return 0
@@ -158,12 +159,14 @@ class Board(val height: Int, val width: Int) {
         if (firstPiece.color == opponentColor) {
             var currentX = s.x() + dx
             var currentY = s.y() + dy
-            while (getSpaceAt(currentX, currentY).color == opponentColor) {
+
+            while (isWithinBounds(currentX, currentY) && getSpaceAt(currentX, currentY).color == opponentColor) {
                 moveVal++
                 currentX += dx
                 currentY += dy
             }
-            if (getSpaceAt(currentX, currentY).color == playerColor) {
+
+            if (isWithinBounds(currentX, currentY) && getSpaceAt(currentX, currentY).color == playerColor) {
                 return moveVal
             }
         }
