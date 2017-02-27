@@ -93,7 +93,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
         super.onPause()
 
         if (mMatchInProgress) {
-            mSavedState.save(mBoard!!, mCurrentPlayer!!, mPlayerWithFirstTurn!!)
+            mSavedState.save(mBoard, mCurrentPlayer!!, mPlayerWithFirstTurn!!)
         }
     }
 
@@ -104,7 +104,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
                 mCurrentPlayer = if (mSavedState.currentPlayer) mP1 else mP2
                 mPlayerWithFirstTurn = if (mSavedState.firstTurn) mP1 else mP2
 
-                mBoard = Board(mBoard!!.height, mBoard!!.width, savedData)
+                mBoard = Board(mBoard.height, mBoard.width, savedData)
                 updateBoardUi(false)
                 return true
             }
@@ -112,7 +112,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
         }
 
     public override fun startNewMatch() {
-        mBoard!!.reset()
+        mBoard.reset()
         displayBoard()
         switchFirstTurn()
         updateScoreDisplay()
@@ -132,7 +132,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
         if (mCurrentPlayer!!.isCPU) {
             // do nothing, this isn't a valid state
         } else {
-            mBoard!!.requestClaimSpace(row, col, mCurrentPlayer!!.color)
+            mBoard.requestClaimSpace(row, col, mCurrentPlayer!!.color)
                     .subscribe(
                             { result ->
                                 updateBoardUi(true)
@@ -150,7 +150,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
             val row = mMatchGridView.getChildAt(i) as ViewGroup
             for (j in 0..row.childCount - 1) {
                 val space = row.getChildAt(j)
-                updateSpace(space, mBoard!!, i, j, animate)
+                updateSpace(space, mBoard, i, j, animate)
             }
         }
     }
@@ -217,9 +217,9 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     fun calculateMatchState() {
         val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
-        if (mBoard!!.hasMove(opponent.color)) { // If opponent can make a move, it's his turn
+        if (mBoard.hasMove(opponent.color)) { // If opponent can make a move, it's his turn
             mCurrentPlayer = opponent
-        } else if (mBoard!!.hasMove(mCurrentPlayer!!.color)) { // Opponent has no move, keep turn
+        } else if (mBoard.hasMove(mCurrentPlayer!!.color)) { // Opponent has no move, keep turn
             Toast.makeText(activity, getString(R.string.no_moves) + opponent.name, Toast.LENGTH_SHORT).show()
         } else { // No moves remaining, end of match
             updateScoreDisplay()
@@ -237,8 +237,8 @@ class SinglePlayerMatchFragment : MatchFragment() {
             val difficulty = mSettings.aiDifficulty
             val move: BoardSpace?
             when (difficulty) {
-                "1" -> move = ComputerAI.getBestMove_d1(mBoard!!, mCurrentPlayer!!)
-                "2" -> move = ComputerAI.getBestMove_d3(mBoard!!, mCurrentPlayer!!, if (mCurrentPlayer === mP1) mP2 else mP1)
+                "1" -> move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
+                "2" -> move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!, if (mCurrentPlayer === mP1) mP2 else mP1)
                 else -> move = null
             }
 
@@ -249,7 +249,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ space ->
                     Log.d(TAG, "CPU move updated")
-                    mBoard!!.commitPiece(space!!, mCurrentPlayer!!.color)
+                    mBoard.commitPiece(space!!, mCurrentPlayer!!.color)
                     updateBoardUi(true)
                     calculateMatchState()
                 })
@@ -258,7 +258,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
     fun updateScoreDisplay() {
         var p1c = 0
         var p2c = 0
-        val i = mBoard!!.iterator()
+        val i = mBoard.iterator()
         while (i.hasNext()) {
             val s = i.next()
             if (s.isOwned) {
@@ -307,20 +307,18 @@ class SinglePlayerMatchFragment : MatchFragment() {
     }
 
     fun showWinningToast(winner: ReversiPlayer?) {
-        if (winner != null) {
-            val toast: Toast
-            if (winner === mP1) {
-                toast = Toast.makeText(activity, getString(R.string.winner_p1), Toast.LENGTH_LONG)
-            } else {
-                toast = Toast.makeText(activity, getString(R.string.winner_cpu), Toast.LENGTH_LONG)
-            }
-            toast.setGravity(Gravity.CENTER, 0, 0)
-            toast.show()
-        } else { // You tied
-            val t = Toast.makeText(activity, getString(R.string.winner_none), Toast.LENGTH_LONG)
-            t.setGravity(Gravity.CENTER, 0, 0)
-            t.show()
-        }
+        val text =
+                if (winner == null) {
+                    getString(R.string.winner_none)
+                } else if (winner === mP1) {
+                    getString(R.string.winner_p1)
+                } else {
+                    getString(R.string.winner_cpu)
+                }
+
+        Toast.makeText(context, text, Toast.LENGTH_LONG).apply {
+            setGravity(Gravity.CENTER, 0, 0)
+        }.show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -328,8 +326,8 @@ class SinglePlayerMatchFragment : MatchFragment() {
         inflater!!.inflate(R.menu.single_player, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
             R.id.action_new_match -> {
                 startNewMatch()
                 return true

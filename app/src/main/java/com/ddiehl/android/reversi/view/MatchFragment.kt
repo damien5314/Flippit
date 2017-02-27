@@ -56,7 +56,11 @@ abstract class MatchFragment : Fragment() {
     protected var mMatchMessageIcon1Color = false
     protected var mMatchMessageIcon2Color = true
 
-    protected var mBoard: Board? = null
+    protected lateinit var mBoard: Board
+
+    internal abstract fun startNewMatch()
+    internal abstract fun selectMatch()
+    internal abstract fun handleSpaceClick(row: Int, col: Int)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,11 +106,7 @@ abstract class MatchFragment : Fragment() {
     }
 
     protected fun showWaitingIndicator(p1: Boolean, p2: Boolean) {
-        mP1WaitingBar!!.visibility = if (p1) View.VISIBLE else View.GONE
-        mP2WaitingBar!!.visibility = if (p2) View.VISIBLE else View.GONE
+        mP1WaitingBar.visibility = if (p1) View.VISIBLE else View.GONE
+        mP2WaitingBar.visibility = if (p2) View.VISIBLE else View.GONE
     }
-
-    internal abstract fun startNewMatch()
-    internal abstract fun selectMatch()
-    internal abstract fun handleSpaceClick(row: Int, col: Int)
 }
