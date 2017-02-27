@@ -92,8 +92,9 @@ class Board(val height: Int, val width: Int) {
         while (iterator.hasNext()) {
             val space = iterator.next()
             if (!space.isOwned) {
+                // FIXME some bug here causing no moves to be available
                 MOVE_DIRECTIONS
-                        .filter { move -> !isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
+                        .filter { move -> isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
                         .map { move -> moveValueInDirection(space, move.dx, move.dy, c) }
                         .filter { value -> value != 0 }
                         .forEach { return true }

@@ -1,8 +1,6 @@
 package com.ddiehl.android.reversi.model
 
-class BoardSpace(private val row: Int, private val col: Int) {
-
-    var color: ReversiColor? = null
+class BoardSpace(private val row: Int, private val col: Int, var color: ReversiColor? = null) {
 
     fun x(): Int {
         return col

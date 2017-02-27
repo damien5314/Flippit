@@ -217,16 +217,26 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     fun calculateMatchState() {
         val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
-        if (mBoard.hasMove(opponent.color)) { // If opponent can make a move, it's his turn
+
+        // If opponent can make a move, it's his turn
+        if (mBoard.hasMove(opponent.color)) {
             mCurrentPlayer = opponent
-        } else if (mBoard.hasMove(mCurrentPlayer!!.color)) { // Opponent has no move, keep turn
-            Toast.makeText(activity, getString(R.string.no_moves) + opponent.name, Toast.LENGTH_SHORT).show()
-        } else { // No moves remaining, end of match
+        }
+        // Opponent has no move, keep turn
+        else if (mBoard.hasMove(mCurrentPlayer!!.color)) {
+            Toast.makeText(activity, getString(R.string.no_moves, opponent.name), Toast.LENGTH_SHORT)
+                    .show()
+        }
+        // No moves remaining, end of match
+        else {
             updateScoreDisplay()
             endMatch()
             return
         }
+
         updateScoreDisplay()
+
+        // If the current player is CPU, tell it to execute a move
         if (mCurrentPlayer!!.isCPU) {
             executeCpuMove()
         }
