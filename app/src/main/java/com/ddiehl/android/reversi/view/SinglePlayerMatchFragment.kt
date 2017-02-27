@@ -1,8 +1,8 @@
 package com.ddiehl.android.reversi.view
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.annotation.DrawableRes
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -12,10 +12,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
 import butterknife.BindView
-import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
-import com.ddiehl.android.reversi.P1_CPU
-import com.ddiehl.android.reversi.P2_CPU
-import com.ddiehl.android.reversi.R
+import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.Board
 import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ComputerAI
@@ -33,16 +30,14 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     companion object {
         private val TAG = SinglePlayerMatchFragment::class.java.simpleName
-
-        private val PREF_PLAYER_NAME = "pref_player_name"
-        private val PREF_AI_DIFFICULTY = "pref_ai_difficulty"
-        private val PREF_CURRENT_PLAYER = "pref_currentPlayer"
-        private val PREF_FIRST_TURN = "pref_firstTurn"
-        private val PREF_BOARD_STATE = "pref_boardState"
+        private val SP_STATE = "SP_STATE"
     }
 
-    private var mP1: ReversiPlayer? = null
-    private var mP2: ReversiPlayer? = null
+    private lateinit var mP1: ReversiPlayer
+    private lateinit var mP2: ReversiPlayer
+    private lateinit var mSavedState: SPSavedState
+    private lateinit var mSettings: SPSettings
+
     private var mCurrentPlayer: ReversiPlayer? = null
     private var mPlayerWithFirstTurn: ReversiPlayer? = null
     private var mMatchInProgress: Boolean = false
@@ -50,15 +45,20 @@ class SinglePlayerMatchFragment : MatchFragment() {
     @BindView(R.id.toolbar)
     lateinit var mToolbar: Toolbar
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        val prefs = context.getSharedPreferences(SP_STATE, Context.MODE_PRIVATE)
+        mSavedState = SPSavedState(prefs)
+        mSettings = SPSettings(prefs)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        PreferenceManager.setDefaultValues(activity, R.xml.preferences, false)
-
         mP1 = ReversiPlayer(LIGHT, getString(R.string.player1_label_default))
         mP2 = ReversiPlayer(DARK, getString(R.string.player2_label))
-        mP1!!.isCPU(P1_CPU)
-        mP2!!.isCPU(P2_CPU)
+        mP1.isCPU(P1_CPU)
+        mP2.isCPU(P2_CPU)
 
         mBoard = Board(8, 8)
     }
@@ -67,7 +67,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Hide select match panel for single player
-        mSelectMatchButton!!.visibility = View.GONE
+        mSelectMatchButton.visibility = View.GONE
 
         if (savedMatch) {
             displayBoard()
@@ -83,7 +83,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     override fun onResume() {
         super.onResume()
-        mP1!!.name = playerName
+        mP1.name = mSettings.playerName
         if (mMatchInProgress && mCurrentPlayer!!.isCPU) {
             executeCpuMove()
         }
@@ -93,44 +93,22 @@ class SinglePlayerMatchFragment : MatchFragment() {
         super.onPause()
 
         if (mMatchInProgress) {
-            saveMatchToPrefs()
+            mSavedState.save(mBoard!!, mCurrentPlayer!!, mPlayerWithFirstTurn!!)
         }
     }
 
     val savedMatch: Boolean
         get() {
-            val sp = PreferenceManager.getDefaultSharedPreferences(activity)
-            if (sp.contains(PREF_CURRENT_PLAYER)
-                    && sp.contains(PREF_FIRST_TURN)
-                    && sp.contains(PREF_BOARD_STATE)) {
-                mCurrentPlayer = if (sp.getBoolean(PREF_CURRENT_PLAYER, true)) mP1 else mP2
-                mPlayerWithFirstTurn = if (sp.getBoolean(PREF_FIRST_TURN, true)) mP1 else mP2
+            val savedData = mSavedState.board
+            if (savedData != null) {
+                mCurrentPlayer = if (mSavedState.currentPlayer) mP1 else mP2
+                mPlayerWithFirstTurn = if (mSavedState.firstTurn) mP1 else mP2
 
-                val savedData = sp.getString(PREF_BOARD_STATE, "")
                 mBoard = Board(mBoard!!.height, mBoard!!.width, savedData)
                 updateBoardUi(false)
                 return true
             }
             return false
-        }
-
-    fun saveMatchToPrefs() {
-        val bytes = mBoard!!.serialize()
-        val out = StringBuilder()
-        for (b in bytes)
-            out.append(b.toInt())
-
-        PreferenceManager.getDefaultSharedPreferences(activity).edit()
-                .putBoolean(PREF_CURRENT_PLAYER, mCurrentPlayer === mP1)
-                .putBoolean(PREF_FIRST_TURN, mPlayerWithFirstTurn === mP1)
-                .putString(PREF_BOARD_STATE, out.toString())
-                .apply()
-    }
-
-    private val playerName: String
-        get() {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
-            return prefs.getString(PREF_PLAYER_NAME, getString(R.string.player1_label_default))
         }
 
     public override fun startNewMatch() {
@@ -168,8 +146,8 @@ class SinglePlayerMatchFragment : MatchFragment() {
     }
 
     private fun updateBoardUi(animate: Boolean) {
-        for (i in 0..mMatchGridView!!.childCount - 1) {
-            val row = mMatchGridView!!.getChildAt(i) as ViewGroup
+        for (i in 0..mMatchGridView.childCount - 1) {
+            val row = mMatchGridView.getChildAt(i) as ViewGroup
             for (j in 0..row.childCount - 1) {
                 val space = row.getChildAt(j)
                 updateSpace(space, mBoard!!, i, j, animate)
@@ -239,10 +217,10 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     fun calculateMatchState() {
         val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
-        if (mBoard!!.hasMove(opponent!!.color)) { // If opponent can make a move, it's his turn
+        if (mBoard!!.hasMove(opponent.color)) { // If opponent can make a move, it's his turn
             mCurrentPlayer = opponent
         } else if (mBoard!!.hasMove(mCurrentPlayer!!.color)) { // Opponent has no move, keep turn
-            Toast.makeText(activity, getString(R.string.no_moves) + opponent!!.name, Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, getString(R.string.no_moves) + opponent.name, Toast.LENGTH_SHORT).show()
         } else { // No moves remaining, end of match
             updateScoreDisplay()
             endMatch()
@@ -256,12 +234,11 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     internal fun executeCpuMove() {
         Observable.defer {
-            val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
-            val difficulty = prefs.getString(PREF_AI_DIFFICULTY, "")
+            val difficulty = mSettings.aiDifficulty
             val move: BoardSpace?
             when (difficulty) {
                 "1" -> move = ComputerAI.getBestMove_d1(mBoard!!, mCurrentPlayer!!)
-                "2" -> move = ComputerAI.getBestMove_d3(mBoard!!, mCurrentPlayer!!, if (mCurrentPlayer === mP1) mP2!! else mP1!!)
+                "2" -> move = ComputerAI.getBestMove_d3(mBoard!!, mCurrentPlayer!!, if (mCurrentPlayer === mP1) mP2 else mP1)
                 else -> move = null
             }
 
@@ -291,10 +268,10 @@ class SinglePlayerMatchFragment : MatchFragment() {
                     p2c++
             }
         }
-        mP1!!.score = p1c
-        mP2!!.score = p2c
-        updateScoreForPlayer(mP1!!)
-        updateScoreForPlayer(mP2!!)
+        mP1.score = p1c
+        mP2.score = p2c
+        updateScoreForPlayer(mP1)
+        updateScoreForPlayer(mP2)
 
         if (mCurrentPlayer === mP1) {
             showWaitingIndicator(false, false)
@@ -304,33 +281,28 @@ class SinglePlayerMatchFragment : MatchFragment() {
     }
 
     fun updateScoreForPlayer(p: ReversiPlayer) {
-        (if (p === mP1) mPlayerOneScoreTextView else mPlayerTwoScoreTextView)!!.text = p.score.toString()
+        (if (p === mP1) mPlayerOneScoreTextView else mPlayerTwoScoreTextView).text = p.score.toString()
     }
 
     fun endMatch() {
         val winner: ReversiPlayer
-        if (mP1!!.score != mP2!!.score) {
-            winner = if (mP1!!.score > mP2!!.score) mP1!! else mP2!!
+        if (mP1.score != mP2.score) {
+            winner = if (mP1.score > mP2.score) mP1 else mP2
             showWinningToast(winner)
-            val diff = 64 - mP1!!.score - mP2!!.score
+            val diff = 64 - mP1.score - mP2.score
             winner.score = winner.score + diff
             updateScoreForPlayer(winner)
         } else {
             showWinningToast(null)
         }
         switchFirstTurn()
-        PreferenceManager.getDefaultSharedPreferences(activity)
-                .edit()
-                .remove(PREF_CURRENT_PLAYER)
-                .remove(PREF_FIRST_TURN)
-                .remove(PREF_BOARD_STATE)
-                .apply()
+        mSavedState.clear()
         mMatchInProgress = false
     }
 
     fun displayBoard() {
-        mBoardPanelView!!.visibility = View.GONE
-        mMatchGridView!!.visibility = View.VISIBLE
+        mBoardPanelView.visibility = View.GONE
+        mMatchGridView.visibility = View.VISIBLE
         updateBoardUi(false)
     }
 
