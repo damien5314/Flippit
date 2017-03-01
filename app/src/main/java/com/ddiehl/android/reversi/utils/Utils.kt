@@ -53,4 +53,13 @@ object Utils {
         Log.d(TAG, "SIZE: " + size)
     }
 
+    fun byteArrayToString(array: ByteArray): String {
+        val builder = StringBuilder()
+
+        array.indices
+                .map { array[it] }
+                .forEach { builder.append(it.toString()) }
+
+        return builder.toString()
+    }
 }
