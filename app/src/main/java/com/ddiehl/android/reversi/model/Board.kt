@@ -21,6 +21,44 @@ class Board(val height: Int, val width: Int) {
                 MoveDirection(-1, 1), // Top-Left
                 MoveDirection(1, 1) // Top-Right
         )
+
+        fun getBoard(rows: Int, cols: Int, saved: ByteArray): Board {
+            val board = Board(rows, cols)
+
+            var index = 0
+            for (y in 0..board.height - 1) {
+                for (x in 0..board.width - 1) {
+                    val c = saved[index++]
+
+                    when (c) {
+                        0.toByte() -> { }
+                        1.toByte() -> board.getSpaceAt(x, y).color = ReversiColor.LIGHT
+                        2.toByte() -> board.getSpaceAt(x, y).color = ReversiColor.DARK
+                    }
+                }
+            }
+
+            return board
+        }
+
+        fun getBoard(rows: Int, cols: Int, saved: String): Board {
+            val board = Board(rows, cols)
+
+            var index = 0
+            for (y in 0..board.height - 1) {
+                for (x in 0..board.width - 1) {
+                    val c = saved[index++]
+
+                    when (c) {
+                        '0' -> { }
+                        '1' -> board.getSpaceAt(x, y).color = ReversiColor.LIGHT
+                        '2' -> board.getSpaceAt(x, y).color = ReversiColor.DARK
+                    }
+                }
+            }
+
+            return board
+        }
     }
 
     private val spaces: Array<Array<BoardSpace>> =
@@ -43,38 +81,6 @@ class Board(val height: Int, val width: Int) {
         spaces[3][4].color = ReversiColor.DARK
         spaces[4][4].color = ReversiColor.LIGHT
         spaces[4][3].color = ReversiColor.DARK
-    }
-
-    constructor(rows: Int, cols: Int, saved: ByteArray) : this(rows, cols) {
-
-        var index = 0
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
-                val c = saved[index++]
-
-                when (c) {
-                    0.toByte() -> { }
-                    1.toByte() -> getSpaceAt(x, y).color = ReversiColor.LIGHT
-                    2.toByte() -> getSpaceAt(x, y).color = ReversiColor.DARK
-                }
-            }
-        }
-    }
-
-    constructor(rows: Int, cols: Int, saved: String) : this(rows, cols) {
-
-        var index = 0
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
-                val c = saved[index++]
-
-                when (c) {
-                    '0' -> { }
-                    '1' -> getSpaceAt(x, y).color = ReversiColor.LIGHT
-                    '2' -> getSpaceAt(x, y).color = ReversiColor.DARK
-                }
-            }
-        }
     }
 
     fun copy(): Board {

@@ -104,7 +104,7 @@ class SinglePlayerMatchFragment : MatchFragment() {
                 mCurrentPlayer = if (mSavedState.currentPlayer) mP1 else mP2
                 mPlayerWithFirstTurn = if (mSavedState.firstTurn) mP1 else mP2
 
-                mBoard = Board(mBoard.height, mBoard.width, savedData)
+                mBoard = Board.getBoard(mBoard.height, mBoard.width, savedData)
                 updateBoardUi(false)
                 return true
             }

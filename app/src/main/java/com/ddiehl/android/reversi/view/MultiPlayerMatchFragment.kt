@@ -395,7 +395,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
         var startIndex = if (currentPlayer === lightPlayer) 0 else 100
         val playerData = Arrays.copyOfRange(mMatchData!!, startIndex, startIndex + 64)
 
-        mBoard = Board(mBoard!!.height, mBoard!!.width, playerData)
+        mBoard = Board.getBoard(mBoard.height, mBoard.width, playerData)
         displayBoard()
         dismissSpinner()
 
