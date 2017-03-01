@@ -2,6 +2,7 @@ package com.ddiehl.android.reversi.model
 
 
 import com.ddiehl.android.reversi.IllegalMoveException
+import com.ddiehl.android.reversi.utils.Utils
 import rx.Observable
 import rx.functions.Func0
 import java.util.*
@@ -23,22 +24,7 @@ class Board(val height: Int, val width: Int) {
         )
 
         fun getBoard(rows: Int, cols: Int, saved: ByteArray): Board {
-            val board = Board(rows, cols)
-
-            var index = 0
-            for (y in 0..board.height - 1) {
-                for (x in 0..board.width - 1) {
-                    val c = saved[index++]
-
-                    when (c) {
-                        0.toByte() -> { }
-                        1.toByte() -> board.getSpaceAt(x, y).color = ReversiColor.LIGHT
-                        2.toByte() -> board.getSpaceAt(x, y).color = ReversiColor.DARK
-                    }
-                }
-            }
-
-            return board
+            return getBoard(rows, cols, Utils.byteArrayToString(saved))
         }
 
         fun getBoard(rows: Int, cols: Int, saved: String): Board {
@@ -97,7 +83,6 @@ class Board(val height: Int, val width: Int) {
         val iterator = iterator()
         while (iterator.hasNext()) {
             val space = iterator.next()
-            // FIXME some bug here causing no moves to be available
             MOVE_DIRECTIONS
                     .filter { !space.isOwned }
                     .filter { move -> isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
