@@ -145,20 +145,20 @@ class Board(val height: Int, val width: Int) {
                         moveValueInDirection(space, move.dx, move.dy, playerColor)
                     }
 
-    private fun moveValueInDirection(s: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {
+    private fun moveValueInDirection(space: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {
         // If the move would bring us out of bounds of the board area, just return 0
-        if (s.x() + dx < 0 || s.x() + dx >= width || s.y() + dy < 0 || s.y() + dy >= height) {
+        if (!isWithinBounds(space.x() + dx, space.y() + dy)) {
             return 0
         }
 
         // Otherwise, calculate how many spaces we can capture in that direction
         var moveVal = 0
         val opponentColor = if (playerColor == ReversiColor.DARK) ReversiColor.LIGHT else ReversiColor.DARK
-        val firstPiece = getSpaceAt(s.x() + dx, s.y() + dy)
+        val firstPiece = getSpaceAt(space.x() + dx, space.y() + dy)
 
         if (firstPiece.color == opponentColor) {
-            var currentX = s.x() + dx
-            var currentY = s.y() + dy
+            var currentX = space.x() + dx
+            var currentY = space.y() + dy
 
             while (isWithinBounds(currentX, currentY) && getSpaceAt(currentX, currentY).color == opponentColor) {
                 moveVal++
