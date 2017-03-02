@@ -4,22 +4,15 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.Fragment
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.preference.EditTextPreference
-import android.preference.ListPreference
-import android.preference.MultiSelectListPreference
-import android.preference.Preference
-import android.preference.PreferenceFragment
-import android.preference.PreferenceGroup
-import android.preference.PreferenceManager
-
+import android.preference.*
 import com.ddiehl.android.reversi.R
 
 /**
  * Adapted to PreferenceFragment from http://stackoverflow.com/a/4325239/3238938
+ * TODO: Create a real UI for this
  */
 class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
@@ -136,7 +129,6 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
     }
 
     companion object {
-
         fun newInstance(intent: Intent): Fragment {
             val frag = SettingsFragment()
             val args = intent.extras

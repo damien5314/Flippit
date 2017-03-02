@@ -187,7 +187,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     override fun onConnectionFailed(result: ConnectionResult) {
-        //        Log.d(TAG, "Failed to connect to Google Play - Error: " + result.getErrorCode());
         dismissSpinner()
 
         if (mResolvingError) {
@@ -195,7 +194,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
 
         if (result.hasResolution()) {
-            //            Log.d(TAG, "Attempting to resolve error (ErrorCode: " + result.getErrorCode() + ")");
             try {
                 mResolvingError = true
                 result.startResolutionForResult(activity, RC_RESOLVE_ERROR)
@@ -217,26 +215,32 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun displaySignInPrompt() {
-        showDialog(
-                AlertDialog.Builder(context)
-                        .setTitle(getString(R.string.dialog_sign_in_title))
-                        .setMessage(getString(R.string.dialog_sign_in_message))
-                        .setPositiveButton(getString(R.string.dialog_sign_in_confirm)) { dialog, id -> connectGoogleApiClient() }
-                        .setNegativeButton(getString(R.string.dialog_sign_in_cancel)) { dialog, id -> }
-                        .setOnCancelListener { mQueuedAction = null }
-                        .create()
-        )
+        val dialog = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.dialog_sign_in_title))
+                .setMessage(getString(R.string.dialog_sign_in_message))
+                .setPositiveButton(getString(R.string.dialog_sign_in_confirm), onSignInConfirm())
+                .setNegativeButton(getString(R.string.dialog_sign_in_cancel), onSignInCancel())
+                .setOnCancelListener { mQueuedAction = null }
+                .create()
+        showDialog(dialog)
     }
 
+    fun onSignInConfirm() = DialogInterface.OnClickListener { dialog, which ->
+        connectGoogleApiClient()
+    }
+
+    fun onSignInCancel() = DialogInterface.OnClickListener { dialog, which -> }
+
     public override fun startNewMatch() {
-        val intent: Intent
         if (!mGoogleApiClient!!.isConnected) {
             mQueuedAction = QueuedAction.NewMatch
             displaySignInPrompt()
             return
+        } else {
+            val intent: Intent = Games.TurnBasedMultiplayer
+                    .getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true)
+            startActivityForResult(intent, RC_SELECT_PLAYERS)
         }
-        intent = Games.TurnBasedMultiplayer.getSelectOpponentsIntent(mGoogleApiClient, 1, 1, true)
-        startActivityForResult(intent, RC_SELECT_PLAYERS)
     }
 
     public override fun selectMatch() {
@@ -249,7 +253,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
         startActivityForResult(intent, RC_VIEW_MATCHES)
     }
 
-    internal override fun handleSpaceClick(row: Int, col: Int) {
+    override fun handleSpaceClick(row: Int, col: Int) {
         // TODO
     }
 
@@ -275,7 +279,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
                         updateMatch(match)
                     }
                 }
-            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) { // User signed out
+            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+                // User signed out
                 mIsSignedIn = false
                 signOutFromGooglePlay()
             } else {
@@ -291,10 +296,14 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 val maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0)
 
                 if (minAutoMatchPlayers > 0) {
-                    autoMatchCriteria = RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0)
+                    autoMatchCriteria = RoomConfig.createAutoMatchCriteria(
+                            minAutoMatchPlayers, maxAutoMatchPlayers, 0
+                    )
                 } else {
                     autoMatchCriteria = null
-                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_lets_play_together))
+                    Games.Achievements.unlock(
+                            mGoogleApiClient, getString(R.string.achievement_lets_play_together)
+                    )
                 }
 
                 val tbmc = TurnBasedMatchConfig.builder()
@@ -303,17 +312,23 @@ class MultiPlayerMatchFragment : MatchFragment(),
                         .build()
 
                 showSpinner(1)
-                Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback { result -> processResult(result) }
-            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) { // User signed out
+                Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback {
+                    result -> processResult(result)
+                }
+            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+                // User signed out
                 mIsSignedIn = false
                 signOutFromGooglePlay()
             } else {
                 showErrorDialog(resultCode)
             }
 
-            RC_SHOW_ACHIEVEMENTS -> if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) { // User signed out
-                mIsSignedIn = false
-                signOutFromGooglePlay()
+            RC_SHOW_ACHIEVEMENTS -> {
+                if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+                    // User signed out
+                    mIsSignedIn = false
+                    signOutFromGooglePlay()
+                }
             }
 
             RC_SETTINGS -> when (resultCode) {
@@ -358,7 +373,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     private fun startMatch(match: TurnBasedMatch) {
         mMatch = match
         mMatchData = null
-        mBoard!!.reset()
+        mBoard.reset()
         saveMatchData()
         displayBoard()
         updateScore()
@@ -406,7 +421,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
         // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
         startIndex += 64
         while (mMatchData!![startIndex].toInt() != 0) {
-            val s = mBoard!!.getBoardSpaceFromNum(mMatchData!![startIndex++].toInt())
+            val s = mBoard.getBoardSpaceFromNum(mMatchData!![startIndex++].toInt())
             mQueuedMoves!!.add(s!!)
         }
 
@@ -451,7 +466,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun saveMatchData() {
-        val playerBoard = mBoard!!.serialize()
+        val playerBoard = mBoard.serialize()
 
         if (mMatchData == null) {
             mMatchData = ByteArray(256)
@@ -470,7 +485,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     private fun processReceivedTurns() {
         mUpdatingMatch = true
         mHandler!!.postDelayed({
-            mBoard!!.commitPiece(mQueuedMoves!!.removeAt(0), opponentColor)
+            mBoard.commitPiece(mQueuedMoves!!.removeAt(0), opponentColor)
             saveMatchData()
             if (!mQueuedMoves!!.isEmpty())
                 processReceivedTurns()
@@ -504,7 +519,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
             return
         }
 
-        if (mMatch!!.status != TurnBasedMatch.MATCH_STATUS_ACTIVE || mMatch!!.turnStatus != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+        if (mMatch!!.status != TurnBasedMatch.MATCH_STATUS_ACTIVE ||
+                mMatch!!.turnStatus != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             return
         }
 
@@ -538,13 +554,17 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun updateMatchState() {
-        if (mBoard!!.hasMove(opponentColor)) { // If opponent can make a move, it's his turn
+        if (mBoard.hasMove(opponentColor)) { // If opponent can make a move, it's his turn
             val pId = if (mOpponent == null) null else mOpponent!!.participantId
             Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch!!.matchId, mMatchData, pId)
                     .setResultCallback { updateMatchResult -> processResult(updateMatchResult) }
-        } else if (mBoard!!.hasMove(currentPlayerColor)) { // Opponent has no move, keep turn
-            Toast.makeText(activity, getString(R.string.no_moves) + mOpponent!!.displayName, Toast.LENGTH_SHORT).show()
-            Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, mMatch!!.matchId, mMatchData, mPlayer!!.participantId)
+        } else if (mBoard.hasMove(currentPlayerColor)) { // Opponent has no move, keep turn
+            val msg = getString(R.string.no_moves, mOpponent!!.displayName)
+            Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
+            Games.TurnBasedMultiplayer.takeTurn(
+                    mGoogleApiClient, mMatch!!.matchId, mMatchData,
+                    mPlayer!!.participantId
+            )
                     .setResultCallback { updateMatchResult -> processResult(updateMatchResult) }
         } else { // No moves remaining, end of match
             endMatch()
@@ -557,56 +577,92 @@ class MultiPlayerMatchFragment : MatchFragment(),
         updateScore()
         if (mMatch!!.status == TurnBasedMatch.MATCH_STATUS_COMPLETE) {
             when (mPlayer!!.result.result) {
-                ParticipantResult.MATCH_RESULT_WIN -> displayMessage(getString(R.string.winner_you))
-                ParticipantResult.MATCH_RESULT_TIE -> displayMessage(getString(R.string.winner_tie))
-                ParticipantResult.MATCH_RESULT_LOSS -> displayMessage(getString(if (mPlayer === mLightPlayer) R.string.winner_dark else R.string.winner_light))
-                else -> displayMessage(getString(R.string.match_complete))
+                ParticipantResult.MATCH_RESULT_WIN -> {
+                    displayMessage(getString(R.string.winner_you))
+                }
+                ParticipantResult.MATCH_RESULT_TIE -> {
+                    displayMessage(getString(R.string.winner_tie))
+                }
+                ParticipantResult.MATCH_RESULT_LOSS -> {
+                    val msg = if (mPlayer === mLightPlayer) R.string.winner_dark else R.string.winner_light
+                    displayMessage(getString(msg))
+                }
+                else -> {
+                    displayMessage(getString(R.string.match_complete))
+                }
             }
 
             if (mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
                 // Call finishMatch() to close out match for player
                 Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch!!.matchId)
-                        .setResultCallback { updateMatchResult -> processResultFinishMatch(updateMatchResult) }
+                        .setResultCallback {
+                            updateMatchResult -> processResultFinishMatch(updateMatchResult)
+                        }
             }
         } else { // Match is not yet finished
             val winnerResult: ParticipantResult
             val loserResult: ParticipantResult
             if (mLightScore != mDarkScore) {
                 if (mLightScore > mDarkScore) {
-                    winnerResult = ParticipantResult(mLightPlayer!!.participantId, ParticipantResult.MATCH_RESULT_WIN,
-                            ParticipantResult.PLACING_UNINITIALIZED)
-                    loserResult = ParticipantResult(mDarkPlayer!!.participantId, ParticipantResult.MATCH_RESULT_LOSS,
-                            ParticipantResult.PLACING_UNINITIALIZED)
-                    displayMessage(getString(if (mPlayer === mLightPlayer) R.string.winner_you else R.string.winner_light))
+                    winnerResult = ParticipantResult(
+                            mLightPlayer!!.participantId,
+                            ParticipantResult.MATCH_RESULT_WIN,
+                            ParticipantResult.PLACING_UNINITIALIZED
+                    )
+                    loserResult = ParticipantResult(
+                            mDarkPlayer!!.participantId,
+                            ParticipantResult.MATCH_RESULT_LOSS,
+                            ParticipantResult.PLACING_UNINITIALIZED
+                    )
+                    val msg = if (mPlayer === mLightPlayer) R.string.winner_you else R.string.winner_light
+                    displayMessage(getString(msg))
                 } else {
-                    winnerResult = ParticipantResult(mDarkPlayer!!.participantId, ParticipantResult.MATCH_RESULT_WIN,
-                            ParticipantResult.PLACING_UNINITIALIZED)
-                    loserResult = ParticipantResult(mLightPlayer!!.participantId, ParticipantResult.MATCH_RESULT_LOSS,
-                            ParticipantResult.PLACING_UNINITIALIZED)
-                    displayMessage(getString(if (mPlayer === mDarkPlayer) R.string.winner_you else R.string.winner_dark))
+                    winnerResult = ParticipantResult(
+                            mDarkPlayer!!.participantId,
+                            ParticipantResult.MATCH_RESULT_WIN,
+                            ParticipantResult.PLACING_UNINITIALIZED
+                    )
+                    loserResult = ParticipantResult(
+                            mLightPlayer!!.participantId,
+                            ParticipantResult.MATCH_RESULT_LOSS,
+                            ParticipantResult.PLACING_UNINITIALIZED
+                    )
+                    val msg = if (mPlayer === mDarkPlayer) R.string.winner_you else R.string.winner_dark
+                    displayMessage(getString(msg))
                 }
             } else {
-                winnerResult = ParticipantResult(mDarkPlayer!!.participantId, ParticipantResult.MATCH_RESULT_TIE,
-                        ParticipantResult.PLACING_UNINITIALIZED)
-                loserResult = ParticipantResult(mLightPlayer!!.participantId, ParticipantResult.MATCH_RESULT_TIE,
-                        ParticipantResult.PLACING_UNINITIALIZED)
+                winnerResult = ParticipantResult(
+                        mDarkPlayer!!.participantId,
+                        ParticipantResult.MATCH_RESULT_TIE,
+                        ParticipantResult.PLACING_UNINITIALIZED
+                )
+                loserResult = ParticipantResult(
+                        mLightPlayer!!.participantId,
+                        ParticipantResult.MATCH_RESULT_TIE,
+                        ParticipantResult.PLACING_UNINITIALIZED
+                )
                 displayMessage(getString(R.string.winner_tie))
             }
 
             // Call finishMatch() with result parameters
-            Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch!!.matchId, mMatchData, winnerResult, loserResult)
-                    .setResultCallback { updateMatchResult -> processResultFinishMatch(updateMatchResult) }
+            Games.TurnBasedMultiplayer.finishMatch(
+                    mGoogleApiClient, mMatch!!.matchId, mMatchData,
+                    winnerResult, loserResult
+            )
+                    .setResultCallback { updateMatchResult ->
+                        processResultFinishMatch(updateMatchResult)
+                    }
         }
     }
 
     private val currentPlayer: Participant
         get() {
-            val lightPlayer = lightPlayer
-            val darkPlayer = darkPlayer
-            if (mMatch!!.getParticipant(mMatch!!.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient))) === lightPlayer)
+            val currentPlayerId = Games.Players.getCurrentPlayerId(mGoogleApiClient)
+            if (mMatch!!.getParticipant(mMatch!!.getParticipantId(currentPlayerId)) === lightPlayer) {
                 return lightPlayer!!
-            else
+            } else {
                 return darkPlayer!!
+            }
         }
 
     private val opponent: Participant
@@ -640,13 +696,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
             if (mMatch != null) {
                 val participantIds = mMatch!!.participantIds
                 val lightId = mMatch!!.creatorId
-                var darkId: String? = null
 
-                for (id in participantIds) {
-                    if (id == lightId)
-                        continue
-                    darkId = id
-                }
+                val darkId: String? = participantIds.lastOrNull { it != lightId }
 
                 if (darkId != null)
                     return mMatch!!.getParticipant(darkId)
@@ -655,33 +706,33 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
 
     private fun displayBoard() {
-        mMatchGridView!!.visibility = View.GONE
-        mBoardPanelView!!.visibility = View.VISIBLE
+        mMatchGridView.visibility = View.GONE
+        mBoardPanelView.visibility = View.VISIBLE
     }
 
     private fun clearBoard() {
         mMatch = null
-        mMatchGridView!!.visibility = View.GONE
-        mPlayerOneScoreTextView!!.text = ""
-        mPlayerTwoScoreTextView!!.text = ""
+        mMatchGridView.visibility = View.GONE
+        mPlayerOneScoreTextView.text = ""
+        mPlayerTwoScoreTextView.text = ""
         showWaitingIndicator(false, false)
-        mBoardPanelView!!.visibility = View.VISIBLE
+        mBoardPanelView.visibility = View.VISIBLE
     }
 
     private fun updateScore() {
-        mLightScore = mBoard!!.getNumSpacesForColor(ReversiColor.LIGHT)
-        mDarkScore = mBoard!!.getNumSpacesForColor(ReversiColor.DARK)
+        mLightScore = mBoard.getNumSpacesForColor(ReversiColor.LIGHT)
+        mDarkScore = mBoard.getNumSpacesForColor(ReversiColor.DARK)
 
         if (mMatch!!.status == TurnBasedMatch.MATCH_STATUS_COMPLETE && !mUpdatingMatch) {
             // Add remaining spaces to winning count as per Reversi rules
             if (mLightPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN)
-                mLightScore += mBoard!!.numberOfEmptySpaces
+                mLightScore += mBoard.numberOfEmptySpaces
             else if (mDarkPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN)
-                mDarkScore += mBoard!!.numberOfEmptySpaces
+                mDarkScore += mBoard.numberOfEmptySpaces
         }
 
-        mPlayerOneScoreTextView!!.text = mLightScore.toString()
-        mPlayerTwoScoreTextView!!.text = mDarkScore.toString()
+        mPlayerOneScoreTextView.text = mLightScore.toString()
+        mPlayerTwoScoreTextView.text = mDarkScore.toString()
 
         // Update turn indicator
         when (mMatch!!.turnStatus) {
@@ -693,7 +744,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun checkStatusCode(statusCode: Int): Boolean {
-        if (statusCode == GamesStatusCodes.STATUS_OK || statusCode == GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED) {
+        if (statusCode == GamesStatusCodes.STATUS_OK ||
+                statusCode == GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED) {
             return true
         }
 
@@ -701,34 +753,74 @@ class MultiPlayerMatchFragment : MatchFragment(),
         dismissSpinner()
 
         when (statusCode) {
-            GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_tester_untrusted))
-            GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_already_rematched))
-            GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_network_operation_failed))
-            GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_reconnect_required))
-            GamesStatusCodes.STATUS_INTERNAL_ERROR -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_internal_error))
-            GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_inactive_match))
-            GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_locally_modified))
-            else -> showAlertDialog(getString(R.string.dialog_error_title), getString(R.string.dialog_error_message_default))
-        }//                Log.w(TAG, "Unknown status code: " + statusCode);
+            GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_tester_untrusted)
+                )
+            }
+            GamesStatusCodes.STATUS_MATCH_ERROR_ALREADY_REMATCHED -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_already_rematched)
+                )
+            }
+            GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_FAILED -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_network_operation_failed)
+                )
+            }
+            GamesStatusCodes.STATUS_CLIENT_RECONNECT_REQUIRED -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_reconnect_required)
+                )
+            }
+            GamesStatusCodes.STATUS_INTERNAL_ERROR -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_internal_error)
+                )
+            }
+            GamesStatusCodes.STATUS_MATCH_ERROR_INACTIVE_MATCH -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_inactive_match)
+                )
+            }
+            GamesStatusCodes.STATUS_MATCH_ERROR_LOCALLY_MODIFIED -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_locally_modified)
+                )
+            }
+            else -> {
+                showAlertDialog(
+                        getString(R.string.dialog_error_title),
+                        getString(R.string.dialog_error_message_default)
+                )
+            }
+        }
 
         return false
     }
 
     private fun displayMessage(matchMsg: String) {
-        mMatchMessageTextView!!.text = matchMsg
-        mMatchMessageView!!.visibility = View.VISIBLE
+        mMatchMessageTextView.text = matchMsg
+        mMatchMessageView.visibility = View.VISIBLE
 
         // Start animations for side icons
         if (mLeftFadeOut != null && mRightFadeOut != null
                 && !mLeftFadeOut!!.hasStarted() && !mRightFadeOut!!.hasStarted()) {
-            mMatchMessageIcon1!!.startAnimation(mLeftFadeOut)
-            mMatchMessageIcon2!!.startAnimation(mRightFadeOut)
+            mMatchMessageIcon1.startAnimation(mLeftFadeOut)
+            mMatchMessageIcon2.startAnimation(mRightFadeOut)
         }
     }
 
     private fun dismissMessage() {
-        mMatchMessageView!!.visibility = View.INVISIBLE
-        mMatchMessageTextView!!.text = ""
+        mMatchMessageView.visibility = View.INVISIBLE
+        mMatchMessageTextView.text = ""
         mLeftFadeOut!!.cancel()
         mRightFadeOut!!.cancel()
         mLeftFadeIn!!.cancel()
@@ -739,20 +831,25 @@ class MultiPlayerMatchFragment : MatchFragment(),
         AlertDialog.Builder(activity)
                 .setTitle(getString(R.string.dialog_rematch_title))
                 .setMessage(getString(R.string.dialog_rematch_message))
-                .setPositiveButton(getString(R.string.dialog_rematch_confirm), DialogInterface.OnClickListener { dialog, which ->
-                    if (!mGoogleApiClient!!.isConnected) {
-                        displaySignInPrompt()
-                        return@OnClickListener
-                    }
-                    showSpinner(1)
-                    Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch!!.matchId)
-                            .setResultCallback { result -> processResult(result) }
-                    mMatch = null
-                })
-                .setNegativeButton(getString(R.string.dialog_rematch_cancel)) { a, b -> }
+                .setPositiveButton(getString(R.string.dialog_rematch_confirm), onRematchConfirm())
+                .setNegativeButton(getString(R.string.dialog_rematch_cancel), onRematchCancel())
                 .setIcon(resources.getDrawable(R.drawable.ic_av_replay_blue))
                 .create()
     }
+
+    private fun onRematchConfirm() =
+        DialogInterface.OnClickListener { dialog, which ->
+            if (!mGoogleApiClient!!.isConnected) {
+                displaySignInPrompt()
+                return@OnClickListener
+            }
+            showSpinner(1)
+            Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch!!.matchId)
+                    .setResultCallback { result -> processResult(result) }
+            mMatch = null
+        }
+
+    private fun onRematchCancel() = DialogInterface.OnClickListener { dialog, which -> }
 
     private fun initializeWaitingAnimations() {
         mLeftFadeIn = AnimationUtils.loadAnimation(activity, R.anim.waitingmessage_fadein)
@@ -760,8 +857,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
         mRightFadeIn = AnimationUtils.loadAnimation(activity, R.anim.waitingmessage_fadein)
         mRightFadeOut = AnimationUtils.loadAnimation(activity, R.anim.waitingmessage_fadeout)
 
-        mMatchMessageIcon1!!.setBackgroundResource(R.drawable.player_icon_p1)
-        mMatchMessageIcon2!!.setBackgroundResource(R.drawable.player_icon_p2)
+        mMatchMessageIcon1.setBackgroundResource(R.drawable.player_icon_p1)
+        mMatchMessageIcon2.setBackgroundResource(R.drawable.player_icon_p2)
 
         mRightFadeOut!!.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation) {}
@@ -770,12 +867,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
             override fun onAnimationEnd(animation: Animation) {
                 // Flip background resources & start animation
-                mMatchMessageIcon2!!.setBackgroundResource(if (mMatchMessageIcon2Color)
+                mMatchMessageIcon2.setBackgroundResource(if (mMatchMessageIcon2Color)
                     R.drawable.player_icon_p1
                 else
                     R.drawable.player_icon_p2)
                 mMatchMessageIcon2Color = !mMatchMessageIcon2Color
-                mMatchMessageIcon2!!.startAnimation(mRightFadeIn)
+                mMatchMessageIcon2.startAnimation(mRightFadeIn)
             }
         })
 
@@ -786,12 +883,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
             override fun onAnimationEnd(animation: Animation) {
                 // Flip background resources & start animation
-                mMatchMessageIcon1!!.setBackgroundResource(if (mMatchMessageIcon1Color)
+                mMatchMessageIcon1.setBackgroundResource(if (mMatchMessageIcon1Color)
                     R.drawable.player_icon_p1
                 else
                     R.drawable.player_icon_p2)
                 mMatchMessageIcon1Color = !mMatchMessageIcon1Color
-                mMatchMessageIcon1!!.startAnimation(mLeftFadeIn)
+                mMatchMessageIcon1.startAnimation(mLeftFadeIn)
             }
         })
 
@@ -802,13 +899,14 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
                     override fun onAnimationEnd(animation: Animation) {
                         mHandler!!.postDelayed({
-                            mMatchMessageIcon1!!.startAnimation(mLeftFadeOut)
-                            mMatchMessageIcon2!!.startAnimation(mRightFadeOut)
+                            mMatchMessageIcon1.startAnimation(mLeftFadeOut)
+                            mMatchMessageIcon2.startAnimation(mRightFadeOut)
                         }, resources.getInteger(R.integer.waiting_message_fade_delay).toLong())
                     }
                 })
     }
 
+    // TODO: Split this out into multiple methods for clarity
     private fun showSpinner(spinnerMsg: Int) {
         if (mProgressBar == null) {
             mProgressBar = ProgressDialog(activity, R.style.ProgressDialog)
@@ -869,8 +967,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
         settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER)
         val isSignedIn = mGoogleApiClient!!.isConnected
         settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn)
-        settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT,
-                if (isSignedIn) Plus.AccountApi.getAccountName(mGoogleApiClient) else "")
+        val accountName = if (isSignedIn) {
+            Plus.AccountApi.getAccountName(mGoogleApiClient)
+        } else {
+            "" // FIXME: Should just pass in `null` here
+        }
+        settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT, accountName)
         startActivityForResult(settings, RC_SETTINGS)
     }
 
@@ -887,20 +989,26 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
 
         when (mMatch!!.status) {
-            TurnBasedMatch.MATCH_STATUS_COMPLETE, TurnBasedMatch.MATCH_STATUS_CANCELED, TurnBasedMatch.MATCH_STATUS_EXPIRED -> Toast.makeText(activity, R.string.match_inactive, Toast.LENGTH_SHORT).show()
+            TurnBasedMatch.MATCH_STATUS_COMPLETE,
+            TurnBasedMatch.MATCH_STATUS_CANCELED,
+            TurnBasedMatch.MATCH_STATUS_EXPIRED -> {
+                Toast.makeText(activity, R.string.match_inactive, Toast.LENGTH_SHORT).show()
+            }
             TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING -> showLeaveMatchDialog()
-            TurnBasedMatch.MATCH_STATUS_ACTIVE -> if (mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-                if (mOpponent == null) {
-                    showLeaveMatchDialog()
-                } else {
-                    if (mOpponent!!.status == Participant.STATUS_JOINED) {
-                        showForfeitMatchDialog()
+            TurnBasedMatch.MATCH_STATUS_ACTIVE -> {
+                if (mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+                    if (mOpponent == null) {
+                        showLeaveMatchDialog()
                     } else {
-                        showCancelMatchDialog()
+                        if (mOpponent!!.status == Participant.STATUS_JOINED) {
+                            showForfeitMatchDialog()
+                        } else {
+                            showCancelMatchDialog()
+                        }
                     }
+                } else {
+                    showForfeitMatchForbiddenAlert()
                 }
-            } else {
-                showForfeitMatchForbiddenAlert()
             }
         }
 
@@ -910,47 +1018,59 @@ class MultiPlayerMatchFragment : MatchFragment(),
         showDialog(AlertDialog.Builder(activity)
                 .setTitle(getString(R.string.dialog_cancel_match_title))
                 .setMessage(getString(R.string.dialog_cancel_match_message))
-                .setPositiveButton(getString(R.string.dialog_cancel_match_confirm), DialogInterface.OnClickListener { dialog, which ->
-                    if (!mGoogleApiClient!!.isConnected) {
-                        displaySignInPrompt()
-                        return@OnClickListener
-                    }
-                    Games.TurnBasedMultiplayer.cancelMatch(mGoogleApiClient, mMatch!!.matchId)
-                            .setResultCallback { cancelMatchResult -> processResult(cancelMatchResult) }
-                })
-                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel)) { dialog, which -> }
+                .setPositiveButton(getString(R.string.dialog_cancel_match_confirm), onCancelMatchConfirm())
+                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel), onCancelMatchCancel())
                 .setCancelable(true)
                 .create())
     }
+
+    private fun onCancelMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
+        if (!mGoogleApiClient!!.isConnected) {
+            displaySignInPrompt()
+        } else {
+            Games.TurnBasedMultiplayer.cancelMatch(mGoogleApiClient, mMatch!!.matchId)
+                    .setResultCallback { cancelMatchResult -> processResult(cancelMatchResult) }
+        }
+    }
+
+    private fun onCancelMatchCancel() = DialogInterface.OnClickListener { dialogInterface, which -> }
 
     private fun showForfeitMatchDialog() {
         showDialog(AlertDialog.Builder(activity)
                 .setTitle(R.string.dialog_forfeit_match_title)
                 .setMessage(R.string.dialog_forfeit_match_message)
-                .setPositiveButton(R.string.dialog_forfeit_match_confirm, DialogInterface.OnClickListener { dialog, which ->
-                    if (!mGoogleApiClient!!.isConnected) {
-                        displaySignInPrompt()
-                        return@OnClickListener
-                    }
-                    val winnerResult = ParticipantResult(mOpponent!!.participantId,
-                            ParticipantResult.MATCH_RESULT_WIN, ParticipantResult.PLACING_UNINITIALIZED)
-                    val loserResult = ParticipantResult(mPlayer!!.participantId,
-                            ParticipantResult.MATCH_RESULT_LOSS, ParticipantResult.PLACING_UNINITIALIZED)
-                    // Give win to other player
-                    Games.TurnBasedMultiplayer.finishMatch(mGoogleApiClient, mMatch!!.matchId, mMatchData, winnerResult, loserResult)
-                            .setResultCallback { result ->
-                                if (result.status.isSuccess) {
-                                    Toast.makeText(activity, getString(R.string.forfeit_success), Toast.LENGTH_LONG).show()
-                                    updateMatch(result.match)
-                                } else {
-                                    Toast.makeText(activity, getString(R.string.forfeit_fail), Toast.LENGTH_LONG).show()
-                                }
-                            }
-                })
-                .setNegativeButton(R.string.dialog_forfeit_match_cancel) { dialog, which -> }
+                .setPositiveButton(R.string.dialog_forfeit_match_confirm, onForfeitMatchConfirm())
+                .setNegativeButton(R.string.dialog_forfeit_match_cancel, onForfeitMatchCancel())
                 .setCancelable(true)
                 .create())
     }
+
+    private fun onForfeitMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
+        if (!mGoogleApiClient!!.isConnected) {
+            displaySignInPrompt()
+            return@OnClickListener
+        }
+
+        val winnerResult = ParticipantResult(mOpponent!!.participantId,
+                ParticipantResult.MATCH_RESULT_WIN, ParticipantResult.PLACING_UNINITIALIZED)
+        val loserResult = ParticipantResult(mPlayer!!.participantId,
+                ParticipantResult.MATCH_RESULT_LOSS, ParticipantResult.PLACING_UNINITIALIZED)
+        // Give win to other player
+        Games.TurnBasedMultiplayer.finishMatch(
+                mGoogleApiClient, mMatch!!.matchId, mMatchData,
+                winnerResult, loserResult
+        )
+                .setResultCallback { result ->
+                    if (result.status.isSuccess) {
+                        Toast.makeText(activity, getString(R.string.forfeit_success), Toast.LENGTH_LONG).show()
+                        updateMatch(result.match)
+                    } else {
+                        Toast.makeText(activity, getString(R.string.forfeit_fail), Toast.LENGTH_LONG).show()
+                    }
+                }
+    }
+
+    private fun onForfeitMatchCancel() = DialogInterface.OnClickListener { dialog, which -> }
 
     private fun showForfeitMatchForbiddenAlert() {
         showDialog(AlertDialog.Builder(activity)
@@ -965,24 +1085,28 @@ class MultiPlayerMatchFragment : MatchFragment(),
         showDialog(AlertDialog.Builder(activity)
                 .setTitle(R.string.dialog_leave_match_title)
                 .setMessage(R.string.dialog_leave_match_message)
-                .setPositiveButton(R.string.dialog_leave_match_confirm, DialogInterface.OnClickListener { dialog, which ->
-                    if (!mGoogleApiClient!!.isConnected) {
-                        displaySignInPrompt()
-                        return@OnClickListener
-                    }
-
-                    if (mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-                        Games.TurnBasedMultiplayer.leaveMatchDuringTurn(mGoogleApiClient, mMatch!!.matchId, null)
-                                .setResultCallback { result -> processResultLeaveMatch(result) }
-                    } else {
-                        Games.TurnBasedMultiplayer.leaveMatch(mGoogleApiClient, mMatch!!.matchId)
-                                .setResultCallback { result -> processResultLeaveMatch(result) }
-                    }
-                })
-                .setNegativeButton(R.string.dialog_leave_match_cancel) { dialog, which -> }
+                .setPositiveButton(R.string.dialog_leave_match_confirm, onLeaveMatchConfirm())
+                .setNegativeButton(R.string.dialog_leave_match_cancel, onLeaveMatchCancel())
                 .setCancelable(true)
                 .create())
     }
+
+    private fun onLeaveMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
+        if (!mGoogleApiClient!!.isConnected) {
+            displaySignInPrompt()
+            return@OnClickListener
+        }
+
+        if (mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+            Games.TurnBasedMultiplayer.leaveMatchDuringTurn(mGoogleApiClient, mMatch!!.matchId, null)
+                    .setResultCallback { result -> processResultLeaveMatch(result) }
+        } else {
+            Games.TurnBasedMultiplayer.leaveMatch(mGoogleApiClient, mMatch!!.matchId)
+                    .setResultCallback { result -> processResultLeaveMatch(result) }
+        }
+    }
+
+    private fun onLeaveMatchCancel() = DialogInterface.OnClickListener { dialogInterface, which -> }
 
     private fun processResultFinishMatch(result: TurnBasedMultiplayer.UpdateMatchResult) {
         mUpdatingMatch = false
@@ -1031,7 +1155,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     private fun showAchievements() {
         if (mGoogleApiClient!!.isConnected) {
-            startActivityForResult(Games.Achievements.getAchievementsIntent(mGoogleApiClient), RC_SHOW_ACHIEVEMENTS)
+            val intent = Games.Achievements.getAchievementsIntent(mGoogleApiClient)
+            startActivityForResult(intent, RC_SHOW_ACHIEVEMENTS)
         } else {
             mQueuedAction = QueuedAction.ShowAchievements
             displaySignInPrompt()
@@ -1092,9 +1217,11 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
                 && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             mHandler!!.postDelayed({
-                val p1 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK, "")
-                val p2 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.DARK else ReversiColor.LIGHT, "")
-                claim(Board.ComputerAI.getBestMove_d3(mBoard!!, p1, p2))
+                // FIXME Why do we need to create new ReversiPlayers here?
+                val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
+                val p1 = ReversiPlayer(color, "")
+                val p2 = ReversiPlayer(color.opposite(), "")
+                claim(Board.ComputerAI.getBestMove_d3(mBoard, p1, p2))
             }, 500)
         }
     }

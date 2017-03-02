@@ -12,8 +12,6 @@ class SettingsActivity : Activity() {
     }
 
     companion object {
-        private val TAG = SettingsActivity::class.java.simpleName
-
         val EXTRA_SETTINGS_MODE = "settings_mode"
         val EXTRA_IS_SIGNED_IN = "is_signed_in"
         val EXTRA_SIGNED_IN_ACCOUNT = "signed_in_account"
