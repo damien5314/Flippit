@@ -14,8 +14,8 @@ import android.widget.Toast
 import butterknife.BindView
 import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.Board
+import com.ddiehl.android.reversi.model.Board.ComputerAI
 import com.ddiehl.android.reversi.model.BoardSpace
-import com.ddiehl.android.reversi.model.ComputerAI
 import com.ddiehl.android.reversi.model.ReversiColor.DARK
 import com.ddiehl.android.reversi.model.ReversiColor.LIGHT
 import com.ddiehl.android.reversi.model.ReversiPlayer
@@ -247,9 +247,16 @@ class SinglePlayerMatchFragment : MatchFragment() {
             val difficulty = mSettings.aiDifficulty
             val move: BoardSpace?
             when (difficulty) {
-                "1" -> move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
-                "2" -> move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!, if (mCurrentPlayer === mP1) mP2 else mP1)
-                else -> move = null
+                "1" -> {
+                    move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
+                }
+                "2" -> {
+                    val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
+                    move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!, opponent)
+                }
+                else -> {
+                    move = null
+                }
             }
 
             Observable.just(move)

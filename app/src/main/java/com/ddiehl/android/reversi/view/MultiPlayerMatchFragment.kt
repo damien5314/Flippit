@@ -20,7 +20,10 @@ import android.widget.Toast
 import com.ddiehl.android.reversi.AUTOMATED_MULTIPLAYER
 import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
 import com.ddiehl.android.reversi.R
-import com.ddiehl.android.reversi.model.*
+import com.ddiehl.android.reversi.model.Board
+import com.ddiehl.android.reversi.model.BoardSpace
+import com.ddiehl.android.reversi.model.ReversiColor
+import com.ddiehl.android.reversi.model.ReversiPlayer
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
@@ -498,7 +501,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     fun claim(s: BoardSpace) {
         if (mUpdatingMatch || !mQueuedMoves!!.isEmpty()) {
-            //            Log.d(TAG, "Error: Still evaluating last move");
             return
         }
 
@@ -515,24 +517,24 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
 
         val playerColor = currentPlayerColor
-        if (mBoard!!.spacesCapturedWithMove(s, playerColor) == 0) {
-            Toast.makeText(activity, R.string.bad_move, Toast.LENGTH_SHORT).show()
-            return
-        }
+        mBoard.requestClaimSpace(s.y(), s.x(), playerColor)
+                .subscribe({
+                    mUpdatingMatch = true
+                    showSpinner(2)
+//                    mBoard.commitPiece(s, playerColor)
+                    saveMatchData()
 
-        mUpdatingMatch = true
-        showSpinner(2)
-        mBoard!!.commitPiece(s, playerColor)
-        saveMatchData()
+                    // Add selected piece to the end of mMatchData array
+                    // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
+                    var nextIndex = if (mPlayer === mLightPlayer) 164 else 64
+                    while (mMatchData!![nextIndex].toInt() != 0)
+                        nextIndex++ // Increase index til we run into an unfilled index
+                    mMatchData!![nextIndex] = mBoard.getSpaceNumber(s)
 
-        // Add selected piece to the end of mMatchData array
-        // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
-        var nextIndex = if (mPlayer === mLightPlayer) 164 else 64
-        while (mMatchData!![nextIndex].toInt() != 0)
-            nextIndex++ // Increase index til we run into an unfilled index
-        mMatchData!![nextIndex] = mBoard!!.getSpaceNumber(s)
-
-        updateMatchState()
+                    updateMatchState()
+                }, {
+                    Toast.makeText(activity, R.string.bad_move, Toast.LENGTH_SHORT).show()
+                })
     }
 
     private fun updateMatchState() {
@@ -1092,7 +1094,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
             mHandler!!.postDelayed({
                 val p1 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK, "")
                 val p2 = ReversiPlayer(if (mPlayer === mLightPlayer) ReversiColor.DARK else ReversiColor.LIGHT, "")
-                claim(ComputerAI.getBestMove_d3(mBoard!!, p1, p2))
+                claim(Board.ComputerAI.getBestMove_d3(mBoard!!, p1, p2))
             }, 500)
         }
     }
