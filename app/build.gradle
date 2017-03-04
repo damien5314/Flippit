@@ -52,15 +52,15 @@ dependencies {
     compile "io.reactivex:rxandroid:$RXANDROID_VERSION"
     compile "io.reactivex:rxjava:$RXJAVA_VERSION"
     compile "com.artemzin.rxjava:proguard-rules:$RXJAVA_PROGUARD_VERSION"
-//    compile "io.reactivex.rxjava2:rxandroid:$project.ext.RXANDROID_VERSION"
-//    compile "io.reactivex.rxjava2:rxjava:$project.ext.RXJAVA_VERSION"
+//    compile "io.reactivex.rxjava2:rxandroid:$RXANDROID_VERSION"
+//    compile "io.reactivex.rxjava2:rxjava:$RXJAVA_VERSION"
 
     compile "com.jakewharton.rxbinding:rxbinding:$RXBINDING_VERSION"
-//    compile "com.jakewharton.rxbinding:rxbinding-support-v4:$project.ext.RXBINDING_VERSION"
-//    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$project.ext.RXBINDING_VERSION"
-//    compile "com.jakewharton.rxbinding:rxbinding-design:$project.ext.RXBINDING_VERSION"
-//    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$project.ext.RXBINDING_VERSION"
-//    compile "com.jakewharton.rxbinding:rxbinding-leanback-v17:$project.ext.RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-support-v4:$RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-design:$RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$RXBINDING_VERSION"
+//    compile "com.jakewharton.rxbinding:rxbinding-leanback-v17:$RXBINDING_VERSION"
 
     // View binding
     compile "com.jakewharton:butterknife:$BUTTER_KNIFE_VERSION"
