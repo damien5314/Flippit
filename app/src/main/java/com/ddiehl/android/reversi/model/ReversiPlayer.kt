@@ -13,8 +13,4 @@ class ReversiPlayer(val color: ReversiColor, var name: String?) {
     fun isCPU(b: Boolean) {
         isCPU = b
     }
-
-    companion object {
-        private val TAG = ReversiPlayer::class.java.simpleName
-    }
 }

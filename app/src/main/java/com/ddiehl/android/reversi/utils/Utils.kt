@@ -5,9 +5,6 @@ import android.content.res.Configuration
 import android.util.DisplayMetrics
 import android.util.Log
 
-/**
- * Created by ddiehl001c on 12/21/2014.
- */
 object Utils {
     private val TAG = Utils::class.java.simpleName
 

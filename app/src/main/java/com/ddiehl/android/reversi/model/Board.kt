@@ -85,8 +85,8 @@ class Board(val height: Int, val width: Int) {
             val space = iterator.next()
             MOVE_DIRECTIONS
                     .filter { !space.isOwned }
-                    .filter { move -> isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
-                    .map { move -> moveValueInDirection(space, move.dx, move.dy, color) }
+                    .filter { (dx, dy) -> isWithinBounds(space.x() + dx, space.y() + dy) }
+                    .map { (dx, dy) -> moveValueInDirection(space, dx, dy, color) }
                     .filter { value -> value > 0 }
                     .forEach { return true }
         }
@@ -94,7 +94,7 @@ class Board(val height: Int, val width: Int) {
     }
 
     fun isWithinBounds(x: Int, y: Int): Boolean {
-        return x >= 0 && x < width && y >= 0 && y < height
+        return x in 0..(width - 1) && y in 0..(height - 1)
     }
 
     fun getSpaceAt(x: Int, y: Int): BoardSpace =
@@ -125,15 +125,15 @@ class Board(val height: Int, val width: Int) {
 
     fun commitPiece(space: BoardSpace, playerColor: ReversiColor) {
         MOVE_DIRECTIONS
-                .filter { move -> moveValueInDirection(space, move.dx, move.dy, playerColor) != 0 }
-                .forEach { move -> flipInDirection(space, move.dx, move.dy, playerColor) }
+                .filter { (dx, dy) -> moveValueInDirection(space, dx, dy, playerColor) != 0 }
+                .forEach { (dx, dy) -> flipInDirection(space, dx, dy, playerColor) }
     }
 
     private fun spacesCapturedWithMove(space: BoardSpace, playerColor: ReversiColor): Int =
             MOVE_DIRECTIONS
-                    .filter { move -> isWithinBounds(space.x() + move.dx, space.y() + move.dy) }
-                    .sumBy { move ->
-                        moveValueInDirection(space, move.dx, move.dy, playerColor)
+                    .filter { (dx, dy) -> isWithinBounds(space.x() + dx, space.y() + dy) }
+                    .sumBy { (dx, dy) ->
+                        moveValueInDirection(space, dx, dy, playerColor)
                     }
 
     private fun moveValueInDirection(space: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {

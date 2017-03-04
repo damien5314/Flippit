@@ -310,12 +310,16 @@
                 <ImageView
                     android:id="@+id/match_message_icon_1"
                     style="@style/GameMessageIcon"
-                    android:layout_toLeftOf="@id/match_message_text"/>
+                    android:layout_toStartOf="@id/match_message_text"
+                    android:layout_toLeftOf="@id/match_message_text"
+                    android:src="@drawable/player_icon_p1"/>
 
                 <ImageView
                     android:id="@+id/match_message_icon_2"
                     style="@style/GameMessageIcon"
-                    android:layout_toRightOf="@id/match_message_text"/>
+                    android:layout_toEndOf="@id/match_message_text"
+                    android:layout_toRightOf="@id/match_message_text"
+                    android:src="@drawable/player_icon_p2"/>
 
             </RelativeLayout>
 

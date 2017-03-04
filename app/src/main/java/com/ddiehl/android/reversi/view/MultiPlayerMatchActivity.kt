@@ -3,12 +3,9 @@ package com.ddiehl.android.reversi.view
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-
 import com.ddiehl.android.reversi.R
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
@@ -18,7 +15,6 @@ import com.google.android.gms.games.multiplayer.Multiplayer
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch
 import com.google.example.games.basegameutils.BaseGameActivity
 import com.google.example.games.basegameutils.BaseGameUtils
-
 import timber.log.Timber
 
 class MultiPlayerMatchActivity : BaseGameActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {

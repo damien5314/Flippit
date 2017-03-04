@@ -2,22 +2,16 @@ package com.ddiehl.android.reversi.view
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
-import android.support.v7.app.ActionBarActivity
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-
+import android.support.v7.app.AppCompatActivity
+import android.view.*
 import com.ddiehl.android.reversi.R
 
 /**
  * Created from tutorial @ http://architects.dzone.com/articles/android-tutorial-using
  */
-class HowToPlayActivity : ActionBarActivity() {
+class HowToPlayActivity : AppCompatActivity() {
 
     private var mViewPager: ViewPager? = null
     private var mMenuPrevious: MenuItem? = null
@@ -51,17 +45,9 @@ class HowToPlayActivity : ActionBarActivity() {
     }
 
     private fun setMenuItemState(page: Int) {
-        if (page == 0) {
-            mMenuPrevious!!.isEnabled = false
-        } else {
-            mMenuPrevious!!.isEnabled = true
-        }
+        mMenuPrevious!!.isEnabled = page != 0
 
-        if (page == FRAGMENT_LAYOUT_ID.size - 1) {
-            mMenuNext!!.isEnabled = false
-        } else {
-            mMenuNext!!.isEnabled = true
-        }
+        mMenuNext!!.isEnabled = page != FRAGMENT_LAYOUT_ID.size - 1
     }
 
     class HowToPlayFragment : Fragment() {
@@ -98,9 +84,5 @@ class HowToPlayActivity : ActionBarActivity() {
             R.id.action_next -> mViewPager!!.currentItem = mViewPager!!.currentItem + 1
         }
         return true
-    }
-
-    companion object {
-        private val TAG = HowToPlayActivity::class.java.simpleName
     }
 }
