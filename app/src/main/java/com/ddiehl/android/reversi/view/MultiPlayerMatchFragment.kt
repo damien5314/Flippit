@@ -20,10 +20,7 @@ import android.widget.Toast
 import com.ddiehl.android.reversi.AUTOMATED_MULTIPLAYER
 import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
 import com.ddiehl.android.reversi.R
-import com.ddiehl.android.reversi.model.Board
-import com.ddiehl.android.reversi.model.BoardSpace
-import com.ddiehl.android.reversi.model.ReversiColor
-import com.ddiehl.android.reversi.model.ReversiPlayer
+import com.ddiehl.android.reversi.model.*
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
@@ -1221,7 +1218,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
                 val p1 = ReversiPlayer(color, "")
                 val p2 = ReversiPlayer(color.opposite(), "")
-                claim(Board.ComputerAI.getBestMove_d3(mBoard, p1, p2))
+                claim(ComputerAI.getBestMove_d3(mBoard, p1, p2))
             }, 500)
         }
     }

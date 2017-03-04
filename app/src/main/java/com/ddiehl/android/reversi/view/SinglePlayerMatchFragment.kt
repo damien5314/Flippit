@@ -14,7 +14,7 @@ import android.widget.Toast
 import butterknife.BindView
 import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.Board
-import com.ddiehl.android.reversi.model.Board.ComputerAI
+import com.ddiehl.android.reversi.model.ComputerAI
 import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ReversiColor.DARK
 import com.ddiehl.android.reversi.model.ReversiColor.LIGHT
