@@ -1,15 +1,21 @@
 package com.ddiehl.android.reversi.view
 
+import android.content.Context
 import android.content.SharedPreferences
 import com.ddiehl.android.reversi.model.Board
 import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.model.ReversiPlayer
 
-class SPSavedState(val prefs: SharedPreferences) {
+class SPSavedState(context: Context) {
 
-    private val PREF_CURRENT_PLAYER = "pref_currentPlayer"
-    private val PREF_FIRST_TURN = "pref_firstTurn"
-    private val PREF_BOARD_STATE = "pref_boardState"
+    companion object {
+        private val PREF_CURRENT_PLAYER = "PREF_CURRENT_PLAYER"
+        private val PREF_FIRST_TURN = "PREF_FIRST_TURN"
+        private val PREF_BOARD_STATE = "PREF_BOARD_STATE"
+    }
+
+    val prefs: SharedPreferences =
+            context.getSharedPreferences("PREFS_SINGLE_PLAYER_STATE", Context.MODE_PRIVATE)
 
     var currentPlayer: Boolean = true
         get() = prefs.getBoolean(PREF_CURRENT_PLAYER, true)

@@ -30,7 +30,6 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     companion object {
         private val TAG = SinglePlayerMatchFragment::class.java.simpleName
-        private val SP_STATE = "SP_STATE"
     }
 
     private lateinit var mP1: ReversiPlayer
@@ -47,9 +46,8 @@ class SinglePlayerMatchFragment : MatchFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        val prefs = context.getSharedPreferences(SP_STATE, Context.MODE_PRIVATE)
-        mSavedState = SPSavedState(prefs)
-        mSettings = SPSettings(prefs)
+        mSavedState = SPSavedState(context)
+        mSettings = SPSettings(context)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
