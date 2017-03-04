@@ -176,16 +176,10 @@ class Board(val height: Int, val width: Int) {
         }
     }
 
-    fun getNumSpacesForColor(c: ReversiColor): Int {
-        var count = 0
-        val i = iterator()
-        while (i.hasNext()) {
-            val s = i.next()
-            if (s.isOwned && s.color == c)
-                count++
-        }
-        return count
-    }
+    fun getNumSpacesForColor(c: ReversiColor) =
+            iterator().asSequence().count { space ->
+                space.isOwned && space.color == c
+            }
 
     val numberOfEmptySpaces: Int
         get() {
