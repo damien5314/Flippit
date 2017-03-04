@@ -21,9 +21,9 @@ class SPSettings(context: Context) {
             prefs.edit().putString(PREF_PLAYER_NAME, value).apply()
         }
 
-    var aiDifficulty: String
-        get() = prefs.getString(PREF_AI_DIFFICULTY, "1")
+    var aiDifficulty: Int
+        get() = prefs.getInt(PREF_AI_DIFFICULTY, 1)
         set(value) {
-            prefs.edit().putString(PREF_AI_DIFFICULTY, value).apply()
+            prefs.edit().putInt(PREF_AI_DIFFICULTY, value).apply()
         }
 }

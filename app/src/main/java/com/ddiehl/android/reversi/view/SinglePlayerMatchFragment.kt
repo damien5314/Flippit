@@ -245,10 +245,10 @@ class SinglePlayerMatchFragment : MatchFragment() {
             val difficulty = mSettings.aiDifficulty
             val move: BoardSpace?
             when (difficulty) {
-                "1" -> {
+                1 -> {
                     move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
                 }
-                "2" -> {
+                2 -> {
                     val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
                     move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!, opponent)
                 }
