@@ -180,16 +180,7 @@ class Board(val height: Int, val width: Int) {
             }
 
     val numberOfEmptySpaces: Int
-        get() {
-            var count = 0
-            val i = iterator()
-            while (i.hasNext()) {
-                val s = i.next()
-                if (!s.isOwned)
-                    count++
-            }
-            return count
-        }
+        get() = iterator().asSequence().count { space -> !space.isOwned }
 
     fun serialize(): ByteArray {
         val out = ByteArray(64)
