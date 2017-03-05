@@ -79,12 +79,10 @@ class Board(val height: Int, val width: Int) {
     }
 
     fun hasMove(color: ReversiColor): Boolean {
-        val iterator = iterator()
-        while (iterator.hasNext()) {
-            val space = iterator.next()
+        for (space in iterator()) {
             MOVE_DIRECTIONS
                     .filter { !space.isOwned }
-                    .filter { (dx, dy) -> isWithinBounds(space.x() + dx, space.y() + dy) }
+                    .filter { (dx, dy) -> isWithinBounds(space.x + dx, space.y + dy) }
                     .map { (dx, dy) -> moveValueInDirection(space, dx, dy, color) }
                     .filter { value -> value > 0 }
                     .forEach { return true }
@@ -130,25 +128,25 @@ class Board(val height: Int, val width: Int) {
 
     internal fun spacesCapturedWithMove(space: BoardSpace, playerColor: ReversiColor): Int =
             MOVE_DIRECTIONS
-                    .filter { (dx, dy) -> isWithinBounds(space.x() + dx, space.y() + dy) }
+                    .filter { (dx, dy) -> isWithinBounds(space.x + dx, space.y + dy) }
                     .sumBy { (dx, dy) ->
                         moveValueInDirection(space, dx, dy, playerColor)
                     }
 
     private fun moveValueInDirection(space: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {
         // If the move would bring us out of bounds of the board area, just return 0
-        if (!isWithinBounds(space.x() + dx, space.y() + dy)) {
+        if (!isWithinBounds(space.x + dx, space.y + dy)) {
             return 0
         }
 
         // Otherwise, calculate how many spaces we can capture in that direction
         var moveVal = 0
         val opponentColor = if (playerColor == ReversiColor.DARK) ReversiColor.LIGHT else ReversiColor.DARK
-        val firstPiece = getSpaceAt(space.x() + dx, space.y() + dy)
+        val firstPiece = getSpaceAt(space.x + dx, space.y + dy)
 
         if (firstPiece.color == opponentColor) {
-            var currentX = space.x() + dx
-            var currentY = space.y() + dy
+            var currentX = space.x + dx
+            var currentY = space.y + dy
 
             while (isWithinBounds(currentX, currentY) && getSpaceAt(currentX, currentY).color == opponentColor) {
                 moveVal++
@@ -166,11 +164,11 @@ class Board(val height: Int, val width: Int) {
 
     private fun flipInDirection(space: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor) {
         space.color = playerColor
-        var cx = space.x() + dx
-        var cy = space.y() + dy
+        var cx = space.x + dx
+        var cy = space.y + dy
 
         while (getSpaceAt(cx, cy).color != playerColor) {
-            getSpaceAt(cx, cy).flipColor()
+            getSpaceAt(cx, cy).flip()
             cx += dx
             cy += dy
         }
@@ -210,12 +208,10 @@ class Board(val height: Int, val width: Int) {
     }
 
     fun getSpaceNumber(s: BoardSpace): Byte {
-        return (s.y() * 8 + s.x() + 1).toByte()
+        return (s.y * 8 + s.x + 1).toByte()
     }
 
     fun getBoardSpaceFromNum(n: Int): BoardSpace? {
-        var n2 = n
-        n2 -= 1
         return getSpaceAt(n % 8, n / 8)
     }
 

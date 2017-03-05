@@ -1,29 +1,18 @@
 package com.ddiehl.android.reversi.model
 
-class BoardSpace(private val row: Int, private val col: Int, var color: ReversiColor? = null) {
+data class BoardSpace(private val row: Int, private val col: Int, var color: ReversiColor? = null) {
 
-    fun x(): Int {
-        return col
-    }
+    val x: Int = col
+    val y: Int = row
 
-    fun y(): Int {
-        return row
-    }
+    val isOwned: Boolean = color != null
 
-    fun copy(): BoardSpace {
-        val copy = BoardSpace(row, col)
-        copy.color = color
-        return copy
-    }
-
-    val isOwned: Boolean
-        get() = color != null
-
-    fun flipColor(): ReversiColor? {
-        if (color == null) {
+    fun flip(): ReversiColor? {
+        val c = color
+        if (c == null) {
             return null
         } else {
-            color = if (color == ReversiColor.DARK) ReversiColor.LIGHT else ReversiColor.DARK
+            color = c.opposite()
             return color
         }
     }

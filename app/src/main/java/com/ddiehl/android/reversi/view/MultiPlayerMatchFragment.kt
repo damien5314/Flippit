@@ -530,7 +530,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
 
         val playerColor = currentPlayerColor
-        mBoard.requestClaimSpace(s.y(), s.x(), playerColor)
+        mBoard.requestClaimSpace(s.y, s.x, playerColor)
                 .subscribe({
                     mUpdatingMatch = true
                     showSpinner(2)

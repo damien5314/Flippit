@@ -53,7 +53,7 @@ object ComputerAI {
                     // Copy board to identical object
                     val copy = board.copy()
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y()), player.color)
+                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), player.color)
                     // Count possible moves for Player's opponent
                     val movesOpened = getPossibleMoves(copy, opponent)
                     if (movesOpened < bestVal) {
@@ -83,7 +83,7 @@ object ComputerAI {
                     // Copy board to identical object
                     val copy = board.copy()
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x(), space.y()), p.color)
+                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.color)
                     val movesOpenedForOpponent = getPossibleMoves(copy, o)
                     if (movesOpenedForOpponent == 0) {
                         moveValue = 999
@@ -101,12 +101,12 @@ object ComputerAI {
         var bestValue = Integer.MIN_VALUE
         val bestMoves = HashSet<BoardSpace>()
         for (s in moveValues.keys) {
-            val `val` = moveValues[s]
-            if (`val`!! > bestValue) {
-                bestValue = `val`
+            val value = moveValues[s]
+            if (value!! > bestValue) {
+                bestValue = value
                 bestMoves.clear()
                 bestMoves.add(s)
-            } else if (`val` == bestValue) {
+            } else if (value == bestValue) {
                 bestMoves.add(s)
             }
         }
@@ -128,6 +128,6 @@ object ComputerAI {
     }
 
     private fun getSpaceValue(s: BoardSpace): Int {
-        return spaceValues[s.y()][s.x()]
+        return spaceValues[s.y][s.x]
     }
 }
