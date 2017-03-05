@@ -19,7 +19,6 @@
         android:textColor="@color/primary_text"
         android:textSize="@dimen/app_title_size"/>
 
-
     <Button
         android:id="@+id/button_start_1p"
         android:layout_width="match_parent"

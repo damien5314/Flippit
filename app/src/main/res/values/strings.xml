@@ -15,7 +15,7 @@
     <string name="player1_label_default">Player 1</string>
     <string name="player2_label">Computer</string>
     <string name="bad_move">Invalid Move</string>
-    <string name="no_moves">No moves for\u0020</string> <!-- Use \u0020 to add a space at end -->
+    <string name="no_moves">No moves for %s</string>
     <string name="winner_p1">You win</string>
     <string name="winner_cpu">CPU wins</string>
     <string name="winner_none">No winner</string>
