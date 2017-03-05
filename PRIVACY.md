@@ -1,0 +1,3 @@
+Flippit interacts with Google Play Games Services (GPGS) to access data required for managing multiplayer games, via the Turn Based Multiplayer API (https://developers.google.com/games/services/android/turnbasedMultiplayer). This includes requesting the email ID for which users wish to log into Google Play Games. This data is not collected or shared with third-party services, nor stored on any intermediary servers between GPGS and the Flippit Android application.
+
+Questions? Feel free to send any email to the developer. Contact information is available on the Google Play store (https://play.google.com/store/apps/details?id=com.ddiehl.android.reversi).
