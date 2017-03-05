@@ -55,11 +55,7 @@ class Board(val height: Int, val width: Int) {
 
     fun reset() {
         // Set the color of each space to null first
-        spaces.forEach { row ->
-            row.forEach { space ->
-                space.color = null
-            }
-        }
+        iterator().forEach { space -> space.color = null }
 
         // Then set the center 4 spaces to the starting configuration
         spaces[3][3].color = ReversiColor.LIGHT
@@ -185,15 +181,14 @@ class Board(val height: Int, val width: Int) {
     fun serialize(): ByteArray {
         val out = ByteArray(64)
         var index = 0
-        val i = iterator()
-        while (i.hasNext()) {
-            val s = i.next()
-            if (!s.isOwned)
+        for (space in iterator()) {
+            if (!space.isOwned) {
                 out[index++] = 0
-            else if (s.color == ReversiColor.LIGHT)
+            } else if (space.color == ReversiColor.LIGHT) {
                 out[index++] = 1
-            else
+            } else {
                 out[index++] = 2
+            }
         }
         return out
     }
@@ -233,5 +228,4 @@ class Board(val height: Int, val width: Int) {
         }
         return sb.toString()
     }
-
 }
