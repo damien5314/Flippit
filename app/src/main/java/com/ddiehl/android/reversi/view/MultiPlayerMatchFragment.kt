@@ -256,83 +256,103 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
+        // Resolving error with GPG
+            RC_RESOLVE_ERROR -> handleError(resultCode, data)
 
-            RC_RESOLVE_ERROR -> {
-                mResolvingError = false
-                if (resultCode == Activity.RESULT_OK) {
-                    if (!mGoogleApiClient!!.isConnecting && !mGoogleApiClient!!.isConnected) {
-                        connectGoogleApiClient()
-                    }
-                }
+        // Returned from the 'Select Match' dialog
+            RC_VIEW_MATCHES -> handleSelectMatchResult(resultCode, data)
+
+        // Returned from 'Select players to Invite' dialog
+            RC_SELECT_PLAYERS -> handleSelectPlayersResult(resultCode, data)
+
+        // Returned from achievements screen
+            RC_SHOW_ACHIEVEMENTS -> handleShowAchievementsResult(resultCode, data)
+
+        // Returned from settings screen
+            RC_SETTINGS -> handleSettingsResult(resultCode, data)
+        }
+    }
+
+    private fun handleError(resultCode: Int, data: Intent?) {
+        mResolvingError = false
+        if (resultCode == Activity.RESULT_OK) {
+            if (!mGoogleApiClient!!.isConnecting && !mGoogleApiClient!!.isConnected) {
+                connectGoogleApiClient()
             }
+        }
+    }
 
-            RC_VIEW_MATCHES // Returned from the 'Select Match' dialog
-            -> if (resultCode == Activity.RESULT_OK) {
-                val match = data!!.getParcelableExtra<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
-                if (match != null) {
-                    if (match.data == null) {
-                        startMatch(match)
-                    } else {
-                        updateMatch(match)
-                    }
-                }
-            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
-                // User signed out
-                mIsSignedIn = false
-                signOutFromGooglePlay()
-            } else {
-                showErrorDialog(resultCode)
-            }
-
-            RC_SELECT_PLAYERS // Returned from 'Select players to Invite' dialog
-            -> if (resultCode == Activity.RESULT_OK) {
-                val invitees = data!!.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS)
-                val autoMatchCriteria: Bundle?
-
-                val minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0)
-                val maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0)
-
-                if (minAutoMatchPlayers > 0) {
-                    autoMatchCriteria = RoomConfig.createAutoMatchCriteria(
-                            minAutoMatchPlayers, maxAutoMatchPlayers, 0
-                    )
+    private fun handleSelectMatchResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK) {
+            val match = data!!.getParcelableExtra<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
+            if (match != null) {
+                if (match.data == null) {
+                    startMatch(match)
                 } else {
-                    autoMatchCriteria = null
-                    Games.Achievements.unlock(
-                            mGoogleApiClient, getString(R.string.achievement_lets_play_together)
-                    )
-                }
-
-                val tbmc = TurnBasedMatchConfig.builder()
-                        .addInvitedPlayers(invitees)
-                        .setAutoMatchCriteria(autoMatchCriteria)
-                        .build()
-
-                showSpinner(1)
-                Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, tbmc).setResultCallback {
-                    result -> processResult(result)
-                }
-            } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
-                // User signed out
-                mIsSignedIn = false
-                signOutFromGooglePlay()
-            } else {
-                showErrorDialog(resultCode)
-            }
-
-            RC_SHOW_ACHIEVEMENTS -> {
-                if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
-                    // User signed out
-                    mIsSignedIn = false
-                    signOutFromGooglePlay()
+                    updateMatch(match)
                 }
             }
+        } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+            // User signed out
+            mIsSignedIn = false
+            signOutFromGooglePlay()
+        } else {
+            showErrorDialog(resultCode)
+        }
+    }
 
-            RC_SETTINGS -> when (resultCode) {
-                SettingsActivity.RESULT_SIGN_IN -> connectGoogleApiClient()
+    private fun handleSelectPlayersResult(resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
+            val invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS)
 
-                SettingsActivity.RESULT_SIGN_OUT -> mSignOutOnConnect = true
-            }
+            val minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0)
+            val maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0)
+
+            val autoMatchCriteria =
+                    if (minAutoMatchPlayers > 0) {
+                        RoomConfig.createAutoMatchCriteria(
+                                minAutoMatchPlayers, maxAutoMatchPlayers, 0
+                        )
+                    } else {
+                        // TODO: Abstract achievement handler
+                        Games.Achievements.unlock(
+                                mGoogleApiClient, getString(R.string.achievement_lets_play_together)
+                        )
+                        null
+                    }
+
+            val matchConfig = TurnBasedMatchConfig.builder()
+                    .addInvitedPlayers(invitees)
+                    .setAutoMatchCriteria(autoMatchCriteria)
+                    .build()
+
+            showSpinner(1)
+            Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, matchConfig)
+                    .setResultCallback {
+                        result ->
+                        processResult(result)
+                    }
+        } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+            // User signed out
+            mIsSignedIn = false
+            signOutFromGooglePlay()
+        } else {
+            showErrorDialog(resultCode)
+        }
+    }
+
+    private fun handleShowAchievementsResult(resultCode: Int, data: Intent?) {
+        if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
+            // User signed out
+            mIsSignedIn = false
+            signOutFromGooglePlay()
+        }
+    }
+
+    private fun handleSettingsResult(resultCode: Int, data: Intent?) {
+        when (resultCode) {
+            SettingsActivity.RESULT_SIGN_IN -> connectGoogleApiClient()
+            SettingsActivity.RESULT_SIGN_OUT -> mSignOutOnConnect = true
         }
     }
 
