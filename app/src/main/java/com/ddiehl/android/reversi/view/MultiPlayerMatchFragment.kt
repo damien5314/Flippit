@@ -21,6 +21,8 @@ import com.ddiehl.android.reversi.AUTOMATED_MULTIPLAYER
 import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.model.*
+import com.ddiehl.android.reversi.multiplayer.AchievementManager
+import com.ddiehl.android.reversi.multiplayer.Achievements
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
@@ -44,7 +46,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     private var mProgressBar: ProgressDialog? = null
 
-    private var mGoogleApiClient: GoogleApiClient? = null
+    private lateinit var mGoogleApiClient: GoogleApiClient
+    private lateinit var mAchievementManager: AchievementManager
 
     private var mMatch: TurnBasedMatch? = null
     private var mPlayer: Participant? = null
@@ -77,7 +80,11 @@ class MultiPlayerMatchFragment : MatchFragment(),
         mSignInOnStart = autoConnectPreference
         mHandler = Handler()
         mQueuedMoves = ArrayList<BoardSpace>()
-        mGoogleApiClient = buildGoogleApiClient()
+
+        // Initialize Games API client
+        val client = buildGoogleApiClient()
+        mAchievementManager = AchievementManager.get(client)
+        mGoogleApiClient = client
 
         if (activity.intent.hasExtra(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
             mMatch = activity.intent.getParcelableExtra<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
@@ -110,12 +117,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
         autoConnectPreference = true
 
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = buildGoogleApiClient()
-        }
-
         showSpinner(3)
-        mGoogleApiClient!!.connect()
+        mGoogleApiClient.connect()
     }
 
     override fun onStart() {
@@ -128,9 +131,9 @@ class MultiPlayerMatchFragment : MatchFragment(),
     override fun onStop() {
         super.onStop()
         mQueuedAction = null
-        if (mGoogleApiClient!!.isConnected) {
+        if (mGoogleApiClient.isConnected) {
             registerMatchUpdateListener(false)
-            mGoogleApiClient!!.disconnect()
+            mGoogleApiClient.disconnect()
         }
     }
 
@@ -204,9 +207,9 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
     }
 
-    private fun registerMatchUpdateListener(b: Boolean) {
+    private fun registerMatchUpdateListener(shouldRegister: Boolean) {
         Games.TurnBasedMultiplayer.unregisterMatchUpdateListener(mGoogleApiClient)
-        if (b) {
+        if (shouldRegister) {
             Games.TurnBasedMultiplayer.registerMatchUpdateListener(mGoogleApiClient, this)
         }
     }
@@ -229,7 +232,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     fun onSignInCancel() = DialogInterface.OnClickListener { dialog, which -> }
 
     public override fun startNewMatch() {
-        if (!mGoogleApiClient!!.isConnected) {
+        if (!mGoogleApiClient.isConnected) {
             mQueuedAction = QueuedAction.NewMatch
             displaySignInPrompt()
             return
@@ -241,7 +244,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     public override fun selectMatch() {
-        if (!mGoogleApiClient!!.isConnected) {
+        if (!mGoogleApiClient.isConnected) {
             mQueuedAction = QueuedAction.SelectMatch
             displaySignInPrompt()
             return
@@ -276,7 +279,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     private fun handleError(resultCode: Int, data: Intent?) {
         mResolvingError = false
         if (resultCode == Activity.RESULT_OK) {
-            if (!mGoogleApiClient!!.isConnecting && !mGoogleApiClient!!.isConnected) {
+            if (!mGoogleApiClient.isConnecting && !mGoogleApiClient.isConnected) {
                 connectGoogleApiClient()
             }
         }
@@ -314,10 +317,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
                                 minAutoMatchPlayers, maxAutoMatchPlayers, 0
                         )
                     } else {
-                        // TODO: Abstract achievement handler
-                        Games.Achievements.unlock(
-                                mGoogleApiClient, getString(R.string.achievement_lets_play_together)
-                        )
+                        mAchievementManager.unlock(Achievements.PLAY_WITH_FRIEND)
                         null
                     }
 
@@ -361,12 +361,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
         mSignOutOnConnect = false
         autoConnectPreference = false
-        if (mGoogleApiClient!!.isConnected && mIsSignedIn) {
+        if (mGoogleApiClient.isConnected && mIsSignedIn) {
             Plus.AccountApi.clearDefaultAccount(mGoogleApiClient)
-            Games.signOut(mGoogleApiClient!!)
+            Games.signOut(mGoogleApiClient)
         }
         mIsSignedIn = false
-        mGoogleApiClient!!.disconnect()
+        mGoogleApiClient.disconnect()
 
         activity.setResult(SettingsActivity.RESULT_SIGN_OUT)
         activity.finish()
@@ -544,7 +544,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
         if (s.isOwned)
             return
 
-        if (!mGoogleApiClient!!.isConnected) {
+        if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
             return
         }
@@ -856,7 +856,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     private fun onRematchConfirm() =
         DialogInterface.OnClickListener { dialog, which ->
-            if (!mGoogleApiClient!!.isConnected) {
+            if (!mGoogleApiClient.isConnected) {
                 displaySignInPrompt()
                 return@OnClickListener
             }
@@ -982,7 +982,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     private fun settingsSelected() {
         val settings = Intent(activity, SettingsActivity::class.java)
         settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER)
-        val isSignedIn = mGoogleApiClient!!.isConnected
+        val isSignedIn = mGoogleApiClient.isConnected
         settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn)
         val accountName = if (isSignedIn) {
             Plus.AccountApi.getAccountName(mGoogleApiClient)
@@ -999,7 +999,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
             return
         }
 
-        if (!mGoogleApiClient!!.isConnected) {
+        if (!mGoogleApiClient.isConnected) {
             mQueuedAction = QueuedAction.ForfeitMatch
             displaySignInPrompt()
             return
@@ -1042,7 +1042,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun onCancelMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
-        if (!mGoogleApiClient!!.isConnected) {
+        if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
         } else {
             Games.TurnBasedMultiplayer.cancelMatch(mGoogleApiClient, mMatch!!.matchId)
@@ -1063,7 +1063,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun onForfeitMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
-        if (!mGoogleApiClient!!.isConnected) {
+        if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
             return@OnClickListener
         }
@@ -1109,7 +1109,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     private fun onLeaveMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
-        if (!mGoogleApiClient!!.isConnected) {
+        if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
             return@OnClickListener
         }
@@ -1133,15 +1133,15 @@ class MultiPlayerMatchFragment : MatchFragment(),
             mPlayer = currentPlayer
             // Update achievements
             if (mPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
-                Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_first_win))
+                mAchievementManager.unlock(Achievements.FIRST_WIN)
                 if (playerScore == MAXIMUM_SCORE) {
-                    Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_the_perfect_win))
+                    mAchievementManager.unlock(Achievements.PERFECT_WIN)
                 }
             } else if (mPlayer!!.result.result == ParticipantResult.MATCH_RESULT_TIE) {
-                Games.Achievements.unlock(mGoogleApiClient, getString(R.string.achievement_evenly_matched))
+                mAchievementManager.unlock(Achievements.TIE_GAME)
             }
-            Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_up_coming), 1)
-            Games.Achievements.increment(mGoogleApiClient, getString(R.string.achievement_reversi_expert), 1)
+            mAchievementManager.increment(Achievements.TEN_MATCHES, 1)
+            mAchievementManager.increment(Achievements.HUNDRED_MATCHES, 1)
 
             if (mMatch!!.canRematch()) {
                 askForRematch()
@@ -1171,7 +1171,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
         get() = if (mPlayer === mLightPlayer) mLightScore else mDarkScore
 
     private fun showAchievements() {
-        if (mGoogleApiClient!!.isConnected) {
+        if (mGoogleApiClient.isConnected) {
             val intent = Games.Achievements.getAchievementsIntent(mGoogleApiClient)
             startActivityForResult(intent, RC_SHOW_ACHIEVEMENTS)
         } else {
