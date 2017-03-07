@@ -39,6 +39,7 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer
 import com.google.android.gms.plus.Plus
 import java.util.*
+import kotlin.collections.ArrayList
 
 class MultiPlayerMatchFragment : MatchFragment(),
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
@@ -70,7 +71,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     private var mIsSignedIn = false
 
     private var mHandler: Handler? = null
-    private var mQueuedMoves: MutableList<BoardSpace>? = null
+    private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
 
     private var mQueuedAction: QueuedAction? = null
 
@@ -84,7 +85,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
         mBoard = Board(8, 8)
         mSignInOnStart = autoConnectPreference
         mHandler = Handler()
-        mQueuedMoves = ArrayList<BoardSpace>()
 
         // Initialize Games API client
         val client = buildGoogleApiClient()
@@ -381,14 +381,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
         val match = result.match
         mMatchData = null
 
-        if (!checkStatusCode(result.status.statusCode)) {
-            return
-        }
-
-        if (match.data == null) {
-            startMatch(match)
-        } else {
-            updateMatch(match)
+        if (checkStatusCode(result.status.statusCode)) {
+            if (match.data == null) {
+                startMatch(match)
+            } else {
+                updateMatch(match)
+            }
         }
     }
 
@@ -444,11 +442,11 @@ class MultiPlayerMatchFragment : MatchFragment(),
         startIndex += 64
         while (mMatchData!![startIndex].toInt() != 0) {
             val s = mBoard.getBoardSpaceFromNum(mMatchData!![startIndex++].toInt())
-            mQueuedMoves!!.add(s!!)
+            mQueuedMoves.add(s!!)
         }
 
         mUpdatingMatch = false
-        if (!mQueuedMoves!!.isEmpty())
+        if (!mQueuedMoves.isEmpty())
             processReceivedTurns()
         updateScore()
 
@@ -507,9 +505,9 @@ class MultiPlayerMatchFragment : MatchFragment(),
     private fun processReceivedTurns() {
         mUpdatingMatch = true
         mHandler!!.postDelayed({
-            mBoard.commitPiece(mQueuedMoves!!.removeAt(0), opponentColor)
+            mBoard.commitPiece(mQueuedMoves.removeAt(0), opponentColor)
             saveMatchData()
-            if (!mQueuedMoves!!.isEmpty())
+            if (!mQueuedMoves.isEmpty())
                 processReceivedTurns()
             else {
                 mUpdatingMatch = false
@@ -537,7 +535,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     fun claim(s: BoardSpace) {
-        if (mUpdatingMatch || !mQueuedMoves!!.isEmpty()) {
+        if (mUpdatingMatch || !mQueuedMoves.isEmpty()) {
             return
         }
 
@@ -559,7 +557,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 .subscribe({
                     mUpdatingMatch = true
                     showSpinner()
-//                    mBoard.commitPiece(s, playerColor)
                     saveMatchData()
 
                     // Add selected piece to the end of mMatchData array
