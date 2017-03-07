@@ -40,10 +40,22 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer
 import com.google.android.gms.plus.Plus
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 class MultiPlayerMatchFragment : MatchFragment(),
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         OnTurnBasedMatchUpdateReceivedListener {
+
+    companion object {
+        private val RC_RESOLVE_ERROR = 1001
+        private val RC_VIEW_MATCHES = 1002
+        private val RC_SELECT_PLAYERS = 1003
+        private val RC_SHOW_ACHIEVEMENTS = 1004
+        private val RC_SETTINGS = 1005
+        private val MAXIMUM_SCORE = 64
+
+        private val PREF_AUTO_SIGN_IN = "pref_auto_sign_in"
+    }
 
     private val mProgressBar: ProgressDialog by lazy {
         ProgressDialog(activity, R.style.ProgressDialog).apply {
@@ -54,15 +66,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     private lateinit var mGoogleApiClient: GoogleApiClient
     private lateinit var mAchievementManager: AchievementManager
-
-    private var mMatch: TurnBasedMatch? = null
-    private var mPlayer: Participant? = null
-    private var mOpponent: Participant? = null
-    private var mLightPlayer: Participant? = null
-    private var mDarkPlayer: Participant? = null
-    private var mMatchData: ByteArray? = null
-    private var mLightScore: Int = 0
-    private var mDarkScore: Int = 0
 
     private var mSignInOnStart = true
     private var mSignOutOnConnect = false
@@ -1247,18 +1250,5 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
 
         return buf.toString()
-    }
-
-    companion object {
-        private val TAG = MultiPlayerMatchFragment::class.java.simpleName
-
-        private val RC_RESOLVE_ERROR = 1001
-        private val RC_VIEW_MATCHES = 1002
-        private val RC_SELECT_PLAYERS = 1003
-        private val RC_SHOW_ACHIEVEMENTS = 1004
-        private val RC_SETTINGS = 1005
-        private val MAXIMUM_SCORE = 64
-
-        private val PREF_AUTO_SIGN_IN = "pref_auto_sign_in"
     }
 }
