@@ -44,7 +44,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         OnTurnBasedMatchUpdateReceivedListener {
 
-    private var mProgressBar: ProgressDialog? = null
+    private val mProgressBar: ProgressDialog by lazy {
+        ProgressDialog(activity, R.style.ProgressDialog).apply {
+            setCancelable(false)
+            setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        }
+    }
 
     private lateinit var mGoogleApiClient: GoogleApiClient
     private lateinit var mAchievementManager: AchievementManager
@@ -117,7 +122,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
         autoConnectPreference = true
 
-        showSpinner(3)
+        showSpinner()
         mGoogleApiClient.connect()
     }
 
@@ -326,7 +331,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
                     .setAutoMatchCriteria(autoMatchCriteria)
                     .build()
 
-            showSpinner(1)
+            showSpinner()
             Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, matchConfig)
                     .setResultCallback {
                         result ->
@@ -553,7 +558,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
         mBoard.requestClaimSpace(s.y, s.x, playerColor)
                 .subscribe({
                     mUpdatingMatch = true
-                    showSpinner(2)
+                    showSpinner()
 //                    mBoard.commitPiece(s, playerColor)
                     saveMatchData()
 
@@ -860,7 +865,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 displaySignInPrompt()
                 return@OnClickListener
             }
-            showSpinner(1)
+            showSpinner()
             Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch!!.matchId)
                     .setResultCallback { result -> processResult(result) }
             mMatch = null
@@ -923,24 +928,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 })
     }
 
-    // TODO: Split this out into multiple methods for clarity
-    private fun showSpinner(spinnerMsg: Int) {
-        if (mProgressBar == null) {
-            mProgressBar = ProgressDialog(activity, R.style.ProgressDialog)
-            mProgressBar!!.setCancelable(false)
-            mProgressBar!!.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        }
-        when (spinnerMsg) {
-            1 -> mProgressBar!!.setMessage(getString(R.string.loading_match))
-            2 -> mProgressBar!!.setMessage(getString(R.string.submitting_move))
-            3 -> mProgressBar!!.setMessage(getString(R.string.connecting))
-            else -> mProgressBar!!.setMessage(getString(R.string.please_wait))
-        }
-        mProgressBar!!.show()
+    private fun showSpinner() {
+        mProgressBar.show()
     }
 
     private fun dismissSpinner() {
-        mProgressBar!!.dismiss()
+        mProgressBar.dismiss()
     }
 
     private fun showDialog(dialog: Dialog) {
