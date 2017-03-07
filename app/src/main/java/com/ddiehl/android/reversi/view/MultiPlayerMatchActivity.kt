@@ -17,7 +17,8 @@ import com.google.example.games.basegameutils.BaseGameActivity
 import com.google.example.games.basegameutils.BaseGameUtils
 import timber.log.Timber
 
-class MultiPlayerMatchActivity : BaseGameActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
+class MultiPlayerMatchActivity : BaseGameActivity(),
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private var mResolvingConnectionFailure = false
     private var mAutoStartSignInFlow = true
@@ -47,7 +48,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(), GoogleApiClient.ConnectionC
         var fragment: Fragment? = fm.findFragmentById(R.id.fragment_container)
 
         if (fragment == null) {
-            fragment = MultiPlayerMatchFragment()
+            fragment = MatchFragment.newInstance(true)
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit()
