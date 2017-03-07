@@ -1036,7 +1036,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 .setTitle(getString(R.string.dialog_cancel_match_title))
                 .setMessage(getString(R.string.dialog_cancel_match_message))
                 .setPositiveButton(getString(R.string.dialog_cancel_match_confirm), onCancelMatchConfirm())
-                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel), onCancelMatchCancel())
+                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel), { dialog, which -> })
                 .setCancelable(true)
                 .create())
     }
@@ -1050,14 +1050,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
         }
     }
 
-    private fun onCancelMatchCancel() = DialogInterface.OnClickListener { dialogInterface, which -> }
-
     private fun showForfeitMatchDialog() {
         showDialog(AlertDialog.Builder(activity)
                 .setTitle(R.string.dialog_forfeit_match_title)
                 .setMessage(R.string.dialog_forfeit_match_message)
                 .setPositiveButton(R.string.dialog_forfeit_match_confirm, onForfeitMatchConfirm())
-                .setNegativeButton(R.string.dialog_forfeit_match_cancel, onForfeitMatchCancel())
+                .setNegativeButton(R.string.dialog_forfeit_match_cancel, { dialog, which -> })
                 .setCancelable(true)
                 .create())
     }
@@ -1087,8 +1085,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 }
     }
 
-    private fun onForfeitMatchCancel() = DialogInterface.OnClickListener { dialog, which -> }
-
     private fun showForfeitMatchForbiddenAlert() {
         showDialog(AlertDialog.Builder(activity)
                 .setTitle(R.string.dialog_forfeit_match_forbidden_title)
@@ -1103,12 +1099,12 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 .setTitle(R.string.dialog_leave_match_title)
                 .setMessage(R.string.dialog_leave_match_message)
                 .setPositiveButton(R.string.dialog_leave_match_confirm, onLeaveMatchConfirm())
-                .setNegativeButton(R.string.dialog_leave_match_cancel, onLeaveMatchCancel())
+                .setNegativeButton(R.string.dialog_leave_match_cancel, { dialog, which -> })
                 .setCancelable(true)
                 .create())
     }
 
-    private fun onLeaveMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
+    private fun onLeaveMatchConfirm() = DialogInterface.OnClickListener { dialog, which ->
         if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
             return@OnClickListener
@@ -1122,8 +1118,6 @@ class MultiPlayerMatchFragment : MatchFragment(),
                     .setResultCallback { result -> processResultLeaveMatch(result) }
         }
     }
-
-    private fun onLeaveMatchCancel() = DialogInterface.OnClickListener { dialogInterface, which -> }
 
     private fun processResultFinishMatch(result: TurnBasedMultiplayer.UpdateMatchResult) {
         mUpdatingMatch = false
