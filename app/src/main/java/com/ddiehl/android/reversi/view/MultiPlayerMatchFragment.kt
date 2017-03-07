@@ -143,6 +143,8 @@ class MultiPlayerMatchFragment : MatchFragment(),
     }
 
     override fun onConnected(bundle: Bundle?) {
+        Toast.makeText(context, "Connected to GPGS", Toast.LENGTH_SHORT).show()
+
         dismissSpinner()
         mIsSignedIn = true
 
@@ -224,17 +226,13 @@ class MultiPlayerMatchFragment : MatchFragment(),
                 .setTitle(getString(R.string.dialog_sign_in_title))
                 .setMessage(getString(R.string.dialog_sign_in_message))
                 .setPositiveButton(getString(R.string.dialog_sign_in_confirm), onSignInConfirm())
-                .setNegativeButton(getString(R.string.dialog_sign_in_cancel), onSignInCancel())
+                .setNegativeButton(getString(R.string.dialog_sign_in_cancel), { dialog, which -> })
                 .setOnCancelListener { mQueuedAction = null }
                 .create()
         showDialog(dialog)
     }
 
-    fun onSignInConfirm() = DialogInterface.OnClickListener { dialog, which ->
-        connectGoogleApiClient()
-    }
-
-    fun onSignInCancel() = DialogInterface.OnClickListener { dialog, which -> }
+    fun onSignInConfirm() = DialogInterface.OnClickListener { dialog, which -> connectGoogleApiClient() }
 
     public override fun startNewMatch() {
         if (!mGoogleApiClient.isConnected) {
@@ -252,10 +250,10 @@ class MultiPlayerMatchFragment : MatchFragment(),
         if (!mGoogleApiClient.isConnected) {
             mQueuedAction = QueuedAction.SelectMatch
             displaySignInPrompt()
-            return
+        } else {
+            val intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient)
+            startActivityForResult(intent, RC_VIEW_MATCHES)
         }
-        val intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient)
-        startActivityForResult(intent, RC_VIEW_MATCHES)
     }
 
     override fun handleSpaceClick(row: Int, col: Int) {
@@ -264,7 +262,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-        // Resolving error with GPG
+        // Resolving error with Play Games
             RC_RESOLVE_ERROR -> handleError(resultCode, data)
 
         // Returned from the 'Select Match' dialog
@@ -333,10 +331,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
 
             showSpinner()
             Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, matchConfig)
-                    .setResultCallback {
-                        result ->
-                        processResult(result)
-                    }
+                    .setResultCallback { processResult(it) }
         } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
             mIsSignedIn = false
@@ -684,7 +679,7 @@ class MultiPlayerMatchFragment : MatchFragment(),
             }
         }
 
-    private val opponent: Participant
+    private val opponent: Participant?
         get() = mMatch!!.descriptionParticipant
 
     private val currentPlayerColor: ReversiColor

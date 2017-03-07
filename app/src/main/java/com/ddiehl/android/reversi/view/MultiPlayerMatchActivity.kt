@@ -187,6 +187,8 @@ class MultiPlayerMatchActivity : BaseGameActivity(), GoogleApiClient.ConnectionC
     }
 
     public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        super.onActivityResult(requestCode, resultCode, data)
+
         when (requestCode) {
             RC_RESOLVE_ERROR -> {
                 mResolvingConnectionFailure = false
