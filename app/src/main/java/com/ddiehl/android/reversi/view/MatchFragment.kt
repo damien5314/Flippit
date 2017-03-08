@@ -226,10 +226,8 @@ class MatchFragment : Fragment(),
             if (savedData != null) {
                 mCurrentPlayer = if (m1PSavedState.currentPlayer) mP1 else mP2
                 mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mP1 else mP2
-
                 mBoard.restoreState(savedData)
                 updateBoardUi()
-
                 displayBoard()
                 updateScoreDisplay()
                 mMatchInProgress = true
@@ -252,13 +250,13 @@ class MatchFragment : Fragment(),
     }
 
     override fun onPause() {
-        super.onPause()
-
         singlePlayer {
             if (mMatchInProgress) {
                 m1PSavedState.save(mBoard, mCurrentPlayer!!, mPlayerWithFirstTurn!!)
             }
         }
+
+        super.onPause()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
@@ -364,22 +362,24 @@ class MatchFragment : Fragment(),
             }
         } else {
             when (space.color) {
-                ReversiColor.LIGHT -> if (view.tag == null || view.tag as Int != 1) {
-                    view.tag = 1
-                    if (animate) {
-                        animateBackgroundChange(view, R.drawable.board_space_p1)
-                    } else {
-                        view.setBackgroundResource(R.drawable.board_space_p1)
+                ReversiColor.LIGHT ->
+                    if (view.tag == null || view.tag as Int != 1) {
+                        view.tag = 1
+                        if (animate) {
+                            animateBackgroundChange(view, R.drawable.board_space_p1)
+                        } else {
+                            view.setBackgroundResource(R.drawable.board_space_p1)
+                        }
                     }
-                }
-                ReversiColor.DARK -> if (view.tag == null || view.tag as Int != 2) {
-                    view.tag = 2
-                    if (animate) {
-                        animateBackgroundChange(view, R.drawable.board_space_p2)
-                    } else {
-                        view.setBackgroundResource(R.drawable.board_space_p2)
+                ReversiColor.DARK ->
+                    if (view.tag == null || view.tag as Int != 2) {
+                        view.tag = 2
+                        if (animate) {
+                            animateBackgroundChange(view, R.drawable.board_space_p2)
+                        } else {
+                            view.setBackgroundResource(R.drawable.board_space_p2)
+                        }
                     }
-                }
             }
         }
     }
