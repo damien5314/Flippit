@@ -118,7 +118,7 @@ class MatchFragment : Fragment(),
     private var mMatchMessageIcon1Color = false
     private var mMatchMessageIcon2Color = true
 
-    private lateinit var mBoard: Board
+    private val mBoard: Board = Board(8, 8)
 
 
     //region Multi Player fragment fields
@@ -189,11 +189,9 @@ class MatchFragment : Fragment(),
             mP1.isCPU(P1_CPU)
             mP2.isCPU(P2_CPU)
 
-            mBoard = Board(8, 8)
         }
 
         multiPlayer {
-            mBoard = Board(8, 8)
             mSignInOnStart = autoConnectPreference
             mHandler = Handler()
 
@@ -229,7 +227,7 @@ class MatchFragment : Fragment(),
                 mCurrentPlayer = if (m1PSavedState.currentPlayer) mP1 else mP2
                 mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mP1 else mP2
 
-                mBoard = Board.getBoard(mBoard.height, mBoard.width, savedData)
+                mBoard.restoreState(savedData)
                 updateBoardUi()
 
                 displayBoard()
@@ -943,7 +941,7 @@ class MatchFragment : Fragment(),
         var startIndex = if (currentPlayer === lightPlayer) 0 else 100
         val playerData = Arrays.copyOfRange(mMatchData!!, startIndex, startIndex + 64)
 
-        mBoard = Board.getBoard(mBoard.height, mBoard.width, playerData)
+        mBoard.restoreState(playerData)
         displayBoard()
         dismissSpinner()
 

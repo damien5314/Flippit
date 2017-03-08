@@ -21,28 +21,24 @@ class Board(val height: Int, val width: Int) {
                 MoveDirection(-1, 1), // Top-Left
                 MoveDirection(1, 1) // Top-Right
         )
+    }
 
-        fun getBoard(rows: Int, cols: Int, saved: ByteArray): Board {
-            return getBoard(rows, cols, Utils.byteArrayToString(saved))
-        }
+    fun restoreState(saved: ByteArray) {
+        restoreState(Utils.byteArrayToString(saved))
+    }
 
-        fun getBoard(rows: Int, cols: Int, saved: String): Board {
-            val board = Board(rows, cols)
+    fun restoreState(saved: String) {
+        var index = 0
+        for (y in 0..height - 1) {
+            for (x in 0..width - 1) {
+                val c = saved[index++]
 
-            var index = 0
-            for (y in 0..board.height - 1) {
-                for (x in 0..board.width - 1) {
-                    val c = saved[index++]
-
-                    when (c) {
-                        '0' -> { }
-                        '1' -> board.getSpaceAt(x, y).color = ReversiColor.LIGHT
-                        '2' -> board.getSpaceAt(x, y).color = ReversiColor.DARK
-                    }
+                when (c) {
+                    '0' -> { }
+                    '1' -> getSpaceAt(x, y).color = ReversiColor.LIGHT
+                    '2' -> getSpaceAt(x, y).color = ReversiColor.DARK
                 }
             }
-
-            return board
         }
     }
 
