@@ -102,7 +102,7 @@ class MatchFragment : Fragment(),
 
     private lateinit var mP1: ReversiPlayer
     private lateinit var mP2: ReversiPlayer
-    private lateinit var mSavedState: SPSavedState
+    private lateinit var m1PSavedState: SPSavedState
     private lateinit var mSettings: SPSettings
 
     private var mCurrentPlayer: ReversiPlayer? = null
@@ -174,7 +174,7 @@ class MatchFragment : Fragment(),
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        mSavedState = SPSavedState(context)
+        m1PSavedState = SPSavedState(context)
         mSettings = SPSettings(context)
     }
 
@@ -216,20 +216,28 @@ class MatchFragment : Fragment(),
         initMatchGrid(mMatchGridView)
         mMatchGridView.visibility = View.GONE
 
-        if (savedMatch) {
-            displayBoard()
-            updateScoreDisplay()
-            mMatchInProgress = true
-        } else {
-            mMatchInProgress = false
-        }
-
         // Set Action bar
         (activity as AppCompatActivity).setSupportActionBar(mToolbar)
 
         singlePlayer {
             // Hide select match panel for single player
             mSelectMatchButton.visibility = View.GONE
+
+            // Restore saved state if it exists
+            val savedData = m1PSavedState.board
+            if (savedData != null) {
+                mCurrentPlayer = if (m1PSavedState.currentPlayer) mP1 else mP2
+                mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mP1 else mP2
+
+                mBoard = Board.getBoard(mBoard.height, mBoard.width, savedData)
+                updateBoardUi()
+
+                displayBoard()
+                updateScoreDisplay()
+                mMatchInProgress = true
+            } else {
+                mMatchInProgress = false
+            }
         }
 
         multiPlayer {
@@ -250,7 +258,7 @@ class MatchFragment : Fragment(),
 
         singlePlayer {
             if (mMatchInProgress) {
-                mSavedState.save(mBoard, mCurrentPlayer!!, mPlayerWithFirstTurn!!)
+                m1PSavedState.save(mBoard, mCurrentPlayer!!, mPlayerWithFirstTurn!!)
             }
         }
     }
@@ -316,20 +324,6 @@ class MatchFragment : Fragment(),
         mP2WaitingBar.visibility = if (p2) View.VISIBLE else View.GONE
     }
 
-    val savedMatch: Boolean
-        get() {
-            val savedData = mSavedState.board
-            if (savedData != null) {
-                mCurrentPlayer = if (mSavedState.currentPlayer) mP1 else mP2
-                mPlayerWithFirstTurn = if (mSavedState.firstTurn) mP1 else mP2
-
-                mBoard = Board.getBoard(mBoard.height, mBoard.width, savedData)
-                updateBoardUi(false)
-                return true
-            }
-            return false
-        }
-
     private fun handleSpaceClick(row: Int, col: Int) {
         Timber.d("Piece clicked @ $row $col")
 
@@ -349,7 +343,7 @@ class MatchFragment : Fragment(),
         }
     }
 
-    private fun updateBoardUi(animate: Boolean) {
+    private fun updateBoardUi(animate: Boolean = false) {
         for (i in 0..mMatchGridView.childCount - 1) {
             val row = mMatchGridView.getChildAt(i) as ViewGroup
             for (j in 0..row.childCount - 1) {
@@ -517,7 +511,7 @@ class MatchFragment : Fragment(),
                 showWinningToast(null)
             }
             switchFirstTurn()
-            mSavedState.clear()
+            m1PSavedState.clear()
             mMatchInProgress = false
         }
 
@@ -607,7 +601,7 @@ class MatchFragment : Fragment(),
     fun displayBoard() {
         mBoardPanelView.visibility = View.GONE
         mMatchGridView.visibility = View.VISIBLE
-        updateBoardUi(false)
+        updateBoardUi()
     }
 
     fun showWinningToast(winner: ReversiPlayer?) {
