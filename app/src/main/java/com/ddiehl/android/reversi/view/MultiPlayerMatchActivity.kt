@@ -20,6 +20,15 @@ import timber.log.Timber
 class MultiPlayerMatchActivity : BaseGameActivity(),
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    companion object {
+        private val PREF_AUTO_SIGN_IN = "PREF_AUTO_SIGN_IN"
+
+        private val RC_SIGN_IN = 9000
+        private val RC_RESOLVE_ERROR = 1001
+        private val RC_START_MATCH = 1002
+        private val RC_NORMAL = 1003
+    }
+
     private var mResolvingConnectionFailure = false
     private var mAutoStartSignInFlow = true
     private var mSignInClicked = false
@@ -212,16 +221,6 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
         val dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_RESOLVE_ERROR)
         dialog.setOnDismissListener { mResolvingConnectionFailure = false }
         dialog.show()
-    }
-
-    companion object {
-
-        private val PREF_AUTO_SIGN_IN = "pref_auto_sign_in"
-
-        private val RC_SIGN_IN = 9000
-        private val RC_RESOLVE_ERROR = 1001
-        private val RC_START_MATCH = 1002
-        private val RC_NORMAL = 1003
     }
 
     //    private void showSpinner() {
