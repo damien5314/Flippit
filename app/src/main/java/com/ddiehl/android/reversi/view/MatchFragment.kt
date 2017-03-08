@@ -147,7 +147,7 @@ class MatchFragment : Fragment(),
     private var mUpdatingMatch = false
     private var mIsSignedIn = false
 
-    private var mHandler: Handler? = null
+    private val mHandler: Handler = Handler()
     private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
 
     private var mQueuedAction: QueuedAction? = null
@@ -1011,7 +1011,7 @@ class MatchFragment : Fragment(),
 
     private fun processReceivedTurns() {
         mUpdatingMatch = true
-        mHandler!!.postDelayed({
+        mHandler.postDelayed({
             mBoard.commitPiece(mQueuedMoves.removeAt(0), opponentColor)
             saveMatchData()
             if (!mQueuedMoves.isEmpty())
@@ -1339,7 +1339,7 @@ class MatchFragment : Fragment(),
                     override fun onAnimationRepeat(animation: Animation) {}
 
                     override fun onAnimationEnd(animation: Animation) {
-                        mHandler!!.postDelayed({
+                        mHandler.postDelayed({
                             mMatchMessageIcon1.startAnimation(mLeftFadeOut)
                             mMatchMessageIcon2.startAnimation(mRightFadeOut)
                         }, resources.getInteger(R.integer.waiting_message_fade_delay).toLong())
@@ -1645,13 +1645,13 @@ class MatchFragment : Fragment(),
         if (!mUpdatingMatch && AUTOMATED_MULTIPLAYER
                 && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
                 && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-            mHandler!!.postDelayed({
+            delay(500) {
                 // FIXME Why do we need to create new ReversiPlayers here?
                 val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
                 val p1 = ReversiPlayer(color, "")
                 val p2 = ReversiPlayer(color.opposite(), "")
                 claim(ComputerAI.getBestMove_d3(mBoard, p1, p2))
-            }, 500)
+            }
         }
     }
 
