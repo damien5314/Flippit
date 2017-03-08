@@ -133,6 +133,15 @@ class MatchFragment : Fragment(),
     private lateinit var mGoogleApiClient: GoogleApiClient
     private lateinit var mAchievementManager: AchievementManager
 
+    private var mMatch: TurnBasedMatch? = null
+    private var mPlayer: Participant? = null
+    private var mOpponent: Participant? = null
+    private var mLightPlayer: Participant? = null
+    private var mDarkPlayer: Participant? = null
+    private var mMatchData: ByteArray? = null
+    private var mLightScore: Int = 0
+    private var mDarkScore: Int = 0
+
     private var mSignInOnStart = true
     private var mSignOutOnConnect = false
     private var mResolvingError = false
@@ -621,28 +630,14 @@ class MatchFragment : Fragment(),
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.single_player, menu)
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_new_match -> {
-                startNewMatch()
-                return true
-            }
-            R.id.action_settings -> {
-                val settings = Intent(activity, SettingsActivity::class.java)
-                settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER)
-                startActivity(settings)
-                return true
-            }
-            R.id.action_how_to_play -> {
-                val htp = Intent(activity, HowToPlayActivity::class.java)
-                startActivity(htp)
-                return true
-            }
+        singlePlayer {
+            inflater.inflate(R.menu.single_player, menu)
         }
-        return super.onOptionsItemSelected(item)
+
+        multiPlayer {
+            inflater.inflate(R.menu.multi_player, menu)
+        }
     }
 
     //endregion
@@ -661,18 +656,18 @@ class MatchFragment : Fragment(),
     }
 
     private fun connectGoogleApiClient() {
-        // Check if Google Play Services are available
-        val result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity)
-        if (result != ConnectionResult.SUCCESS) {
-            autoConnectPreference = false
-            showErrorDialog(result)
-            return
+        multiPlayer {
+            // Check if Google Play Services are available
+            val result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(activity)
+            if (result != ConnectionResult.SUCCESS) {
+                autoConnectPreference = false
+                showErrorDialog(result)
+            } else {
+                autoConnectPreference = true
+                showSpinner()
+                mGoogleApiClient.connect()
+            }
         }
-
-        autoConnectPreference = true
-
-        showSpinner()
-        mGoogleApiClient.connect()
     }
 
     override fun onStart() {
@@ -683,12 +678,15 @@ class MatchFragment : Fragment(),
     }
 
     override fun onStop() {
-        super.onStop()
-        mQueuedAction = null
-        if (mGoogleApiClient.isConnected) {
-            registerMatchUpdateListener(false)
-            mGoogleApiClient.disconnect()
+        multiPlayer {
+            mQueuedAction = null
+            if (mGoogleApiClient.isConnected) {
+                registerMatchUpdateListener(false)
+                mGoogleApiClient.disconnect()
+            }
         }
+
+        super.onStop()
     }
 
     override fun onConnected(bundle: Bundle?) {
@@ -706,12 +704,12 @@ class MatchFragment : Fragment(),
             when (mQueuedAction) {
                 QueuedAction.NewMatch -> {
                     mQueuedAction = null
-                    startNewMatchSelected()
+                    onStartNewMatchClicked()
                     return
                 }
                 QueuedAction.SelectMatch -> {
                     mQueuedAction = null
-                    selectMatchSelected()
+                    onSelectMatchClicked()
                     return
                 }
                 QueuedAction.ForfeitMatch -> {
@@ -1141,8 +1139,9 @@ class MatchFragment : Fragment(),
 
     private val lightPlayer: Participant?
         get() {
-            if (mMatch != null)
+            if (mMatch != null) {
                 return mMatch!!.getParticipant(mMatch!!.creatorId)
+            }
             return null
         }
 
@@ -1154,8 +1153,9 @@ class MatchFragment : Fragment(),
 
                 val darkId: String? = participantIds.lastOrNull { it != lightId }
 
-                if (darkId != null)
+                if (darkId != null) {
                     return mMatch!!.getParticipant(darkId)
+                }
             }
             return null
         }
@@ -1378,8 +1378,7 @@ class MatchFragment : Fragment(),
                 .setTitle(title)
                 .setMessage(message)
                 .setCancelable(false)
-                .setPositiveButton(getString(R.string.dialog_error_confirm)
-                ) { dialog, id -> }
+                .setPositiveButton(getString(R.string.dialog_error_confirm)) { dialog, id -> }
                 .create())
     }
 
@@ -1595,19 +1594,32 @@ class MatchFragment : Fragment(),
             prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply()
         }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater!!.inflate(R.menu.multi_player, menu)
-    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_new_match -> {
+                onStartNewMatchClicked()
+                return true
+            }
+            R.id.action_settings -> {
+                val settings = Intent(activity, SettingsActivity::class.java)
+                settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER)
+                startActivity(settings)
+                return true
+            }
+            R.id.action_how_to_play -> {
+                val intent = Intent(activity, HowToPlayActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+        }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item!!.itemId) {
+        when (item.itemId) {
             R.id.action_create_match -> {
-                startNewMatchSelected()
+                onStartNewMatchClicked()
                 return true
             }
             R.id.action_select_match -> {
-                selectMatchSelected()
+                onSelectMatchClicked()
                 return true
             }
             R.id.action_how_to_play -> {
@@ -1632,6 +1644,7 @@ class MatchFragment : Fragment(),
                 return true
             }
         }
+
         return super.onOptionsItemSelected(item)
     }
 
