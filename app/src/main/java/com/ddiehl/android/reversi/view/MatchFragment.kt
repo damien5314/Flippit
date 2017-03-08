@@ -62,7 +62,6 @@ class MatchFragment : Fragment(),
         private val RC_SELECT_PLAYERS = 1003
         private val RC_SHOW_ACHIEVEMENTS = 1004
         private val RC_SETTINGS = 1005
-        private val MAXIMUM_SCORE = 64 // FIXME: Calculate this dynamically
 
         fun newInstance(multiPlayer: Boolean): MatchFragment {
             return MatchFragment().apply {
@@ -1532,7 +1531,8 @@ class MatchFragment : Fragment(),
             // Update achievements
             if (mPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
                 mAchievementManager.unlock(Achievements.FIRST_WIN)
-                if (playerScore == MAXIMUM_SCORE) {
+                val maxScore = mBoard.width * mBoard.height
+                if (playerScore == maxScore) {
                     mAchievementManager.unlock(Achievements.PERFECT_WIN)
                 }
             } else if (mPlayer!!.result.result == ParticipantResult.MATCH_RESULT_TIE) {
