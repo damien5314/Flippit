@@ -15,7 +15,7 @@ class SinglePlayerMatchActivity : AppCompatActivity() {
         var fragment: Fragment? = fm.findFragmentById(R.id.fragment_container)
 
         if (fragment == null) {
-            fragment = SinglePlayerMatchFragment()
+            fragment = MatchFragment.newInstance(false)
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit()

@@ -5,7 +5,8 @@ data class BoardSpace(private val row: Int, private val col: Int, var color: Rev
     val x: Int = col
     val y: Int = row
 
-    val isOwned: Boolean = color != null
+    val isOwned: Boolean
+        get() = color != null
 
     fun flip(): ReversiColor? {
         val c = color

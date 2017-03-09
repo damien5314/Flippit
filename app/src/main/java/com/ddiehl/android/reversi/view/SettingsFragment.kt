@@ -102,11 +102,11 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         AlertDialog.Builder(mContext)
                 .setTitle(getString(R.string.settings_dialog_sign_in_title))
                 .setMessage(getString(R.string.settings_dialog_sign_in_message))
-                .setPositiveButton(getString(R.string.settings_dialog_sign_in_confirm)) { dialog, which ->
+                .setPositiveButton(getString(R.string.settings_dialog_sign_in_confirm)) { _, _ ->
                     (mContext as Activity).setResult(SettingsActivity.RESULT_SIGN_IN)
                     (mContext as Activity).finish()
                 }
-                .setNegativeButton(getString(R.string.settings_dialog_sign_in_cancel)) { dialog, which -> }
+                .setNegativeButton(getString(R.string.settings_dialog_sign_in_cancel)) { _, _ -> }
                 .setCancelable(true)
                 .show()
     }
@@ -115,11 +115,11 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
         AlertDialog.Builder(mContext)
                 .setTitle(getString(R.string.settings_dialog_sign_out_title))
                 .setMessage(getString(R.string.settings_dialog_sign_out_message))
-                .setPositiveButton(getString(R.string.settings_dialog_sign_out_confirm)) { dialog, which ->
+                .setPositiveButton(getString(R.string.settings_dialog_sign_out_confirm)) { _, _ ->
                     (mContext as Activity).setResult(SettingsActivity.RESULT_SIGN_OUT)
                     (mContext as Activity).finish()
                 }
-                .setNegativeButton(getString(R.string.settings_dialog_sign_out_cancel)) { dialog, which -> }
+                .setNegativeButton(getString(R.string.settings_dialog_sign_out_cancel)) { _, _ -> }
                 .setCancelable(true)
                 .show()
     }

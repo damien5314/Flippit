@@ -42,20 +42,20 @@ object ComputerAI {
      * Finds the space on the board which would result in a board configuration leaving the
      * opposing player with the least choices.
      */
-    fun getBestMove_d2(board: Board, player: ReversiPlayer, opponent: ReversiPlayer): BoardSpace {
+    fun getBestMove_d2(board: Board, color: ReversiColor): BoardSpace {
         var best: BoardSpace? = null
         var bestVal = 999
         val i = board.iterator()
         while (i.hasNext()) {
             val space = i.next()
             if (!space.isOwned) {
-                if (board.spacesCapturedWithMove(space, player.color) > 0) {
+                if (board.spacesCapturedWithMove(space, color) > 0) {
                     // Copy board to identical object
                     val copy = board.copy()
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), player.color)
+                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), color)
                     // Count possible moves for Player's opponent
-                    val movesOpened = getPossibleMoves(copy, opponent)
+                    val movesOpened = getPossibleMoves(copy, color.opposite())
                     if (movesOpened < bestVal) {
                         best = space
                         bestVal = movesOpened
@@ -70,7 +70,7 @@ object ComputerAI {
     /**
      * Finds space which maximizes space value * number of spaces obtained
      */
-    fun getBestMove_d3(board: Board, p: ReversiPlayer, o: ReversiPlayer): BoardSpace {
+    fun getBestMove_d3(board: Board, color: ReversiColor): BoardSpace {
         val moveValues = HashMap<BoardSpace, Int>()
 
         val spaceValueWeight = 1
@@ -78,19 +78,19 @@ object ComputerAI {
 
         for (space in board.iterator()) {
             if (!space.isOwned) {
-                if (board.spacesCapturedWithMove(space, p.color) > 0) {
+                if (board.spacesCapturedWithMove(space, color) > 0) {
                     val moveValue: Int
                     // Copy board to identical object
                     val copy = board.copy()
                     // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), p.color)
-                    val movesOpenedForOpponent = getPossibleMoves(copy, o)
+                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), color)
+                    val movesOpenedForOpponent = getPossibleMoves(copy, color.opposite())
                     if (movesOpenedForOpponent == 0) {
                         moveValue = 999
                     } else {
                         moveValue =
                                 getSpaceValue(space) * spaceValueWeight +
-                                        board.spacesCapturedWithMove(space, p.color) * spacesCapturedWeight
+                                        board.spacesCapturedWithMove(space, color) * spacesCapturedWeight
                     }
                     moveValues.put(space, moveValue)
                 }
@@ -115,12 +115,12 @@ object ComputerAI {
         return bestMoves.maxBy { getSpaceValue(it) }!!
     }
 
-    private fun getPossibleMoves(board: Board, p: ReversiPlayer): Int {
+    private fun getPossibleMoves(board: Board, color: ReversiColor): Int {
         var possible = 0
 
         for (space in board.iterator()) {
             if (!space.isOwned) {
-                if (board.spacesCapturedWithMove(space, p.color) > 0) possible++
+                if (board.spacesCapturedWithMove(space, color) > 0) possible++
             }
         }
 
