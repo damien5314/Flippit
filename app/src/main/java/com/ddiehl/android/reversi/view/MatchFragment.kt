@@ -8,7 +8,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
-import android.os.Handler
 import android.preference.PreferenceManager
 import android.support.annotation.DrawableRes
 import android.support.v4.app.Fragment
@@ -54,6 +53,9 @@ class MatchFragment : Fragment(),
         OnTurnBasedMatchUpdateReceivedListener {
 
     companion object {
+        // Delay between animations for the waiting message
+        val WAITING_MESSAGE_FADE_DELAY_MS = 2000L
+
         private val ARG_MULTI_PLAYER = "ARG_MULTI_PLAYER"
         private val PREF_AUTO_SIGN_IN = "PREF_AUTO_SIGN_IN"
 
@@ -147,7 +149,6 @@ class MatchFragment : Fragment(),
     private var mUpdatingMatch = false
     private var mIsSignedIn = false
 
-    private val mHandler: Handler = Handler()
     private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
 
     private var mQueuedAction: QueuedAction? = null
@@ -192,7 +193,6 @@ class MatchFragment : Fragment(),
 
         multiPlayer {
             mSignInOnStart = autoConnectPreference
-            mHandler = Handler()
 
             // Initialize Games API client
             val client = buildGoogleApiClient()
@@ -1011,17 +1011,22 @@ class MatchFragment : Fragment(),
 
     private fun processReceivedTurns() {
         mUpdatingMatch = true
-        mHandler.postDelayed({
+
+        delay(CPU_TURN_DELAY_MS) {
             mBoard.commitPiece(mQueuedMoves.removeAt(0), opponentColor)
-            saveMatchData()
-            if (!mQueuedMoves.isEmpty())
+
+            // If we have moves in the pending queue, make a recursive call to this function to process them
+            if (!mQueuedMoves.isEmpty()) {
                 processReceivedTurns()
+            }
+            // Otherwise, update the score and save match data
             else {
                 mUpdatingMatch = false
                 updateScore()
-                //                    autoplayIfEnabled();
+                saveMatchData()
+//                autoplayIfEnabled()
             }
-        }, CPU_TURN_DELAY_MS)
+        }
     }
 
     override fun onTurnBasedMatchReceived(match: TurnBasedMatch) {
@@ -1339,10 +1344,10 @@ class MatchFragment : Fragment(),
                     override fun onAnimationRepeat(animation: Animation) {}
 
                     override fun onAnimationEnd(animation: Animation) {
-                        mHandler.postDelayed({
+                        delay(WAITING_MESSAGE_FADE_DELAY_MS) {
                             mMatchMessageIcon1.startAnimation(mLeftFadeOut)
                             mMatchMessageIcon2.startAnimation(mRightFadeOut)
-                        }, resources.getInteger(R.integer.waiting_message_fade_delay).toLong())
+                        }
                     }
                 })
     }

@@ -3,7 +3,6 @@
 
     <integer name="player_move_fade_out_duration">150</integer>
     <integer name="player_move_fade_in_duration">150</integer>
-    <integer name="waiting_message_fade_delay">2000</integer>
     <integer name="waiting_message_fade_out_duration">300</integer>
     <integer name="waiting_message_fade_in_duration">300</integer>
 
