@@ -334,7 +334,48 @@ class MatchFragment : Fragment(),
         }
 
         multiPlayer {
-            // TODO
+            if (mUpdatingMatch || !mQueuedMoves.isEmpty()) {
+                Timber.d("Error: Still evaluating last move")
+                return@multiPlayer
+            }
+
+            if (mMatch!!.status != TurnBasedMatch.MATCH_STATUS_ACTIVE ||
+                    mMatch!!.turnStatus != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+                return@multiPlayer
+            }
+
+            val s = mBoard.spaceAt(row, col)
+
+            if (s.isOwned)
+                return@multiPlayer
+
+            if (!mGoogleApiClient.isConnected) {
+                displaySignInPrompt()
+                return@multiPlayer
+            }
+
+            val playerColor = currentPlayerColor
+
+            if (mBoard.spacesCapturedWithMove(s, playerColor) == 0) {
+                Toast.makeText(context, R.string.bad_move, Toast.LENGTH_SHORT).show()
+                return@multiPlayer
+            }
+
+            mUpdatingMatch = true
+            showSpinner()
+            mBoard.commitPiece(s, playerColor) // FIXME: requestClaimSpace?
+            saveMatchData()
+
+            // Add selected piece to the end of mMatchData array
+            // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
+            var nextIndex = if (mPlayer == mLightPlayer) 164 else 64
+            // Increase index til we run into an unfilled index
+            while (mMatchData!![nextIndex].toInt() != 0) {
+                nextIndex += 1
+            }
+            mMatchData!![nextIndex] = mBoard.getSpaceNumber(s)
+
+            updateMatchState()
         }
     }
 
@@ -1125,10 +1166,11 @@ class MatchFragment : Fragment(),
 
     private val currentPlayerColor: ReversiColor
         get() {
-            if (mPlayer === mLightPlayer)
+            if (mPlayer === mLightPlayer) {
                 return ReversiColor.LIGHT
-            else
+            } else {
                 return ReversiColor.DARK
+            }
         }
 
     private val opponentColor: ReversiColor
