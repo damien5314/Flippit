@@ -3,7 +3,6 @@ package com.ddiehl.android.reversi.view
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender
@@ -103,8 +102,8 @@ class MatchFragment : Fragment(),
 
     private lateinit var mP1: ReversiPlayer
     private lateinit var mP2: ReversiPlayer
-    private lateinit var m1PSavedState: SPSavedState
-    private lateinit var mSettings: SPSettings
+    private val m1PSavedState: SPSavedState by lazy { SPSavedState(context) }
+    private val mSettings: SPSettings by lazy { SPSettings(context) }
 
     private var mCurrentPlayer: ReversiPlayer? = null
     private var mPlayerWithFirstTurn: ReversiPlayer? = null
@@ -172,12 +171,6 @@ class MatchFragment : Fragment(),
         }
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        m1PSavedState = SPSavedState(context)
-        mSettings = SPSettings(context)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -188,7 +181,6 @@ class MatchFragment : Fragment(),
             mP2 = ReversiPlayer(ReversiColor.DARK, getString(R.string.player2_label))
             mP1.isCPU(P1_CPU)
             mP2.isCPU(P2_CPU)
-
         }
 
         multiPlayer {
