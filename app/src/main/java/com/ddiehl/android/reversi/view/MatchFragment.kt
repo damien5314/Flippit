@@ -239,6 +239,16 @@ class MatchFragment : Fragment(),
         }
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+            = inflater.inflate(R.layout.fragment_reversi, container, false)
+
+    override fun onStart() {
+        super.onStart()
+        if (mSignInOnStart) {
+            connectGoogleApiClient()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -260,8 +270,17 @@ class MatchFragment : Fragment(),
         super.onPause()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
-            = inflater.inflate(R.layout.fragment_reversi, container, false)
+    override fun onStop() {
+        multiPlayer {
+            mQueuedAction = null
+            if (mGoogleApiClient.isConnected) {
+                registerMatchUpdateListener(false)
+                mGoogleApiClient.disconnect()
+            }
+        }
+
+        super.onStop()
+    }
 
     @OnClick(R.id.board_panel_new_game)
     internal fun onStartNewMatchClicked() {
@@ -707,25 +726,6 @@ class MatchFragment : Fragment(),
                 mGoogleApiClient.connect()
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        if (mSignInOnStart) {
-            connectGoogleApiClient()
-        }
-    }
-
-    override fun onStop() {
-        multiPlayer {
-            mQueuedAction = null
-            if (mGoogleApiClient.isConnected) {
-                registerMatchUpdateListener(false)
-                mGoogleApiClient.disconnect()
-            }
-        }
-
-        super.onStop()
     }
 
     override fun onConnected(bundle: Bundle?) {
