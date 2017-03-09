@@ -16,7 +16,7 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.view.*
 import android.view.animation.Animation
-import android.view.animation.AnimationUtils
+import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.*
 import butterknife.BindView
 import butterknife.ButterKnife
@@ -112,10 +112,10 @@ class MatchFragment : Fragment(),
 
     private var mDisplayedDialog: Dialog? = null
 
-    private var mLeftFadeOut: Animation? = null
-    private var mLeftFadeIn: Animation? = null
-    private var mRightFadeOut: Animation? = null
-    private var mRightFadeIn: Animation? = null
+    private val mLeftFadeOut: Animation by lazy { loadAnimation(context, R.anim.waitingmessage_fadeout) }
+    private val mLeftFadeIn: Animation by lazy { loadAnimation(context, R.anim.waitingmessage_fadein) }
+    private val mRightFadeOut: Animation by lazy { loadAnimation(context, R.anim.waitingmessage_fadeout) }
+    private val mRightFadeIn: Animation by lazy { loadAnimation(context, R.anim.waitingmessage_fadein) }
     private var mMatchMessageIcon1Color = false
     private var mMatchMessageIcon2Color = true
 
@@ -384,19 +384,13 @@ class MatchFragment : Fragment(),
     }
 
     private fun animateBackgroundChange(view: View, @DrawableRes resId: Int) {
-        val fadeOut = AnimationUtils.loadAnimation(context, R.anim.playermove_fadeout)
-        val fadeIn = AnimationUtils.loadAnimation(context, R.anim.playermove_fadein)
+        val fadeOut = loadAnimation(context, R.anim.playermove_fadeout)
+        val fadeIn = loadAnimation(context, R.anim.playermove_fadein)
 
-        fadeOut.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {}
-
-            override fun onAnimationRepeat(animation: Animation) {}
-
-            override fun onAnimationEnd(animation: Animation) {
-                view.setBackgroundResource(resId)
-                view.startAnimation(fadeIn)
-            }
-        })
+        fadeOut.onAnimationEnd {
+            view.setBackgroundResource(resId)
+            view.startAnimation(fadeIn)
+        }
 
         view.startAnimation(fadeOut)
     }
@@ -1258,7 +1252,7 @@ class MatchFragment : Fragment(),
 
         // Start animations for side icons
         if (mLeftFadeOut != null && mRightFadeOut != null
-                && !mLeftFadeOut!!.hasStarted() && !mRightFadeOut!!.hasStarted()) {
+                && !mLeftFadeOut.hasStarted() && !mRightFadeOut.hasStarted()) {
             mMatchMessageIcon1.startAnimation(mLeftFadeOut)
             mMatchMessageIcon2.startAnimation(mRightFadeOut)
         }
@@ -1267,10 +1261,10 @@ class MatchFragment : Fragment(),
     private fun dismissMessage() {
         mMatchMessageView.visibility = View.INVISIBLE
         mMatchMessageTextView.text = ""
-        mLeftFadeOut!!.cancel()
-        mRightFadeOut!!.cancel()
-        mLeftFadeIn!!.cancel()
-        mRightFadeIn!!.cancel()
+        mLeftFadeOut.cancel()
+        mRightFadeOut.cancel()
+        mLeftFadeIn.cancel()
+        mRightFadeIn.cancel()
     }
 
     private fun askForRematch() {
@@ -1298,58 +1292,35 @@ class MatchFragment : Fragment(),
     private fun onRematchCancel() = DialogInterface.OnClickListener { dialog, which -> }
 
     private fun initializeWaitingAnimations() {
-        mLeftFadeIn = AnimationUtils.loadAnimation(activity, R.anim.waitingmessage_fadein)
-        mLeftFadeOut = AnimationUtils.loadAnimation(activity, R.anim.waitingmessage_fadeout)
-        mRightFadeIn = AnimationUtils.loadAnimation(activity, R.anim.waitingmessage_fadein)
-        mRightFadeOut = AnimationUtils.loadAnimation(activity, R.anim.waitingmessage_fadeout)
-
         mMatchMessageIcon1.setBackgroundResource(R.drawable.player_icon_p1)
         mMatchMessageIcon2.setBackgroundResource(R.drawable.player_icon_p2)
 
-        mRightFadeOut!!.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {}
+        mRightFadeOut.onAnimationEnd {
+            // Flip background resources & start animation
+            mMatchMessageIcon2.setBackgroundResource(
+                    if (mMatchMessageIcon2Color) R.drawable.player_icon_p1
+                    else R.drawable.player_icon_p2
+            )
+            mMatchMessageIcon2Color = !mMatchMessageIcon2Color
+            mMatchMessageIcon2.startAnimation(mRightFadeIn)
+        }
 
-            override fun onAnimationRepeat(animation: Animation) {}
+        mLeftFadeOut.onAnimationEnd {
+            // Flip background resources & start animation
+            mMatchMessageIcon1.setBackgroundResource(
+                    if (mMatchMessageIcon1Color) R.drawable.player_icon_p1
+                    else R.drawable.player_icon_p2
+            )
+            mMatchMessageIcon1Color = !mMatchMessageIcon1Color
+            mMatchMessageIcon1.startAnimation(mLeftFadeIn)
+        }
 
-            override fun onAnimationEnd(animation: Animation) {
-                // Flip background resources & start animation
-                mMatchMessageIcon2.setBackgroundResource(if (mMatchMessageIcon2Color)
-                    R.drawable.player_icon_p1
-                else
-                    R.drawable.player_icon_p2)
-                mMatchMessageIcon2Color = !mMatchMessageIcon2Color
-                mMatchMessageIcon2.startAnimation(mRightFadeIn)
+        mLeftFadeIn.onAnimationEnd {
+            delay(WAITING_MESSAGE_FADE_DELAY_MS) {
+                mMatchMessageIcon1.startAnimation(mLeftFadeOut)
+                mMatchMessageIcon2.startAnimation(mRightFadeOut)
             }
-        })
-
-        mLeftFadeOut!!.setAnimationListener(object : Animation.AnimationListener {
-            override fun onAnimationStart(animation: Animation) {}
-
-            override fun onAnimationRepeat(animation: Animation) {}
-
-            override fun onAnimationEnd(animation: Animation) {
-                // Flip background resources & start animation
-                mMatchMessageIcon1.setBackgroundResource(if (mMatchMessageIcon1Color)
-                    R.drawable.player_icon_p1
-                else
-                    R.drawable.player_icon_p2)
-                mMatchMessageIcon1Color = !mMatchMessageIcon1Color
-                mMatchMessageIcon1.startAnimation(mLeftFadeIn)
-            }
-        })
-
-        mLeftFadeIn!!.setAnimationListener(
-                object : Animation.AnimationListener {
-                    override fun onAnimationStart(animation: Animation) {}
-                    override fun onAnimationRepeat(animation: Animation) {}
-
-                    override fun onAnimationEnd(animation: Animation) {
-                        delay(WAITING_MESSAGE_FADE_DELAY_MS) {
-                            mMatchMessageIcon1.startAnimation(mLeftFadeOut)
-                            mMatchMessageIcon2.startAnimation(mRightFadeOut)
-                        }
-                    }
-                })
+        }
     }
 
     private fun showSpinner() {
