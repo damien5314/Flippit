@@ -514,7 +514,7 @@ class MatchFragment : Fragment(),
                 }
                 2 -> {
                     val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
-                    move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!, opponent)
+                    move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
                 }
                 else -> {
                     move = null
@@ -1093,44 +1093,6 @@ class MatchFragment : Fragment(),
         }
     }
 
-    fun claim(s: BoardSpace) {
-        if (mUpdatingMatch || !mQueuedMoves.isEmpty()) {
-            return
-        }
-
-        if (mMatch!!.status != TurnBasedMatch.MATCH_STATUS_ACTIVE ||
-                mMatch!!.turnStatus != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-            return
-        }
-
-        if (s.isOwned)
-            return
-
-        if (!mGoogleApiClient.isConnected) {
-            displaySignInPrompt()
-            return
-        }
-
-        val playerColor = currentPlayerColor
-        mBoard.requestClaimSpace(s.y, s.x, playerColor)
-                .subscribe({
-                    mUpdatingMatch = true
-                    showSpinner()
-                    saveMatchData()
-
-                    // Add selected piece to the end of mMatchData array
-                    // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
-                    var nextIndex = if (mPlayer === mLightPlayer) 164 else 64
-                    while (mMatchData!![nextIndex].toInt() != 0)
-                        nextIndex++ // Increase index til we run into an unfilled index
-                    mMatchData!![nextIndex] = mBoard.getSpaceNumber(s)
-
-                    updateMatchState()
-                }, {
-                    Toast.makeText(activity, R.string.bad_move, Toast.LENGTH_SHORT).show()
-                })
-    }
-
     private fun updateMatchState() {
         if (mBoard.hasMove(opponentColor)) { // If opponent can make a move, it's his turn
             val pId = if (mOpponent == null) null else mOpponent!!.participantId
@@ -1681,11 +1643,9 @@ class MatchFragment : Fragment(),
                 && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
                 && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             delay(500) {
-                // FIXME Why do we need to create new ReversiPlayers here?
                 val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
-                val p1 = ReversiPlayer(color, "")
-                val p2 = ReversiPlayer(color.opposite(), "")
-                claim(ComputerAI.getBestMove_d3(mBoard, p1, p2))
+                val bestMove = ComputerAI.getBestMove_d3(mBoard, color)
+                handleSpaceClick(bestMove.y, bestMove.x)
             }
         }
     }
