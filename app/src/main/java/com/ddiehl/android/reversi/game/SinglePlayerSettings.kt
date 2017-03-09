@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.singleplayer
+package com.ddiehl.android.reversi.game
 
 import android.content.Context
 import android.content.SharedPreferences

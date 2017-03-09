@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.view
+package com.ddiehl.android.reversi.game
 
 import android.app.Activity
 import android.app.Dialog
@@ -22,11 +22,9 @@ import butterknife.BindView
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.ddiehl.android.reversi.*
+import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
 import com.ddiehl.android.reversi.model.*
-import com.ddiehl.android.reversi.multiplayer.AchievementManager
-import com.ddiehl.android.reversi.multiplayer.Achievements
-import com.ddiehl.android.reversi.singleplayer.SinglePlayerSavedState
-import com.ddiehl.android.reversi.singleplayer.SinglePlayerSettings
+import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient

@@ -1,5 +1,6 @@
-package com.ddiehl.android.reversi.view
+package com.ddiehl.android.reversi.settings
 
+import android.R
 import android.app.Activity
 import android.os.Bundle
 
@@ -8,7 +9,7 @@ class SettingsActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         fragmentManager.beginTransaction()
-                .replace(android.R.id.content, SettingsFragment.newInstance(intent)).commit()
+                .replace(R.id.content, SettingsFragment.newInstance(intent)).commit()
     }
 
     companion object {

@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.multiplayer
+package com.ddiehl.android.reversi.game
 
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.games.Games
