@@ -2,7 +2,7 @@ package com.ddiehl.android.reversi.model
 
 
 import com.ddiehl.android.reversi.IllegalMoveException
-import com.ddiehl.android.reversi.utils.Utils
+import com.ddiehl.android.reversi.byteArrayToString
 import rx.Observable
 import rx.functions.Func0
 
@@ -24,7 +24,7 @@ class Board(val height: Int, val width: Int) {
     }
 
     fun restoreState(saved: ByteArray) {
-        restoreState(Utils.byteArrayToString(saved))
+        restoreState(byteArrayToString(saved))
     }
 
     fun restoreState(saved: String) {
