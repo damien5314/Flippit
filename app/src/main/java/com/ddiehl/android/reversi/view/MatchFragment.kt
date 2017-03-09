@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.annotation.DrawableRes
 import android.support.v4.app.Fragment
+import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
@@ -42,6 +43,7 @@ import com.google.android.gms.plus.Plus
 import com.jakewharton.rxbinding.view.RxView
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
+import rx.functions.Action1
 import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
@@ -134,9 +136,6 @@ class MatchFragment : Fragment(),
     private lateinit var mGoogleApiClient: GoogleApiClient
     private lateinit var mAchievementManager: AchievementManager
 
-    val mTurnBasedMatch: TurnBasedMatch
-        get() = arguments.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH)
-
     private var mMatch: TurnBasedMatch? = null
     private var mPlayer: Participant? = null
     private var mOpponent: Participant? = null
@@ -162,18 +161,24 @@ class MatchFragment : Fragment(),
 
     //endregion
 
+    private val singlePlayer: Boolean
+        get() = !arguments.getBoolean(ARG_MULTI_PLAYER)
 
     private fun singlePlayer(f: () -> Unit) {
-        if (!arguments.getBoolean(ARG_MULTI_PLAYER)) {
+        if (singlePlayer) { f.invoke() }
+    }
+
+    private val multiPlayer: Boolean
+        get() = arguments.getBoolean(ARG_MULTI_PLAYER)
+
+    private fun multiPlayer(f: () -> Unit) {
+        if (multiPlayer) {
             f.invoke()
         }
     }
 
-    private fun multiPlayer(f: () -> Unit) {
-        if (arguments.getBoolean(ARG_MULTI_PLAYER)) {
-            f.invoke()
-        }
-    }
+    fun getTurnBasedMatch(): TurnBasedMatch?
+            = arguments.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -194,6 +199,8 @@ class MatchFragment : Fragment(),
             val client = buildGoogleApiClient()
             mAchievementManager = AchievementManager.get(client)
             mGoogleApiClient = client
+
+            mMatch = getTurnBasedMatch()
         }
     }
 
@@ -253,8 +260,8 @@ class MatchFragment : Fragment(),
         super.onPause()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
-            inflater.inflate(R.layout.fragment_reversi, container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+            = inflater.inflate(R.layout.fragment_reversi, container, false)
 
     @OnClick(R.id.board_panel_new_game)
     internal fun onStartNewMatchClicked() {
@@ -317,19 +324,30 @@ class MatchFragment : Fragment(),
     private fun handleSpaceClick(row: Int, col: Int) {
         Timber.d("Piece clicked @ $row $col")
 
-        if (mCurrentPlayer!!.isCPU) {
-            // do nothing, this isn't a valid state
-        } else {
-            mBoard.requestClaimSpace(row, col, mCurrentPlayer!!.color)
-                    .subscribe(
-                            { result ->
-                                updateBoardUi(true)
-                                calculateMatchState()
-                            },
-                            { throwable ->
-                                Toast.makeText(activity, throwable.message, Toast.LENGTH_SHORT).show()
-                            }
-                    )
+        singlePlayer {
+            if (mCurrentPlayer!!.isCPU) {
+                // Do nothing, it's a CPU's turn
+            } else {
+                mBoard.requestClaimSpace(row, col, mCurrentPlayer!!.color)
+                        .subscribe(onSpaceClaimed(), onSpaceClaimError())
+            }
+        }
+
+        multiPlayer {
+            // TODO
+        }
+    }
+
+    private fun onSpaceClaimed(): Action1<Boolean> {
+        return Action1 {
+            updateBoardUi(true)
+            calculateMatchState()
+        }
+    }
+
+    private fun onSpaceClaimError(): Action1<Throwable> {
+        return Action1 { throwable ->
+            Toast.makeText(activity, throwable.message, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -895,8 +913,9 @@ class MatchFragment : Fragment(),
         updateScore()
 
         val participantId = mMatch!!.getParticipantId(Games.Players.getCurrentPlayerId(mGoogleApiClient))
-        Games.TurnBasedMultiplayer.takeTurn(mGoogleApiClient, match.matchId,
-                mMatchData, participantId).setResultCallback { result -> processResult(result) }
+        Games.TurnBasedMultiplayer.takeTurn(
+                mGoogleApiClient, match.matchId, mMatchData, participantId
+        ).setResultCallback { processResult(it) }
     }
 
     private fun processResult(result: TurnBasedMultiplayer.UpdateMatchResult) {
@@ -1004,17 +1023,15 @@ class MatchFragment : Fragment(),
         delay(CPU_TURN_DELAY_MS) {
             mBoard.commitPiece(mQueuedMoves.removeAt(0), opponentColor)
 
-            // If we have moves in the pending queue, make a recursive call to this function to process them
-            if (!mQueuedMoves.isEmpty()) {
-                processReceivedTurns()
-            }
-            // Otherwise, update the score and save match data
-            else {
+            // If there are not moves in the pending queue, update the score and save match data
+            if (mQueuedMoves.isEmpty()) {
                 mUpdatingMatch = false
                 updateScore()
                 saveMatchData()
 //                autoplayIfEnabled()
             }
+            // Otherwise, make a recursive call to this function to process them
+            else processReceivedTurns()
         }
     }
 
@@ -1268,7 +1285,7 @@ class MatchFragment : Fragment(),
                 .setMessage(getString(R.string.dialog_rematch_message))
                 .setPositiveButton(getString(R.string.dialog_rematch_confirm), onRematchConfirm())
                 .setNegativeButton(getString(R.string.dialog_rematch_cancel), onRematchCancel())
-                .setIcon(resources.getDrawable(R.drawable.ic_av_replay_blue))
+                .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_av_replay_blue))
                 .create()
     }
 

@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import com.ddiehl.android.reversi.R
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
@@ -36,11 +37,31 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     private var mGoogleApiClient: GoogleApiClient? = null
     private var mMatchReceived: TurnBasedMatch? = null
 
-    private val mProgressBar: ProgressDialog? = null
-    private val mSignInPrompt: Dialog? = null
+    private val mProgressBar: ProgressDialog by lazy {
+        ProgressDialog(this, R.style.ProgressDialog).apply {
+            setCancelable(true)
+            setProgressStyle(ProgressDialog.STYLE_SPINNER)
+            setMessage(getString(R.string.connecting))
+        }
+    }
 
-    //    private boolean mSignInOnStart = false;
-    //    private boolean mResolvingError = false;
+    private val mSignInPrompt: Dialog by lazy {
+        AlertDialog.Builder(this)
+                .setTitle(getString(R.string.dialog_sign_in_title))
+                .setMessage(getString(R.string.dialog_sign_in_message))
+                .setPositiveButton(getString(R.string.dialog_sign_in_confirm)) { dialog, which ->
+//                    setAutoConnectPreference(true)
+                    connectGoogleApiClient()
+                }
+                .setNegativeButton(getString(R.string.dialog_sign_in_cancel)) { dialog, which -> }
+                .setOnCancelListener { dialog ->
+                    mQueuedAction = null
+                }
+                .create()
+    }
+
+    private val mSignInOnStart = false
+    private val mResolvingError = false
     private val mStartMatchOnStart = false
 
     private var mQueuedAction: QueuedAction? = null
@@ -66,7 +87,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
         mGoogleApiClient = setupApiClient()
     }
 
-    internal fun setupApiClient(): GoogleApiClient {
+    private fun setupApiClient(): GoogleApiClient {
         return GoogleApiClient.Builder(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .addConnectionCallbacks(this)
@@ -74,35 +95,11 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
                 .build()
     }
 
-    //    private void displaySignInPrompt() {
-    //        if (mSignInPrompt != null && mSignInPrompt.isShowing()) {
-    //            // Dialog is already showing
-    //        } else {
-    //            mSignInPrompt = new AlertDialog.Builder(getActivity())
-    //                    .setTitle(getString(R.string.dialog_sign_in_title))
-    //                    .setMessage(getString(R.string.dialog_sign_in_message))
-    //                    .setPositiveButton(getString(R.string.dialog_sign_in_confirm), new DialogInterface.OnClickListener() {
-    //                        public void onClick(DialogInterface dialog, int id) {
-    //                            setAutoConnectPreference(true);
-    //                            connectGoogleApiClient();
-    //                        }
-    //                    })
-    //                    .setNegativeButton(getString(R.string.dialog_sign_in_cancel), new DialogInterface.OnClickListener() {
-    //                        @Override
-    //                        public void onClick(DialogInterface dialog, int id) {
-    //                            // User canceled
-    //                        }
-    //                    })
-    //                    .setOnCancelListener(new DialogInterface.OnCancelListener() {
-    //                        @Override
-    //                        public void onCancel(DialogInterface dialog) {
-    //                            mQueuedAction = null;
-    //                        }
-    //                    })
-    //                    .create();
-    //            mSignInPrompt.show();
-    //        }
-    //    }
+    private fun displaySignInPrompt() {
+        if (!mSignInPrompt.isShowing) {
+            mSignInPrompt.show()
+        }
+    }
 
     override fun onStart() {
         super.onStart()
@@ -169,8 +166,8 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
 
-        //        dismissSpinner();
-        //        Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show();
+//        dismissSpinner()
+//        Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show()
 
         if (bundle != null && bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
             mMatchReceived = bundle.getParcelable<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
@@ -208,12 +205,12 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
                     }
                 }
             }
-        }//            case RC_NORMAL:
-        //            case RC_START_MATCH:
-        //                if (resultCode == SettingsActivity.RESULT_SIGN_OUT) {
-        //                    setAutoConnectPreference(false);
-        //                }
-        //                break;
+//            RC_NORMAL, RC_START_MATCH -> {
+//                if (resultCode == SettingsActivity.RESULT_SIGN_OUT) {
+//                    setAutoConnectPreference(false)
+//                }
+//            }
+        }
     }
 
     /* Creates a dialog for an error message */
@@ -223,17 +220,11 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
         dialog.show()
     }
 
-    //    private void showSpinner() {
-    //        if (mProgressBar == null) {
-    //            mProgressBar = new ProgressDialog(this, R.style.ProgressDialog);
-    //            mProgressBar.setCancelable(true);
-    //            mProgressBar.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-    //            mProgressBar.setMessage(getString(R.string.connecting));
-    //        }
-    //        mProgressBar.show();
-    //    }
-    //
-    //    private void dismissSpinner() {
-    //        mProgressBar.dismiss();
-    //    }
+    private fun showSpinner() {
+        mProgressBar.show()
+    }
+
+    private fun dismissSpinner() {
+        mProgressBar.dismiss()
+    }
 }
