@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.view
+package com.ddiehl.android.reversi.game
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,7 +6,7 @@ import com.ddiehl.android.reversi.model.Board
 import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.model.ReversiPlayer
 
-class SPSavedState(context: Context) {
+class SinglePlayerSavedState(context: Context) {
 
     companion object {
         private val PREF_CURRENT_PLAYER = "PREF_CURRENT_PLAYER"

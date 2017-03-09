@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.view
+package com.ddiehl.android.reversi.launcher
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import butterknife.ButterKnife
 import butterknife.OnClick
 import com.ddiehl.android.reversi.R
+import com.ddiehl.android.reversi.game.MultiPlayerMatchActivity
+import com.ddiehl.android.reversi.game.SinglePlayerMatchActivity
 
 class LauncherFragment : Fragment() {
 

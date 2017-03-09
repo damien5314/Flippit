@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.view
+package com.ddiehl.android.reversi.howtoplay
 
 import android.os.Bundle
 import android.support.v4.app.Fragment

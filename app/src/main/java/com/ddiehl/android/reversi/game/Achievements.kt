@@ -1,4 +1,4 @@
-package com.ddiehl.android.reversi.multiplayer
+package com.ddiehl.android.reversi.game
 
 enum class Achievements(val id: String) {
     PLAY_WITH_FRIEND("CgkIgZGBs4QdEAIQAg"),
