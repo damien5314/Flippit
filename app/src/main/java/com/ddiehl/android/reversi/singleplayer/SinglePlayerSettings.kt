@@ -1,9 +1,10 @@
-package com.ddiehl.android.reversi
+package com.ddiehl.android.reversi.singleplayer
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.ddiehl.android.reversi.R
 
-class SPSettings(context: Context) {
+class SinglePlayerSettings(context: Context) {
 
     companion object {
         private val PREF_PLAYER_NAME = "PREF_PLAYER_NAME"

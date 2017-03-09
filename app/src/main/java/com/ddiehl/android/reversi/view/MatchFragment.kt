@@ -25,6 +25,8 @@ import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.*
 import com.ddiehl.android.reversi.multiplayer.AchievementManager
 import com.ddiehl.android.reversi.multiplayer.Achievements
+import com.ddiehl.android.reversi.singleplayer.SinglePlayerSavedState
+import com.ddiehl.android.reversi.singleplayer.SinglePlayerSettings
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
@@ -105,8 +107,8 @@ class MatchFragment : Fragment(),
 
     private lateinit var mP1: ReversiPlayer
     private lateinit var mP2: ReversiPlayer
-    private val m1PSavedState: SPSavedState by lazy { SPSavedState(context) }
-    private val mSettings: SPSettings by lazy { SPSettings(context) }
+    private val m1PSavedState: SinglePlayerSavedState by lazy { SinglePlayerSavedState(context) }
+    private val m1PSettings: SinglePlayerSettings by lazy { SinglePlayerSettings(context) }
 
     private var mCurrentPlayer: ReversiPlayer? = null
     private var mPlayerWithFirstTurn: ReversiPlayer? = null
@@ -253,7 +255,7 @@ class MatchFragment : Fragment(),
         super.onResume()
 
         singlePlayer {
-            mP1.name = mSettings.playerName
+            mP1.name = m1PSettings.playerName
             if (mMatchInProgress && mCurrentPlayer!!.isCPU) {
                 executeCpuMove()
             }
@@ -506,7 +508,7 @@ class MatchFragment : Fragment(),
 
     internal fun executeCpuMove() {
         Observable.defer {
-            val difficulty = mSettings.aiDifficulty
+            val difficulty = m1PSettings.aiDifficulty
             val move: BoardSpace?
             when (difficulty) {
                 1 -> {
