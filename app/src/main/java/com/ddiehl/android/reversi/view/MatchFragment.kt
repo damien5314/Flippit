@@ -1651,27 +1651,27 @@ class MatchFragment : Fragment(),
     }
 
     // Used for converting Board to debugging text
-    private fun bytesToString(`in`: ByteArray?): String {
-        if (`in` == null)
+    private fun bytesToString(bytes: ByteArray?): String {
+        if (bytes == null)
             return ""
 
         val buf = StringBuilder()
 
         buf.append("\n")
         for (i in 0..63) {
-            buf.append(`in`[i].toString())
+            buf.append(bytes[i].toString())
         }
         buf.append("\n")
         for (i in 64..99) {
-            buf.append(`in`[i].toString()).append(" ")
+            buf.append(bytes[i].toString()).append(" ")
         }
         buf.append("\n")
         for (i in 100..163) {
-            buf.append(`in`[i].toString())
+            buf.append(bytes[i].toString())
         }
         buf.append("\n")
         for (i in 164..199) {
-            buf.append(`in`[i].toString()).append(" ")
+            buf.append(bytes[i].toString()).append(" ")
         }
 
         return buf.toString()
