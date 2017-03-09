@@ -49,14 +49,12 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_sign_in_title))
                 .setMessage(getString(R.string.dialog_sign_in_message))
-                .setPositiveButton(getString(R.string.dialog_sign_in_confirm)) { dialog, which ->
+                .setPositiveButton(getString(R.string.dialog_sign_in_confirm)) { _, _ ->
 //                    setAutoConnectPreference(true)
                     connectGoogleApiClient()
                 }
-                .setNegativeButton(getString(R.string.dialog_sign_in_cancel)) { dialog, which -> }
-                .setOnCancelListener { dialog ->
-                    mQueuedAction = null
-                }
+                .setNegativeButton(getString(R.string.dialog_sign_in_cancel)) { _, _ -> }
+                .setOnCancelListener { mQueuedAction = null }
                 .create()
     }
 

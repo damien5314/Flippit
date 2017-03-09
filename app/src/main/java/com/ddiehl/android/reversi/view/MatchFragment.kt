@@ -771,18 +771,18 @@ class MatchFragment : Fragment(),
                 .setTitle(getString(R.string.dialog_sign_in_title))
                 .setMessage(getString(R.string.dialog_sign_in_message))
                 .setPositiveButton(getString(R.string.dialog_sign_in_confirm), onSignInConfirm())
-                .setNegativeButton(getString(R.string.dialog_sign_in_cancel), { dialog, which -> })
+                .setNegativeButton(getString(R.string.dialog_sign_in_cancel), { _, _ -> })
                 .setOnCancelListener { mQueuedAction = null }
                 .create()
         showDialog(dialog)
     }
 
-    fun onSignInConfirm() = DialogInterface.OnClickListener { dialog, which -> connectGoogleApiClient() }
+    fun onSignInConfirm() = DialogInterface.OnClickListener { _, _ -> connectGoogleApiClient() }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
         // Resolving error with Play Games
-            RC_RESOLVE_ERROR -> handleError(resultCode, data)
+            RC_RESOLVE_ERROR -> handleError(resultCode)
 
         // Returned from the 'Select Match' dialog
             RC_VIEW_MATCHES -> handleSelectMatchResult(resultCode, data)
@@ -791,14 +791,14 @@ class MatchFragment : Fragment(),
             RC_SELECT_PLAYERS -> handleSelectPlayersResult(resultCode, data)
 
         // Returned from achievements screen
-            RC_SHOW_ACHIEVEMENTS -> handleShowAchievementsResult(resultCode, data)
+            RC_SHOW_ACHIEVEMENTS -> handleShowAchievementsResult(resultCode)
 
         // Returned from settings screen
-            RC_SETTINGS -> handleSettingsResult(resultCode, data)
+            RC_SETTINGS -> handleSettingsResult(resultCode)
         }
     }
 
-    private fun handleError(resultCode: Int, data: Intent?) {
+    private fun handleError(resultCode: Int) {
         mResolvingError = false
         if (resultCode == Activity.RESULT_OK) {
             if (!mGoogleApiClient.isConnecting && !mGoogleApiClient.isConnected) {
@@ -860,7 +860,7 @@ class MatchFragment : Fragment(),
         }
     }
 
-    private fun handleShowAchievementsResult(resultCode: Int, data: Intent?) {
+    private fun handleShowAchievementsResult(resultCode: Int) {
         if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
             mIsSignedIn = false
@@ -868,7 +868,7 @@ class MatchFragment : Fragment(),
         }
     }
 
-    private fun handleSettingsResult(resultCode: Int, data: Intent?) {
+    private fun handleSettingsResult(resultCode: Int) {
         when (resultCode) {
             SettingsActivity.RESULT_SIGN_IN -> connectGoogleApiClient()
             SettingsActivity.RESULT_SIGN_OUT -> mSignOutOnConnect = true
@@ -1263,8 +1263,7 @@ class MatchFragment : Fragment(),
         mMatchMessageView.visibility = View.VISIBLE
 
         // Start animations for side icons
-        if (mLeftFadeOut != null && mRightFadeOut != null
-                && !mLeftFadeOut.hasStarted() && !mRightFadeOut.hasStarted()) {
+        if (!mLeftFadeOut.hasStarted() && !mRightFadeOut.hasStarted()) {
             mMatchMessageIcon1.startAnimation(mLeftFadeOut)
             mMatchMessageIcon2.startAnimation(mRightFadeOut)
         }
@@ -1280,7 +1279,7 @@ class MatchFragment : Fragment(),
     }
 
     private fun askForRematch() {
-        AlertDialog.Builder(activity)
+        AlertDialog.Builder(context)
                 .setTitle(getString(R.string.dialog_rematch_title))
                 .setMessage(getString(R.string.dialog_rematch_message))
                 .setPositiveButton(getString(R.string.dialog_rematch_confirm), onRematchConfirm())
@@ -1290,7 +1289,7 @@ class MatchFragment : Fragment(),
     }
 
     private fun onRematchConfirm() =
-            DialogInterface.OnClickListener { dialog, which ->
+            DialogInterface.OnClickListener { _, _ ->
                 if (!mGoogleApiClient.isConnected) {
                     showSpinner()
                     Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch!!.matchId)
@@ -1301,7 +1300,7 @@ class MatchFragment : Fragment(),
                 }
             }
 
-    private fun onRematchCancel() = DialogInterface.OnClickListener { dialog, which -> }
+    private fun onRematchCancel() = DialogInterface.OnClickListener { _, _ -> }
 
     private fun initializeWaitingAnimations() {
         mMatchMessageIcon1.setBackgroundResource(R.drawable.player_icon_p1)
@@ -1357,7 +1356,7 @@ class MatchFragment : Fragment(),
                 .setTitle(title)
                 .setMessage(message)
                 .setCancelable(false)
-                .setPositiveButton(getString(R.string.dialog_error_confirm)) { dialog, id -> }
+                .setPositiveButton(getString(R.string.dialog_error_confirm)) { _, _ -> }
                 .create())
     }
 
@@ -1427,12 +1426,12 @@ class MatchFragment : Fragment(),
                 .setTitle(getString(R.string.dialog_cancel_match_title))
                 .setMessage(getString(R.string.dialog_cancel_match_message))
                 .setPositiveButton(getString(R.string.dialog_cancel_match_confirm), onCancelMatchConfirm())
-                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel)) { dialog, which -> }
+                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel)) { _, _ -> }
                 .setCancelable(true)
                 .create())
     }
 
-    private fun onCancelMatchConfirm() = DialogInterface.OnClickListener { dialog, which ->
+    private fun onCancelMatchConfirm() = DialogInterface.OnClickListener { _, _ ->
         if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
         } else {
@@ -1446,12 +1445,12 @@ class MatchFragment : Fragment(),
                 .setTitle(R.string.dialog_forfeit_match_title)
                 .setMessage(R.string.dialog_forfeit_match_message)
                 .setPositiveButton(R.string.dialog_forfeit_match_confirm, onForfeitMatchConfirm())
-                .setNegativeButton(R.string.dialog_forfeit_match_cancel, { dialog, which -> })
+                .setNegativeButton(R.string.dialog_forfeit_match_cancel) { _, _ -> }
                 .setCancelable(true)
                 .create())
     }
 
-    private fun onForfeitMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
+    private fun onForfeitMatchConfirm() = DialogInterface.OnClickListener { _, _ ->
         if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
             return@OnClickListener
@@ -1486,7 +1485,7 @@ class MatchFragment : Fragment(),
         showDialog(AlertDialog.Builder(activity)
                 .setTitle(R.string.dialog_forfeit_match_forbidden_title)
                 .setMessage(R.string.dialog_forfeit_match_forbidden_message)
-                .setPositiveButton(R.string.dialog_forfeit_match_forbidden_confirm) { dialog, which -> }
+                .setPositiveButton(R.string.dialog_forfeit_match_forbidden_confirm) { _, _ -> }
                 .setCancelable(true)
                 .create())
     }
@@ -1496,12 +1495,12 @@ class MatchFragment : Fragment(),
                 .setTitle(R.string.dialog_leave_match_title)
                 .setMessage(R.string.dialog_leave_match_message)
                 .setPositiveButton(R.string.dialog_leave_match_confirm, onLeaveMatchConfirm())
-                .setNegativeButton(R.string.dialog_leave_match_cancel, { dialog, which -> })
+                .setNegativeButton(R.string.dialog_leave_match_cancel, { _, _ -> })
                 .setCancelable(true)
                 .create())
     }
 
-    private fun onLeaveMatchConfirm() = DialogInterface.OnClickListener { dialog, which ->
+    private fun onLeaveMatchConfirm() = DialogInterface.OnClickListener { _, _ ->
         if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
             return@OnClickListener
@@ -1509,10 +1508,10 @@ class MatchFragment : Fragment(),
 
         if (mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             Games.TurnBasedMultiplayer.leaveMatchDuringTurn(mGoogleApiClient, mMatch!!.matchId, null)
-                    .setResultCallback { result -> processResultLeaveMatch(result) }
+                    .setResultCallback { processResultLeaveMatch(it) }
         } else {
             Games.TurnBasedMultiplayer.leaveMatch(mGoogleApiClient, mMatch!!.matchId)
-                    .setResultCallback { result -> processResultLeaveMatch(result) }
+                    .setResultCallback { processResultLeaveMatch(it) }
         }
     }
 
