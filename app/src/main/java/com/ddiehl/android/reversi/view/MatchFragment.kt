@@ -64,10 +64,11 @@ class MatchFragment : Fragment(),
         private val RC_SHOW_ACHIEVEMENTS = 1004
         private val RC_SETTINGS = 1005
 
-        fun newInstance(multiPlayer: Boolean): MatchFragment {
+        fun newInstance(multiPlayer: Boolean, match: TurnBasedMatch? = null): MatchFragment {
             return MatchFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(ARG_MULTI_PLAYER, multiPlayer)
+                    putParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH, match)
                 }
             }
         }
@@ -133,6 +134,9 @@ class MatchFragment : Fragment(),
     private lateinit var mGoogleApiClient: GoogleApiClient
     private lateinit var mAchievementManager: AchievementManager
 
+    val mTurnBasedMatch: TurnBasedMatch
+        get() = arguments.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH)
+
     private var mMatch: TurnBasedMatch? = null
     private var mPlayer: Participant? = null
     private var mOpponent: Participant? = null
@@ -190,10 +194,6 @@ class MatchFragment : Fragment(),
             val client = buildGoogleApiClient()
             mAchievementManager = AchievementManager.get(client)
             mGoogleApiClient = client
-
-            if (activity.intent.hasExtra(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
-                mMatch = activity.intent.getParcelableExtra<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
-            }
         }
     }
 
@@ -234,9 +234,12 @@ class MatchFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
-        mP1.name = mSettings.playerName
-        if (mMatchInProgress && mCurrentPlayer!!.isCPU) {
-            executeCpuMove()
+
+        singlePlayer {
+            mP1.name = mSettings.playerName
+            if (mMatchInProgress && mCurrentPlayer!!.isCPU) {
+                executeCpuMove()
+            }
         }
     }
 
@@ -916,11 +919,10 @@ class MatchFragment : Fragment(),
         mDarkPlayer = darkPlayer
         mMatchData = match.data
 
-        //        Log.d(TAG, "Match ID: " + mMatch.getMatchId());
-        //        Log.d(TAG, bytesToString(mMatchData));
-        //
-        //        Log.d(TAG, "Match Status: " + mMatch.getStatus());
-        //        Log.d(TAG, "Turn Status: " + mMatch.getTurnStatus());
+//        Timber.d("Match ID: " + mMatch!!.matchId)
+//        Timber.d(bytesToString(mMatchData))
+//        Timber.d("Match Status: " + mMatch!!.status)
+//        Timber.d("Turn Status: " + mMatch!!.turnStatus)
 
         // Grab the appropriate segment from mMatchData based on player's color
         var startIndex = if (currentPlayer === lightPlayer) 0 else 100
@@ -939,8 +941,9 @@ class MatchFragment : Fragment(),
         }
 
         mUpdatingMatch = false
-        if (!mQueuedMoves.isEmpty())
+        if (!mQueuedMoves.isEmpty()) {
             processReceivedTurns()
+        }
         updateScore()
 
         // Check for inactive match states
@@ -967,7 +970,7 @@ class MatchFragment : Fragment(),
         when (mMatch!!.turnStatus) {
             TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN -> {
                 dismissMessage()
-                //                autoplayIfEnabled();
+//                autoplayIfEnabled()
                 return
             }
             TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN -> {
@@ -1272,13 +1275,13 @@ class MatchFragment : Fragment(),
     private fun onRematchConfirm() =
             DialogInterface.OnClickListener { dialog, which ->
                 if (!mGoogleApiClient.isConnected) {
+                    showSpinner()
+                    Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch!!.matchId)
+                            .setResultCallback { result -> processResult(result) }
+                    mMatch = null
+                } else {
                     displaySignInPrompt()
-                    return@OnClickListener
                 }
-                showSpinner()
-                Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch!!.matchId)
-                        .setResultCallback { result -> processResult(result) }
-                mMatch = null
             }
 
     private fun onRematchCancel() = DialogInterface.OnClickListener { dialog, which -> }
@@ -1407,17 +1410,17 @@ class MatchFragment : Fragment(),
                 .setTitle(getString(R.string.dialog_cancel_match_title))
                 .setMessage(getString(R.string.dialog_cancel_match_message))
                 .setPositiveButton(getString(R.string.dialog_cancel_match_confirm), onCancelMatchConfirm())
-                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel), { dialog, which -> })
+                .setNegativeButton(getString(R.string.dialog_cancel_match_cancel)) { dialog, which -> }
                 .setCancelable(true)
                 .create())
     }
 
-    private fun onCancelMatchConfirm() = DialogInterface.OnClickListener { dialogInterface, which ->
+    private fun onCancelMatchConfirm() = DialogInterface.OnClickListener { dialog, which ->
         if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
         } else {
             Games.TurnBasedMultiplayer.cancelMatch(mGoogleApiClient, mMatch!!.matchId)
-                    .setResultCallback { cancelMatchResult -> processResult(cancelMatchResult) }
+                    .setResultCallback { result -> processResult(result) }
         }
     }
 
@@ -1437,10 +1440,16 @@ class MatchFragment : Fragment(),
             return@OnClickListener
         }
 
-        val winnerResult = ParticipantResult(mOpponent!!.participantId,
-                ParticipantResult.MATCH_RESULT_WIN, ParticipantResult.PLACING_UNINITIALIZED)
-        val loserResult = ParticipantResult(mPlayer!!.participantId,
-                ParticipantResult.MATCH_RESULT_LOSS, ParticipantResult.PLACING_UNINITIALIZED)
+        val winnerResult = ParticipantResult(
+                mOpponent!!.participantId,
+                ParticipantResult.MATCH_RESULT_WIN,
+                ParticipantResult.PLACING_UNINITIALIZED
+        )
+        val loserResult = ParticipantResult(
+                mPlayer!!.participantId,
+                ParticipantResult.MATCH_RESULT_LOSS,
+                ParticipantResult.PLACING_UNINITIALIZED
+        )
         // Give win to other player
         Games.TurnBasedMultiplayer.finishMatch(
                 mGoogleApiClient, mMatch!!.matchId, mMatchData,

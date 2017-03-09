@@ -10,7 +10,7 @@ fun delay(ms: Long, f: () -> Unit) {
 }
 
 /**
- * {@link Animation} extension function to invoke a method after the animation is finished
+ * [Animation] extension function to invoke a method after the animation is finished
  */
 fun Animation.onAnimationEnd(f: () -> Unit) {
     setAnimationListener(
