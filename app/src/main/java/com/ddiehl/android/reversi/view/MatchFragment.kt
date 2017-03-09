@@ -153,7 +153,7 @@ class MatchFragment : Fragment(),
     private var mQueuedAction: QueuedAction? = null
 
     private enum class QueuedAction {
-        NewMatch, SelectMatch, ShowAchievements, ForfeitMatch
+        NEW_MATCH, SELECT_MATCH, SHOW_ACHIEVEMENTS, FORFEIT_MATCH
     }
 
     //endregion
@@ -270,7 +270,7 @@ class MatchFragment : Fragment(),
 
         multiPlayer {
             if (!mGoogleApiClient.isConnected) {
-                mQueuedAction = QueuedAction.NewMatch
+                mQueuedAction = QueuedAction.NEW_MATCH
                 displaySignInPrompt()
             } else {
                 val intent: Intent = Games.TurnBasedMultiplayer
@@ -285,7 +285,7 @@ class MatchFragment : Fragment(),
         // Button is hidden in single player
         multiPlayer {
             if (!mGoogleApiClient.isConnected) {
-                mQueuedAction = QueuedAction.SelectMatch
+                mQueuedAction = QueuedAction.SELECT_MATCH
                 displaySignInPrompt()
             } else {
                 val intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient)
@@ -679,22 +679,22 @@ class MatchFragment : Fragment(),
 
         if (mQueuedAction != null) {
             when (mQueuedAction) {
-                QueuedAction.NewMatch -> {
+                QueuedAction.NEW_MATCH -> {
                     mQueuedAction = null
                     onStartNewMatchClicked()
                     return
                 }
-                QueuedAction.SelectMatch -> {
+                QueuedAction.SELECT_MATCH -> {
                     mQueuedAction = null
                     onSelectMatchClicked()
                     return
                 }
-                QueuedAction.ForfeitMatch -> {
+                QueuedAction.FORFEIT_MATCH -> {
                     mQueuedAction = null
                     forfeitMatchSelected()
                     return
                 }
-                QueuedAction.ShowAchievements -> {
+                QueuedAction.SHOW_ACHIEVEMENTS -> {
                     mQueuedAction = null
                     showAchievements()
                     return
@@ -1371,7 +1371,7 @@ class MatchFragment : Fragment(),
         }
 
         if (!mGoogleApiClient.isConnected) {
-            mQueuedAction = QueuedAction.ForfeitMatch
+            mQueuedAction = QueuedAction.FORFEIT_MATCH
             displaySignInPrompt()
             return
         }
@@ -1541,7 +1541,7 @@ class MatchFragment : Fragment(),
             val intent = Games.Achievements.getAchievementsIntent(mGoogleApiClient)
             startActivityForResult(intent, RC_SHOW_ACHIEVEMENTS)
         } else {
-            mQueuedAction = QueuedAction.ShowAchievements
+            mQueuedAction = QueuedAction.SHOW_ACHIEVEMENTS
             displaySignInPrompt()
         }
     }
