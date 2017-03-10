@@ -39,7 +39,6 @@
         <item name="android:background">@drawable/board_action_panel</item>
         <item name="android:textSize">@dimen/board_panel_text_size</item>
         <item name="android:textColor">@color/board_action_panel_color</item>
-        <item name="android:fontFamily" tools:targetApi="16">sans-serif-light</item>
     </style>
 
     <style name="MatchGridRow">
@@ -53,23 +52,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_margin">@dimen/space_padding</item>
-    </style>
-
-    <style name="GameMessage">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">3</item>
-        <item name="android:visibility">invisible</item>
-    </style>
-
-    <style name="GameMessageText">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_gravity">center</item>
-        <item name="android:layout_centerVertical">true</item>
-        <item name="android:layout_centerHorizontal">true</item>
-        <item name="android:textSize">@dimen/game_message_text_size</item>
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:background">@drawable/board_space_neutral</item>
     </style>
 
     <style name="GameMessageIcon">
@@ -90,7 +73,7 @@
     </style>
 
     <style name="HowToPlayHeader">
-        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <!--<item name="android:paddingBottom">@dimen/how_to_play_header_padding</item>-->
         <item name="android:textStyle">bold</item>
@@ -105,7 +88,7 @@
     </style>
 
     <style name="HowToPlayImage">
-        <item name="android:layout_width">fill_parent</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:paddingTop">@dimen/how_to_play_image_padding</item>
         <item name="android:paddingBottom">@dimen/how_to_play_image_padding</item>
@@ -115,9 +98,9 @@
     <style name="ProgressDialog" parent="Theme.AppCompat.Dialog">
         <item name="android:alertDialogStyle">@style/CustomAlertDialogStyle</item>
         <item name="android:windowBackground">@color/transparent</item>
-        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorPrimary">@color/white</item>
         <item name="android:backgroundDimEnabled">true</item>
-        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textStyle">normal</item>
         <item name="android:textSize">12sp</item>
     </style>
