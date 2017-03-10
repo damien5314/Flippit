@@ -95,8 +95,6 @@ fun byteArrayToString(array: ByteArray): String {
 
 /**
  * Tints menu icons similar to the AppCompat style
- *
- *
  * http://stackoverflow.com/a/33697621/3238938
  */
 object MenuTintUtils {

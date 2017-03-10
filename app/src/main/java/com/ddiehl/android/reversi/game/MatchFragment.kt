@@ -200,7 +200,6 @@ class MatchFragment : Fragment(),
 
         (activity as AppCompatActivity).setSupportActionBar(mToolbar)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        (activity as AppCompatActivity).supportActionBar!!.setHomeButtonEnabled(true)
 
         mStartNewMatchButton.setOnClickListener { onStartNewMatchClicked() }
         mSelectMatchButton.setOnClickListener { onSelectMatchClicked() }
