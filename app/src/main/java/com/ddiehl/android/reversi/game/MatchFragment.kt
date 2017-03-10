@@ -1264,7 +1264,6 @@ class MatchFragment : Fragment(),
                 .setMessage(getString(R.string.dialog_rematch_message))
                 .setPositiveButton(getString(R.string.dialog_rematch_confirm), onRematchConfirm())
                 .setNegativeButton(getString(R.string.dialog_rematch_cancel), onRematchCancel())
-                .setIcon(ContextCompat.getDrawable(context, R.drawable.ic_av_replay_blue))
                 .create()
     }
 

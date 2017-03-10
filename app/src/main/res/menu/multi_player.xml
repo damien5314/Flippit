@@ -5,15 +5,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_how_to_play"
+        android:icon="@drawable/ic_help_outline_black_24dp"
+        android:title="@string/action_how_to_play"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/action_create_match"
-        android:icon="@drawable/ic_action_content_add_circle_outline"
         android:title="@string/multiplayer_new_match"
         android:titleCondensed="@string/multiplayer_new_match_condensed"
         app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_select_match"
-        android:icon="@drawable/ic_action_action_view_list"
         android:title="@string/multiplayer_select_match"
         android:titleCondensed="@string/multiplayer_select_match_condensed"
         app:showAsAction="never" />
@@ -37,11 +41,5 @@
         android:id="@+id/action_settings"
         android:title="@string/multiplayer_settings"
         app:showAsAction="never" />
-
-    <item
-        android:id="@+id/action_how_to_play"
-        android:icon="@drawable/ic_help_outline_black_24dp"
-        android:title="@string/action_how_to_play"
-        app:showAsAction="ifRoom"/>
 
 </menu>

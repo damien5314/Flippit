@@ -5,7 +5,10 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import com.ddiehl.android.reversi.R
 
 /**
@@ -68,21 +71,5 @@ class HowToPlayActivity : AppCompatActivity() {
                 return frag
             }
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.how_to_play, menu)
-        mMenuPrevious = menu.getItem(0)
-        mMenuNext = menu.getItem(1)
-        setMenuItemState(0)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_previous -> mViewPager!!.currentItem = mViewPager!!.currentItem - 1
-            R.id.action_next -> mViewPager!!.currentItem = mViewPager!!.currentItem + 1
-        }
-        return true
     }
 }
