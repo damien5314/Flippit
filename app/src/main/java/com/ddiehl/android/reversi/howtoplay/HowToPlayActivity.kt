@@ -20,7 +20,12 @@ class HowToPlayActivity : AppCompatActivity() {
     private var mMenuPrevious: MenuItem? = null
     private var mMenuNext: MenuItem? = null
 
-    private val FRAGMENT_LAYOUT_ID = intArrayOf(R.layout.how_to_play_1, R.layout.how_to_play_2, R.layout.how_to_play_3, R.layout.how_to_play_4)
+    private val FRAGMENT_LAYOUT_ID = intArrayOf(
+            R.layout.how_to_play_1,
+            R.layout.how_to_play_2,
+            R.layout.how_to_play_3,
+            R.layout.how_to_play_4
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,7 +45,7 @@ class HowToPlayActivity : AppCompatActivity() {
             }
         }
 
-        mViewPager!!.setOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+        mViewPager!!.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
             override fun onPageSelected(i: Int) {
                 setMenuItemState(i)
             }
@@ -52,24 +57,22 @@ class HowToPlayActivity : AppCompatActivity() {
 
         mMenuNext!!.isEnabled = page != FRAGMENT_LAYOUT_ID.size - 1
     }
+}
 
-    class HowToPlayFragment : Fragment() {
+class HowToPlayFragment : Fragment() {
 
-        override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-            val layoutId = arguments.getInt(ARG_LAYOUT_ID)
-            return inflater!!.inflate(layoutId, container, false)
-        }
+    companion object {
+        private val ARG_LAYOUT_ID = "id"
 
-        companion object {
-            private val ARG_LAYOUT_ID = "id"
-
-            fun newInstance(id: Int): Fragment {
-                val args = Bundle()
-                args.putInt(ARG_LAYOUT_ID, id)
-                val frag = HowToPlayFragment()
-                frag.arguments = args
-                return frag
-            }
+        fun newInstance(id: Int): Fragment {
+            val args = Bundle()
+            args.putInt(ARG_LAYOUT_ID, id)
+            val frag = HowToPlayFragment()
+            frag.arguments = args
+            return frag
         }
     }
+
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
+            = inflater!!.inflate(arguments.getInt(ARG_LAYOUT_ID), container, false)
 }
