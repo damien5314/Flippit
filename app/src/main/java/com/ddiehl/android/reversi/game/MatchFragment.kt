@@ -200,6 +200,7 @@ class MatchFragment : Fragment(),
 
         (activity as AppCompatActivity).setSupportActionBar(mToolbar)
         (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        (activity as AppCompatActivity).supportActionBar!!.setHomeButtonEnabled(true)
 
         mStartNewMatchButton.setOnClickListener { onStartNewMatchClicked() }
         mSelectMatchButton.setOnClickListener { onSelectMatchClicked() }
@@ -1566,6 +1567,12 @@ class MatchFragment : Fragment(),
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            android.R.id.home -> {
+                if (!activity.isFinishing) {
+                    activity.finish()
+                }
+                return true
+            }
             R.id.action_new_match -> {
                 onStartNewMatchClicked()
                 return true
