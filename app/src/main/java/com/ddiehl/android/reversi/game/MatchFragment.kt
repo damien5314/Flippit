@@ -12,14 +12,12 @@ import android.support.annotation.DrawableRes
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.*
-import butterknife.BindView
 import butterknife.ButterKnife
-import butterknife.OnClick
+import butterknife.bindView
 import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
 import com.ddiehl.android.reversi.model.*
@@ -75,36 +73,21 @@ class MatchFragment : Fragment(),
         }
     }
 
-    @BindView(R.id.back)
-    lateinit var mBackButton: View
-    @BindView(R.id.how_to_play)
-    lateinit var mHowToPlayButton: View
-    @BindView(R.id.settings)
-    lateinit var mSettingsButton: View
-    @BindView(R.id.match_grid)
-    lateinit var mMatchGridView: TableLayout
-    @BindView(R.id.score_p1)
-    lateinit var mPlayerOneScoreTextView: TextView
-    @BindView(R.id.score_p2)
-    lateinit var mPlayerTwoScoreTextView: TextView
-    @BindView(R.id.p1_waiting_bar)
-    lateinit var mP1WaitingBar: ProgressBar
-    @BindView(R.id.p2_waiting_bar)
-    lateinit var mP2WaitingBar: ProgressBar
-    @BindView(R.id.board_panels)
-    lateinit var mBoardPanelView: View
-    @BindView(R.id.board_panel_new_game)
-    lateinit var mStartNewMatchButton: Button
-    @BindView(R.id.board_panel_select_game)
-    lateinit var mSelectMatchButton: Button
-    @BindView(R.id.match_message)
-    lateinit var mMatchMessageView: View
-    @BindView(R.id.match_message_text)
-    lateinit var mMatchMessageTextView: TextView
-    @BindView(R.id.match_message_icon_1)
-    lateinit var mMatchMessageIcon1: ImageView
-    @BindView(R.id.match_message_icon_2)
-    lateinit var mMatchMessageIcon2: ImageView
+    internal val mBackButton by bindView<View>(R.id.back)
+    internal val mHowToPlayButton by bindView<View>(R.id.how_to_play)
+    internal val mSettingsButton by bindView<View>(R.id.settings)
+    internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
+    internal val mPlayerOneScoreTextView by bindView<TextView>(R.id.score_p1)
+    internal val mPlayerTwoScoreTextView by bindView<TextView>(R.id.score_p2)
+    internal val mP1WaitingBar by bindView<ProgressBar>(R.id.p1_waiting_bar)
+    internal val mP2WaitingBar by bindView<ProgressBar>(R.id.p2_waiting_bar)
+    internal val mBoardPanelView by bindView<View>(R.id.board_panels)
+    internal val mStartNewMatchButton by bindView<Button>(R.id.board_panel_new_game)
+    internal val mSelectMatchButton by bindView<Button>(R.id.board_panel_select_game)
+    internal val mMatchMessageView by bindView<View>(R.id.match_message)
+    internal val mMatchMessageTextView by bindView<TextView>(R.id.match_message_text)
+    internal val mMatchMessageIcon1 by bindView<ImageView>(R.id.match_message_icon_1)
+    internal val mMatchMessageIcon2 by bindView<ImageView>(R.id.match_message_icon_2)
 
     private lateinit var mP1: ReversiPlayer
     private lateinit var mP2: ReversiPlayer
@@ -164,6 +147,7 @@ class MatchFragment : Fragment(),
 
     //endregion
 
+
     private val singlePlayer: Boolean
         get() = !arguments.getBoolean(ARG_MULTI_PLAYER)
 
@@ -207,16 +191,17 @@ class MatchFragment : Fragment(),
         }
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+            = inflater.inflate(R.layout.match_fragment, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ButterKnife.bind(this, view)
+        mStartNewMatchButton.setOnClickListener { onStartNewMatchClicked() }
+        mSelectMatchButton.setOnClickListener { onSelectMatchClicked() }
 
         initMatchGrid(mMatchGridView)
         mMatchGridView.visibility = View.GONE
-
-        // Set Action bar
-        (activity as AppCompatActivity).setSupportActionBar(mToolbar)
 
         singlePlayer {
             // Hide select match panel for single player
@@ -242,8 +227,10 @@ class MatchFragment : Fragment(),
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
-            = inflater.inflate(R.layout.match_fragment, container, false)
+    override fun onDestroyView() {
+        ButterKnife.reset(this)
+        super.onDestroyView()
+    }
 
     override fun onStart() {
         super.onStart()
@@ -285,8 +272,7 @@ class MatchFragment : Fragment(),
         super.onStop()
     }
 
-    @OnClick(R.id.board_panel_new_game)
-    internal fun onStartNewMatchClicked() {
+    private fun onStartNewMatchClicked() {
         singlePlayer {
             mBoard.reset()
             displayBoard()
@@ -312,8 +298,7 @@ class MatchFragment : Fragment(),
         }
     }
 
-    @OnClick(R.id.board_panel_select_game)
-    internal fun onSelectMatchClicked() {
+    private fun onSelectMatchClicked() {
         // Button is hidden in single player
         multiPlayer {
             if (!mGoogleApiClient.isConnected) {
