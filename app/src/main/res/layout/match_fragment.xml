@@ -1,5 +1,6 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,79 +11,31 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <RelativeLayout
-            android:id="@+id/toolbar"
+        <android.support.design.widget.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:minHeight="56dp"
-            android:orientation="horizontal">
+            android:background="@color/transparent"
+            app:elevation="0dp">
 
-            <FrameLayout
-                android:id="@+id/back"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:theme="@style/MatchToolbar"
+                app:titleTextAppearance="@style/MatchToolbarTitle"
+                app:elevation="0dp"/>
 
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/back_button_description"
-                    android:src="@drawable/ic_arrow_back_black_24dp"
-                    android:tint="@color/white"/>
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/settings"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/settings_button_description"
-                    android:src="@drawable/ic_settings_black_24dp"
-                    android:tint="@color/white"/>
-
-            </FrameLayout>
-
-            <FrameLayout
-                android:id="@+id/how_to_play"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_toLeftOf="@id/settings"
-                android:layout_toStartOf="@id/settings"
-                android:background="?attr/selectableItemBackgroundBorderless">
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/how_to_play_button_description"
-                    android:src="@drawable/ic_info_outline_black_24dp"
-                    android:tint="@color/white"/>
-
-            </FrameLayout>
-
-        </RelativeLayout>
+        </android.support.design.widget.AppBarLayout>
 
         <LinearLayout
             android:id="@+id/score_overlay"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
+            android:baselineAligned="false"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp">
 
             <LinearLayout
                 android:layout_width="0dp"

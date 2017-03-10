@@ -6,12 +6,15 @@ import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender
+import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.annotation.DrawableRes
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils.loadAnimation
@@ -73,9 +76,7 @@ class MatchFragment : Fragment(),
         }
     }
 
-    internal val mBackButton by bindView<View>(R.id.back)
-    internal val mHowToPlayButton by bindView<View>(R.id.how_to_play)
-    internal val mSettingsButton by bindView<View>(R.id.settings)
+    internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
     internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
     internal val mPlayerOneScoreTextView by bindView<TextView>(R.id.score_p1)
     internal val mPlayerTwoScoreTextView by bindView<TextView>(R.id.score_p2)
@@ -196,6 +197,9 @@ class MatchFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        (activity as AppCompatActivity).setSupportActionBar(mToolbar)
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         mStartNewMatchButton.setOnClickListener { onStartNewMatchClicked() }
         mSelectMatchButton.setOnClickListener { onSelectMatchClicked() }
@@ -1570,6 +1574,11 @@ class MatchFragment : Fragment(),
             val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
             prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply()
         }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        MenuTintUtils.tintAllIcons(menu, Color.WHITE)
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {

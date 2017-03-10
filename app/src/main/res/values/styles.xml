@@ -143,4 +143,19 @@
         <item name="android:topDark">@color/transparent</item>
     </style>
 
+    <style name="MatchToolbar" parent="ThemeOverlay.AppCompat.ActionBar">
+        <!-- Customize color of navigation drawer icon and back arrow -->
+        <item name="colorControlNormal">@color/white</item>
+        <item name="android:colorControlNormal" tools:targetApi="lollipop">@color/white</item>
+        <item name="android:background">@color/transparent</item>
+        <item name="android:elevation" tools:ignore="NewApi">0dp</item>
+    </style>
+
+    <style name="MatchToolbarTitle" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        <!-- Set proper title size -->
+        <item name="android:textSize">20sp</item>
+        <!-- Set title color -->
+        <item name="android:textColor">@color/white</item>
+    </style>
+
 </resources>
