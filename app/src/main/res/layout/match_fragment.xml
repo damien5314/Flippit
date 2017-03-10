@@ -108,8 +108,8 @@
 
                 <ProgressBar
                     android:id="@+id/p1_waiting_bar"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="@dimen/player_icon_size"
+                    android:layout_height="@dimen/player_icon_size"
                     android:layout_gravity="center"
                     android:indeterminate="true"
                     android:indeterminateTint="@color/white"
@@ -129,8 +129,8 @@
 
                 <ProgressBar
                     android:id="@+id/p2_waiting_bar"
-                    android:layout_width="16dp"
-                    android:layout_height="16dp"
+                    android:layout_width="@dimen/player_icon_size"
+                    android:layout_height="@dimen/player_icon_size"
                     android:layout_gravity="center"
                     android:indeterminate="true"
                     android:indeterminateTint="@color/white"
