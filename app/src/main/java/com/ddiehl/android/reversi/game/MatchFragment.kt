@@ -78,8 +78,8 @@ class MatchFragment : Fragment(),
 
     internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
     internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
-    internal val mPlayerOneScoreTextView by bindView<TextView>(R.id.score_p1)
-    internal val mPlayerTwoScoreTextView by bindView<TextView>(R.id.score_p2)
+    internal val mPlayerOneScore by bindView<TextView>(R.id.score_p1)
+    internal val mPlayerTwoScore by bindView<TextView>(R.id.score_p2)
     internal val mP1WaitingBar by bindView<ProgressBar>(R.id.p1_waiting_bar)
     internal val mP2WaitingBar by bindView<ProgressBar>(R.id.p2_waiting_bar)
     internal val mBoardPanelView by bindView<View>(R.id.board_panels)
@@ -203,6 +203,9 @@ class MatchFragment : Fragment(),
 
         mStartNewMatchButton.setOnClickListener { onStartNewMatchClicked() }
         mSelectMatchButton.setOnClickListener { onSelectMatchClicked() }
+
+        mPlayerOneScore.text = 0.toString()
+        mPlayerTwoScore.text = 0.toString()
 
         initMatchGrid(mMatchGridView)
         mMatchGridView.visibility = View.GONE
@@ -551,7 +554,7 @@ class MatchFragment : Fragment(),
     }
 
     fun updateScoreForPlayer(p: ReversiPlayer) {
-        (if (p === mP1) mPlayerOneScoreTextView else mPlayerTwoScoreTextView).text = p.score.toString()
+        (if (p === mP1) mPlayerOneScore else mPlayerTwoScore).text = p.score.toString()
     }
 
     fun endMatch() {
@@ -1161,8 +1164,8 @@ class MatchFragment : Fragment(),
     private fun clearBoard() {
         mMatch = null
         mMatchGridView.visibility = View.GONE
-        mPlayerOneScoreTextView.text = ""
-        mPlayerTwoScoreTextView.text = ""
+        mPlayerOneScore.text = ""
+        mPlayerTwoScore.text = ""
         showWaitingIndicator(false, false)
         mBoardPanelView.visibility = View.VISIBLE
     }
@@ -1173,14 +1176,15 @@ class MatchFragment : Fragment(),
 
         if (mMatch!!.status == TurnBasedMatch.MATCH_STATUS_COMPLETE && !mUpdatingMatch) {
             // Add remaining spaces to winning count as per Reversi rules
-            if (mLightPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN)
+            if (mLightPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
                 mLightScore += mBoard.numberOfEmptySpaces
-            else if (mDarkPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN)
+            } else if (mDarkPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
                 mDarkScore += mBoard.numberOfEmptySpaces
+            }
         }
 
-        mPlayerOneScoreTextView.text = mLightScore.toString()
-        mPlayerTwoScoreTextView.text = mDarkScore.toString()
+        mPlayerOneScore.text = mLightScore.toString()
+        mPlayerTwoScore.text = mDarkScore.toString()
 
         // Update turn indicator
         when (mMatch!!.turnStatus) {
