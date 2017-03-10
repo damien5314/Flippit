@@ -144,4 +144,8 @@
     <string name="player1_icon_content_description">light player</string>
     <string name="signin_other_error">There was an issue signing in, please try again later</string>
 
+    <string name="back_button_description">back</string>
+    <string name="settings_button_description">settings</string>
+    <string name="how_to_play_button_description">how to play</string>
+
 </resources>

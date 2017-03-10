@@ -13,7 +13,6 @@ import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils.loadAnimation
@@ -76,8 +75,12 @@ class MatchFragment : Fragment(),
         }
     }
 
-    @BindView(R.id.toolbar)
-    lateinit var mToolbar: Toolbar
+    @BindView(R.id.back)
+    lateinit var mBackButton: View
+    @BindView(R.id.how_to_play)
+    lateinit var mHowToPlayButton: View
+    @BindView(R.id.settings)
+    lateinit var mSettingsButton: View
     @BindView(R.id.match_grid)
     lateinit var mMatchGridView: TableLayout
     @BindView(R.id.score_p1)
@@ -240,7 +243,7 @@ class MatchFragment : Fragment(),
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
-            = inflater.inflate(R.layout.fragment_reversi, container, false)
+            = inflater.inflate(R.layout.match_fragment, container, false)
 
     override fun onStart() {
         super.onStart()
