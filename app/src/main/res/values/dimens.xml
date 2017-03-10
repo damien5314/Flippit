@@ -6,9 +6,6 @@
 
     <dimen name="app_title_size">60sp</dimen>
 
-    <dimen name="call_to_action_margin">2dp</dimen>
-    <dimen name="call_to_action_text_size">22sp</dimen>
-
     <dimen name="board_panel_margin">6dp</dimen>
     <dimen name="board_panel_border">2dp</dimen>
     <dimen name="board_panel_corner_radius">24dp</dimen>
