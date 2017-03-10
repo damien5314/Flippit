@@ -59,15 +59,14 @@
                     android:textSize="@dimen/score_overlay_text_size"
                     tools:text="88"/>
 
-                <ProgressBar
-                    android:id="@+id/p1_waiting_bar"
-                    android:layout_width="@dimen/player_icon_size"
-                    android:layout_height="@dimen/player_icon_size"
+                <TextView
+                    android:id="@+id/p1_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:indeterminate="true"
-                    android:indeterminateTint="@color/white"
-                    android:visibility="gone"
-                    tools:visibility="visible"/>
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/score_overlay_text_size"
+                    tools:text="Player 1"/>
 
             </LinearLayout>
 
@@ -80,15 +79,14 @@
                 android:orientation="horizontal"
                 android:showDividers="middle">
 
-                <ProgressBar
-                    android:id="@+id/p2_waiting_bar"
-                    android:layout_width="@dimen/player_icon_size"
-                    android:layout_height="@dimen/player_icon_size"
+                <TextView
+                    android:id="@+id/p2_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:indeterminate="true"
-                    android:indeterminateTint="@color/white"
-                    android:visibility="gone"
-                    tools:visibility="visible"/>
+                    android:textColor="@color/primary_text"
+                    android:textSize="@dimen/score_overlay_text_size"
+                    tools:text="Player 2"/>
 
                 <TextView
                     android:id="@+id/score_p2"

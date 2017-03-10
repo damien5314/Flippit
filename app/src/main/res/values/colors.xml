@@ -11,7 +11,6 @@
     <color name="primary_text">#212121</color>
 
     <color name="board_color">#42A321</color>
-
     <color name="board_panel_pressed">#000000</color>
 
 </resources>

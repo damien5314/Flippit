@@ -80,8 +80,8 @@ class MatchFragment : Fragment(),
     internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
     internal val mPlayerOneScore by bindView<TextView>(R.id.score_p1)
     internal val mPlayerTwoScore by bindView<TextView>(R.id.score_p2)
-    internal val mP1WaitingBar by bindView<ProgressBar>(R.id.p1_waiting_bar)
-    internal val mP2WaitingBar by bindView<ProgressBar>(R.id.p2_waiting_bar)
+    internal val mPlayerOneLabel by bindView<TextView>(R.id.p1_label)
+    internal val mPlayerTwoLabel by bindView<TextView>(R.id.p2_label)
     internal val mBoardPanelView by bindView<View>(R.id.board_panels)
     internal val mStartNewMatchButton by bindView<Button>(R.id.board_panel_new_game)
     internal val mSelectMatchButton by bindView<Button>(R.id.board_panel_select_game)
@@ -330,11 +330,6 @@ class MatchFragment : Fragment(),
         }
     }
 
-    private fun showWaitingIndicator(p1: Boolean, p2: Boolean) {
-        mP1WaitingBar.visibility = if (p1) View.VISIBLE else View.GONE
-        mP2WaitingBar.visibility = if (p2) View.VISIBLE else View.GONE
-    }
-
     private fun handleSpaceClick(row: Int, col: Int) {
         Timber.d("Piece clicked @ $row $col")
 
@@ -545,12 +540,6 @@ class MatchFragment : Fragment(),
         mP2.score = p2c
         updateScoreForPlayer(mP1)
         updateScoreForPlayer(mP2)
-
-        if (mCurrentPlayer === mP1) {
-            showWaitingIndicator(false, false)
-        } else {
-            showWaitingIndicator(false, true)
-        }
     }
 
     fun updateScoreForPlayer(p: ReversiPlayer) {
@@ -1166,7 +1155,6 @@ class MatchFragment : Fragment(),
         mMatchGridView.visibility = View.GONE
         mPlayerOneScore.text = ""
         mPlayerTwoScore.text = ""
-        showWaitingIndicator(false, false)
         mBoardPanelView.visibility = View.VISIBLE
     }
 
@@ -1185,14 +1173,6 @@ class MatchFragment : Fragment(),
 
         mPlayerOneScore.text = mLightScore.toString()
         mPlayerTwoScore.text = mDarkScore.toString()
-
-        // Update turn indicator
-        when (mMatch!!.turnStatus) {
-            TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN -> showWaitingIndicator(false, false)
-            TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN -> showWaitingIndicator(false, true)
-            TurnBasedMatch.MATCH_TURN_STATUS_INVITED -> showWaitingIndicator(false, false)
-            TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE -> showWaitingIndicator(false, false)
-        }
     }
 
     private fun checkStatusCode(statusCode: Int): Boolean {
