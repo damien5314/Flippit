@@ -28,17 +28,9 @@
         <item name="android:radius">@dimen/player_icon_corner_radius</item>
     </style>
 
-    <style name="BoardActionPanels">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">fill_parent</item>
-        <item name="android:gravity">center</item>
-        <item name="android:orientation">vertical</item>
-    </style>
-
     <style name="BoardActionPanel">
-        <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">0dp</item>
-        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">112dp</item>
         <item name="android:layout_marginTop">@dimen/board_panel_margin</item>
         <item name="android:layout_marginBottom">@dimen/board_panel_margin</item>
         <item name="android:layout_marginLeft">@dimen/activity_horizontal_margin</item>

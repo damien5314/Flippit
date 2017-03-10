@@ -121,12 +121,10 @@
 
             <LinearLayout
                 android:id="@+id/board_panels"
-                style="@style/BoardActionPanels">
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <Button
                     android:id="@+id/board_panel_new_game"
@@ -137,11 +135,6 @@
                     android:id="@+id/board_panel_select_game"
                     style="@style/BoardActionPanel"
                     android:text="@string/multiplayer_select_match"/>
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1"/>
 
             </LinearLayout>
 
