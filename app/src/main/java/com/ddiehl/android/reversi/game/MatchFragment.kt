@@ -6,6 +6,7 @@ import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.IntentSender
+import android.graphics.Color
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.annotation.DrawableRes
@@ -18,9 +19,8 @@ import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.*
-import butterknife.BindView
 import butterknife.ButterKnife
-import butterknife.OnClick
+import butterknife.bindView
 import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
 import com.ddiehl.android.reversi.model.*
@@ -76,32 +76,19 @@ class MatchFragment : Fragment(),
         }
     }
 
-    @BindView(R.id.toolbar)
-    lateinit var mToolbar: Toolbar
-    @BindView(R.id.match_grid)
-    lateinit var mMatchGridView: TableLayout
-    @BindView(R.id.score_p1)
-    lateinit var mPlayerOneScoreTextView: TextView
-    @BindView(R.id.score_p2)
-    lateinit var mPlayerTwoScoreTextView: TextView
-    @BindView(R.id.p1_waiting_bar)
-    lateinit var mP1WaitingBar: ProgressBar
-    @BindView(R.id.p2_waiting_bar)
-    lateinit var mP2WaitingBar: ProgressBar
-    @BindView(R.id.board_panels)
-    lateinit var mBoardPanelView: View
-    @BindView(R.id.board_panel_new_game)
-    lateinit var mStartNewMatchButton: Button
-    @BindView(R.id.board_panel_select_game)
-    lateinit var mSelectMatchButton: Button
-    @BindView(R.id.match_message)
-    lateinit var mMatchMessageView: View
-    @BindView(R.id.match_message_text)
-    lateinit var mMatchMessageTextView: TextView
-    @BindView(R.id.match_message_icon_1)
-    lateinit var mMatchMessageIcon1: ImageView
-    @BindView(R.id.match_message_icon_2)
-    lateinit var mMatchMessageIcon2: ImageView
+    internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
+    internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
+    internal val mPlayerOneScore by bindView<TextView>(R.id.score_p1)
+    internal val mPlayerTwoScore by bindView<TextView>(R.id.score_p2)
+    internal val mPlayerOneLabel by bindView<TextView>(R.id.p1_label)
+    internal val mPlayerTwoLabel by bindView<TextView>(R.id.p2_label)
+    internal val mBoardPanelView by bindView<View>(R.id.board_panels)
+    internal val mStartNewMatchButton by bindView<Button>(R.id.board_panel_new_game)
+    internal val mSelectMatchButton by bindView<Button>(R.id.board_panel_select_game)
+    internal val mMatchMessageView by bindView<View>(R.id.match_message)
+    internal val mMatchMessageTextView by bindView<TextView>(R.id.match_message_text)
+    internal val mMatchMessageIcon1 by bindView<ImageView>(R.id.match_message_icon_1)
+    internal val mMatchMessageIcon2 by bindView<ImageView>(R.id.match_message_icon_2)
 
     private lateinit var mP1: ReversiPlayer
     private lateinit var mP2: ReversiPlayer
@@ -161,6 +148,7 @@ class MatchFragment : Fragment(),
 
     //endregion
 
+
     private val singlePlayer: Boolean
         get() = !arguments.getBoolean(ARG_MULTI_PLAYER)
 
@@ -204,16 +192,23 @@ class MatchFragment : Fragment(),
         }
     }
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
+            = inflater.inflate(R.layout.match_fragment, container, false)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ButterKnife.bind(this, view)
+        (activity as AppCompatActivity).setSupportActionBar(mToolbar)
+        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        mStartNewMatchButton.setOnClickListener { onStartNewMatchClicked() }
+        mSelectMatchButton.setOnClickListener { onSelectMatchClicked() }
+
+        mPlayerOneScore.text = 0.toString()
+        mPlayerTwoScore.text = 0.toString()
 
         initMatchGrid(mMatchGridView)
         mMatchGridView.visibility = View.GONE
-
-        // Set Action bar
-        (activity as AppCompatActivity).setSupportActionBar(mToolbar)
 
         singlePlayer {
             // Hide select match panel for single player
@@ -239,8 +234,10 @@ class MatchFragment : Fragment(),
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View
-            = inflater.inflate(R.layout.fragment_reversi, container, false)
+    override fun onDestroyView() {
+        ButterKnife.reset(this)
+        super.onDestroyView()
+    }
 
     override fun onStart() {
         super.onStart()
@@ -282,8 +279,7 @@ class MatchFragment : Fragment(),
         super.onStop()
     }
 
-    @OnClick(R.id.board_panel_new_game)
-    internal fun onStartNewMatchClicked() {
+    private fun onStartNewMatchClicked() {
         singlePlayer {
             mBoard.reset()
             displayBoard()
@@ -309,8 +305,7 @@ class MatchFragment : Fragment(),
         }
     }
 
-    @OnClick(R.id.board_panel_select_game)
-    internal fun onSelectMatchClicked() {
+    private fun onSelectMatchClicked() {
         // Button is hidden in single player
         multiPlayer {
             if (!mGoogleApiClient.isConnected) {
@@ -333,11 +328,6 @@ class MatchFragment : Fragment(),
                         .subscribe({ handleSpaceClick(i, j) })
             }
         }
-    }
-
-    private fun showWaitingIndicator(p1: Boolean, p2: Boolean) {
-        mP1WaitingBar.visibility = if (p1) View.VISIBLE else View.GONE
-        mP2WaitingBar.visibility = if (p2) View.VISIBLE else View.GONE
     }
 
     private fun handleSpaceClick(row: Int, col: Int) {
@@ -550,16 +540,10 @@ class MatchFragment : Fragment(),
         mP2.score = p2c
         updateScoreForPlayer(mP1)
         updateScoreForPlayer(mP2)
-
-        if (mCurrentPlayer === mP1) {
-            showWaitingIndicator(false, false)
-        } else {
-            showWaitingIndicator(false, true)
-        }
     }
 
     fun updateScoreForPlayer(p: ReversiPlayer) {
-        (if (p === mP1) mPlayerOneScoreTextView else mPlayerTwoScoreTextView).text = p.score.toString()
+        (if (p === mP1) mPlayerOneScore else mPlayerTwoScore).text = p.score.toString()
     }
 
     fun endMatch() {
@@ -1169,9 +1153,8 @@ class MatchFragment : Fragment(),
     private fun clearBoard() {
         mMatch = null
         mMatchGridView.visibility = View.GONE
-        mPlayerOneScoreTextView.text = ""
-        mPlayerTwoScoreTextView.text = ""
-        showWaitingIndicator(false, false)
+        mPlayerOneScore.text = ""
+        mPlayerTwoScore.text = ""
         mBoardPanelView.visibility = View.VISIBLE
     }
 
@@ -1181,22 +1164,15 @@ class MatchFragment : Fragment(),
 
         if (mMatch!!.status == TurnBasedMatch.MATCH_STATUS_COMPLETE && !mUpdatingMatch) {
             // Add remaining spaces to winning count as per Reversi rules
-            if (mLightPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN)
+            if (mLightPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
                 mLightScore += mBoard.numberOfEmptySpaces
-            else if (mDarkPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN)
+            } else if (mDarkPlayer!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
                 mDarkScore += mBoard.numberOfEmptySpaces
+            }
         }
 
-        mPlayerOneScoreTextView.text = mLightScore.toString()
-        mPlayerTwoScoreTextView.text = mDarkScore.toString()
-
-        // Update turn indicator
-        when (mMatch!!.turnStatus) {
-            TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN -> showWaitingIndicator(false, false)
-            TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN -> showWaitingIndicator(false, true)
-            TurnBasedMatch.MATCH_TURN_STATUS_INVITED -> showWaitingIndicator(false, false)
-            TurnBasedMatch.MATCH_TURN_STATUS_COMPLETE -> showWaitingIndicator(false, false)
-        }
+        mPlayerOneScore.text = mLightScore.toString()
+        mPlayerTwoScore.text = mDarkScore.toString()
     }
 
     private fun checkStatusCode(statusCode: Int): Boolean {
@@ -1583,8 +1559,19 @@ class MatchFragment : Fragment(),
             prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply()
         }
 
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        MenuTintUtils.tintAllIcons(menu, Color.WHITE)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
+            android.R.id.home -> {
+                if (!activity.isFinishing) {
+                    activity.finish()
+                }
+                return true
+            }
             R.id.action_new_match -> {
                 onStartNewMatchClicked()
                 return true

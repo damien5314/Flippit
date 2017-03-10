@@ -1,5 +1,5 @@
 
-import com.ddiehl.android.reversi.utils.Utils
+import com.ddiehl.android.reversi.byteArrayToString
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 
@@ -23,7 +23,7 @@ class StringByteArrayConversionTests {
         val arrayLength = 10
         val byteArray = ByteArray(arrayLength, Int::toByte)
 
-        val string = Utils.byteArrayToString(byteArray)
+        val string = byteArrayToString(byteArray)
 
         assertEquals(arrayLength, string.length)
 

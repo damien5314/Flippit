@@ -10,7 +10,7 @@
 
     <item
         android:id="@+id/action_how_to_play"
-        android:icon="@drawable/ic_help_black_24dp"
+        android:icon="@drawable/ic_help_outline_black_24dp"
         android:title="@string/action_how_to_play"
         app:showAsAction="ifRoom"/>
 

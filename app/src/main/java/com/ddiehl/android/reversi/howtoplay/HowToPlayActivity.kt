@@ -17,7 +17,7 @@ class HowToPlayActivity : AppCompatActivity() {
     private var mMenuPrevious: MenuItem? = null
     private var mMenuNext: MenuItem? = null
 
-    private val FRAGMENT_LAYOUT_ID = intArrayOf(R.layout.activity_howtoplay_p1, R.layout.activity_howtoplay_p2, R.layout.activity_howtoplay_p3, R.layout.activity_howtoplay_p4)
+    private val FRAGMENT_LAYOUT_ID = intArrayOf(R.layout.how_to_play_1, R.layout.how_to_play_2, R.layout.how_to_play_3, R.layout.how_to_play_4)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

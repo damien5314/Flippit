@@ -9,13 +9,12 @@
 
         <TextView
             style="@style/HowToPlayText"
-            android:text="@string/how_to_play_p1"/>
+            android:text="@string/how_to_play_p2"/>
 
         <ImageView
             style="@style/HowToPlayImage"
-            android:src="@drawable/winning_scenario" />
+            android:src="@drawable/possible_moves" />
 
     </LinearLayout>
 
 </ScrollView>
-
