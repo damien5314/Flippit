@@ -5,15 +5,9 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.ddiehl.android.reversi.R
 
-/**
- * Created from tutorial @ http://architects.dzone.com/articles/android-tutorial-using
- */
 class HowToPlayActivity : AppCompatActivity() {
 
     private var mViewPager: ViewPager? = null
@@ -52,9 +46,24 @@ class HowToPlayActivity : AppCompatActivity() {
         })
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.how_to_play, menu)
+        mMenuPrevious = menu.getItem(0)
+        mMenuNext = menu.getItem(1)
+        setMenuItemState(0)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.action_previous -> mViewPager!!.currentItem = mViewPager!!.currentItem - 1
+            R.id.action_next -> mViewPager!!.currentItem = mViewPager!!.currentItem + 1
+        }
+        return true
+    }
+
     private fun setMenuItemState(page: Int) {
         mMenuPrevious!!.isEnabled = page != 0
-
         mMenuNext!!.isEnabled = page != FRAGMENT_LAYOUT_ID.size - 1
     }
 }
@@ -65,11 +74,11 @@ class HowToPlayFragment : Fragment() {
         private val ARG_LAYOUT_ID = "id"
 
         fun newInstance(id: Int): Fragment {
-            val args = Bundle()
-            args.putInt(ARG_LAYOUT_ID, id)
-            val frag = HowToPlayFragment()
-            frag.arguments = args
-            return frag
+            return HowToPlayFragment().apply {
+                arguments = Bundle().apply {
+                    putInt(ARG_LAYOUT_ID, id)
+                }
+            }
         }
     }
 
