@@ -5,31 +5,29 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
+import android.support.v7.widget.Toolbar
 import android.view.*
+import butterknife.bindView
 import com.ddiehl.android.reversi.R
 
 class HowToPlayActivity : AppCompatActivity() {
 
-    private var mViewPager: ViewPager? = null
-    private var mMenuPrevious: MenuItem? = null
-    private var mMenuNext: MenuItem? = null
+    private val mToolbar by bindView<Toolbar>(R.id.toolbar)
+    private val mViewPager by bindView<ViewPager>(R.id.view_pager)
+    private var mPage: Int = 0
 
     private val FRAGMENT_LAYOUT_ID = intArrayOf(
             R.layout.how_to_play_1,
-            R.layout.how_to_play_2,
-            R.layout.how_to_play_3,
-            R.layout.how_to_play_4
+            R.layout.how_to_play_2
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.how_to_play_activity)
 
-        mViewPager = ViewPager(this)
-        mViewPager!!.id = R.id.view_pager
-        setContentView(mViewPager)
+        setSupportActionBar(mToolbar)
 
-        val fm = supportFragmentManager
-        mViewPager!!.adapter = object : FragmentStatePagerAdapter(fm) {
+        mViewPager.adapter = object : FragmentStatePagerAdapter(supportFragmentManager) {
             override fun getItem(position: Int): Fragment {
                 return HowToPlayFragment.newInstance(FRAGMENT_LAYOUT_ID[position])
             }
@@ -39,32 +37,31 @@ class HowToPlayActivity : AppCompatActivity() {
             }
         }
 
-        mViewPager!!.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
-            override fun onPageSelected(i: Int) {
-                setMenuItemState(i)
+        mViewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
+            override fun onPageSelected(position: Int) {
+                mPage = position
+                invalidateOptionsMenu()
             }
         })
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.how_to_play, menu)
-        mMenuPrevious = menu.getItem(0)
-        mMenuNext = menu.getItem(1)
-        setMenuItemState(0)
+        return true
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menu.getItem(0)!!.isEnabled = mPage != 0
+        menu.getItem(1)!!.isEnabled = mPage != FRAGMENT_LAYOUT_ID.size - 1
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_previous -> mViewPager!!.currentItem = mViewPager!!.currentItem - 1
-            R.id.action_next -> mViewPager!!.currentItem = mViewPager!!.currentItem + 1
+            R.id.action_previous -> mViewPager.currentItem = mViewPager.currentItem - 1
+            R.id.action_next -> mViewPager.currentItem = mViewPager.currentItem + 1
         }
         return true
-    }
-
-    private fun setMenuItemState(page: Int) {
-        mMenuPrevious!!.isEnabled = page != 0
-        mMenuNext!!.isEnabled = page != FRAGMENT_LAYOUT_ID.size - 1
     }
 }
 

@@ -67,22 +67,16 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <!--<item name="android:paddingBottom">@dimen/how_to_play_header_padding</item>-->
-        <item name="android:textStyle">bold</item>
+        <!--<item name="android:textStyle">bold</item>-->
         <item name="android:textSize">@dimen/how_to_play_header_size</item>
+        <item name="android:textColor">@color/secondary_text</item>
     </style>
 
     <style name="HowToPlayText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">@dimen/how_to_play_text_size</item>
-    </style>
-
-    <style name="HowToPlayImage">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">@dimen/how_to_play_image_padding</item>
-        <item name="android:paddingBottom">@dimen/how_to_play_image_padding</item>
-        <item name="android:adjustViewBounds">true</item>
+        <item name="android:textColor">@color/primary_text</item>
     </style>
 
     <style name="ProgressDialog" parent="Theme.AppCompat.Dialog">
