@@ -57,6 +57,9 @@ dependencies {
 
     compile "com.jakewharton.rxbinding:rxbinding:$RXBINDING_VERSION"
 
+    // Views
+    compile "me.relex:circleindicator:$CIRCLE_INDICATOR_VERSION"
+
     // Debugging
     compile "com.jakewharton.timber:timber:$TIMBER_VERSION"
 

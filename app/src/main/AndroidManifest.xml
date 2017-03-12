@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ddiehl.android.reversi" >
+          package="com.ddiehl.android.reversi">
 
     <!-- TODO: Try to remove this permission -->
-    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
 
         <activity
             android:name=".launcher.LauncherActivity"
             android:label="@string/activity_launcher_title"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/DarkBG">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
 
@@ -26,31 +27,31 @@
             android:name=".game.SinglePlayerMatchActivity"
             android:label="@string/label_single_player"
             android:screenOrientation="portrait"
-            android:theme="@style/GameBG" />
+            android:theme="@style/GameBG"/>
 
         <activity
             android:name=".game.MultiPlayerMatchActivity"
             android:label="@string/label_multi_player"
             android:screenOrientation="portrait"
-            android:theme="@style/GameBG" />
+            android:theme="@style/GameBG"/>
 
         <activity
             android:name=".settings.SettingsActivity"
             android:label="@string/activity_settings_title"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
 
         <activity
             android:name=".howtoplay.HowToPlayActivity"
             android:label="@string/activity_howToPlay_title"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"/>
 
         <meta-data
             android:name="com.google.android.gms.games.APP_ID"
-            android:value="@string/app_id" />
+            android:value="@string/app_id"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version" />
+            android:value="@integer/google_play_services_version"/>
 
     </application>
 

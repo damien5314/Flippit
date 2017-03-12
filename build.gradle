@@ -39,6 +39,7 @@ subprojects {
         BUTTER_KNIFE_VERSION = "8.5.1"
         CRASHLYTICS_VERSION = "2.5.1"
         TIMBER_VERSION = "4.3.1"
+        CIRCLE_INDICATOR_VERSION = "1.2.2@aar"
         JUNIT_VERSION = "4.12"
         MOCKITO_VERSION = "1.10.19"
         TEST_SUPPORT_LIBRARY_VERSION = "0.5"

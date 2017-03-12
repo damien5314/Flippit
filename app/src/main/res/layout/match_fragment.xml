@@ -1,31 +1,14 @@
 <android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".game.MultiPlayerMatchActivity">
+    tools:context=".game.SinglePlayerMatchActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/transparent"
-            app:elevation="0dp">
-
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:elevation="0dp"
-                app:theme="@style/MatchToolbar"
-                app:titleTextAppearance="@style/MatchToolbarTitle"/>
-
-        </android.support.design.widget.AppBarLayout>
 
         <LinearLayout
             android:id="@+id/score_overlay"
@@ -34,8 +17,7 @@
             android:layout_gravity="center"
             android:baselineAligned="false"
             android:orientation="horizontal"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp">
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="0dp"
