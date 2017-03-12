@@ -6,7 +6,8 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
 import butterknife.bindView
 import com.ddiehl.android.reversi.R
 import me.relex.circleindicator.CircleIndicator
@@ -67,22 +68,4 @@ class HowToPlayActivity : AppCompatActivity() {
         }
         return true
     }
-}
-
-class HowToPlayFragment : Fragment() {
-
-    companion object {
-        private val ARG_LAYOUT_ID = "id"
-
-        fun newInstance(id: Int): Fragment {
-            return HowToPlayFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_LAYOUT_ID, id)
-                }
-            }
-        }
-    }
-
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View?
-            = inflater!!.inflate(arguments.getInt(ARG_LAYOUT_ID), container, false)
 }

@@ -13,7 +13,7 @@ import com.ddiehl.android.reversi.game.SinglePlayerMatchActivity
 
 class LauncherFragment : Fragment() {
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, savedInstanceState: Bundle?): View
+    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, state: Bundle?): View
             = inflater!!.inflate(R.layout.fragment_launcher, container, false)
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
