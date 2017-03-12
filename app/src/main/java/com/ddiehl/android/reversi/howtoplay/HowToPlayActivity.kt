@@ -9,11 +9,13 @@ import android.support.v7.widget.Toolbar
 import android.view.*
 import butterknife.bindView
 import com.ddiehl.android.reversi.R
+import me.relex.circleindicator.CircleIndicator
 
 class HowToPlayActivity : AppCompatActivity() {
 
     private val mToolbar by bindView<Toolbar>(R.id.toolbar)
     private val mViewPager by bindView<ViewPager>(R.id.view_pager)
+    private val mViewPagerIndicator by bindView<CircleIndicator>(R.id.view_pager_indicator)
     private var mPage: Int = 0
 
     private val FRAGMENT_LAYOUT_ID = intArrayOf(
@@ -43,6 +45,8 @@ class HowToPlayActivity : AppCompatActivity() {
                 invalidateOptionsMenu()
             }
         })
+
+        mViewPagerIndicator.setViewPager(mViewPager)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
