@@ -13,8 +13,6 @@ import android.support.annotation.DrawableRes
 import android.support.v4.app.Fragment
 import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.*
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils.loadAnimation
@@ -76,7 +74,6 @@ class MatchFragment : Fragment(),
         }
     }
 
-    internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
     internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
     internal val mPlayerOneScore by bindView<TextView>(R.id.score_p1)
     internal val mPlayerTwoScore by bindView<TextView>(R.id.score_p2)
@@ -197,9 +194,6 @@ class MatchFragment : Fragment(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        (activity as AppCompatActivity).setSupportActionBar(mToolbar)
-        (activity as AppCompatActivity).supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         mStartNewMatchButton.setOnClickListener { onStartNewMatchClicked() }
         mSelectMatchButton.setOnClickListener { onSelectMatchClicked() }
