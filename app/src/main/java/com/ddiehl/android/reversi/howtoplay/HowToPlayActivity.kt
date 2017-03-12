@@ -6,8 +6,6 @@ import android.support.v4.app.FragmentStatePagerAdapter
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
-import android.view.Menu
-import android.view.MenuItem
 import butterknife.bindView
 import com.ddiehl.android.reversi.R
 import me.relex.circleindicator.CircleIndicator
@@ -48,24 +46,5 @@ class HowToPlayActivity : AppCompatActivity() {
         })
 
         mViewPagerIndicator.setViewPager(mViewPager)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.how_to_play, menu)
-        return true
-    }
-
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.getItem(0)!!.isEnabled = mPage != 0
-        menu.getItem(1)!!.isEnabled = mPage != FRAGMENT_LAYOUT_ID.size - 1
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_previous -> mViewPager.currentItem = mViewPager.currentItem - 1
-            R.id.action_next -> mViewPager.currentItem = mViewPager.currentItem + 1
-        }
-        return true
     }
 }
