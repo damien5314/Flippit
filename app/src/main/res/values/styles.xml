@@ -15,6 +15,12 @@
     </style>
 
     <!-- Base application theme. -->
+    <style name="DarkBG" parent="AppTheme">
+        <!-- app background color -->
+        <item name="android:windowBackground">@color/imgur_black</item>
+    </style>
+
+    <!-- Base application theme. -->
     <style name="GameBG" parent="AppTheme">
         <!-- app background color -->
         <item name="android:windowBackground">@color/board_color</item>

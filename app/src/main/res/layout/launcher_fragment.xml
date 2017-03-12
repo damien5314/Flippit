@@ -13,25 +13,29 @@
         android:layout_weight="1"
         android:gravity="center"
         android:text="@string/activity_launcher_title"
-        android:textColor="@color/primary_text"
+        android:textColor="@color/white"
         android:textSize="@dimen/app_title_size"/>
 
     <Button
         android:id="@+id/button_start_1p"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="?attr/selectableItemBackground"
+        android:background="@color/imgur_black_light"
         android:text="@string/button_start_1p"
-        android:textColor="@color/primary_text"
+        android:textColor="@color/white_70"
         android:textSize="22sp"/>
+
+    <android.support.v4.widget.Space
+        android:layout_width="match_parent"
+        android:layout_height="8dp"/>
 
     <Button
         android:id="@+id/button_start_mp"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="?attr/selectableItemBackground"
+        android:background="@color/imgur_black_light"
         android:text="@string/button_start_mp"
-        android:textColor="@color/primary_text"
+        android:textColor="@color/white_70"
         android:textSize="22sp"/>
 
 </LinearLayout>
