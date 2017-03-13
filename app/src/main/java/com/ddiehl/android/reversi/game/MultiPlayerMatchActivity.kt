@@ -1,12 +1,10 @@
 package com.ddiehl.android.reversi.game
 
 import android.app.Activity
-import android.app.Dialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import butterknife.bindView
 import com.ddiehl.android.reversi.R
@@ -49,19 +47,6 @@ class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
 
     internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
 
-    private val mSignInPrompt: Dialog by lazy {
-        AlertDialog.Builder(this)
-                .setTitle(getString(R.string.dialog_sign_in_title))
-                .setMessage(getString(R.string.dialog_sign_in_message))
-                .setPositiveButton(getString(R.string.dialog_sign_in_confirm)) { _, _ ->
-                    connectGoogleApiClient()
-                }
-                .setNegativeButton(getString(R.string.dialog_sign_in_cancel)) { _, _ -> }
-                .create()
-    }
-
-    private val mSignInOnStart = false
-    private val mResolvingError = false
     private val mStartMatchOnStart = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -79,12 +64,6 @@ class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
             fm.beginTransaction()
                     .add(R.id.fragment_container, fragment)
                     .commit()
-        }
-    }
-
-    private fun displaySignInPrompt() {
-        if (!mSignInPrompt.isShowing) {
-            mSignInPrompt.show()
         }
     }
 
