@@ -10,7 +10,7 @@ import butterknife.bindView
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.toast
 import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GooglePlayServicesUtil
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.games.Games
 import com.google.android.gms.games.multiplayer.Multiplayer
@@ -83,7 +83,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
 
     private fun connectGoogleApiClient() {
         // Check if Google Play Services are available
-        val result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
+        val result = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this)
         if (result != ConnectionResult.SUCCESS) {
             showErrorDialog(result)
             return
@@ -164,7 +164,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
 
     /* Creates a dialog for an error message */
     private fun showErrorDialog(errorCode: Int) {
-        val dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_RESOLVE_ERROR)
+        val dialog = GoogleApiAvailability.getInstance().getErrorDialog(this, errorCode, RC_RESOLVE_ERROR)
         dialog.setOnDismissListener { mResolvingConnectionFailure = false }
         dialog.show()
     }
