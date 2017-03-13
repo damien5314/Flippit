@@ -21,7 +21,7 @@ import com.google.example.games.basegameutils.BaseGameActivity
 import com.google.example.games.basegameutils.BaseGameUtils
 import timber.log.Timber
 
-class MultiPlayerMatchActivity : BaseGameActivity(),
+class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     companion object {
@@ -37,7 +37,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     private var mAutoStartSignInFlow = true
     private var mSignInClicked = false
 
-    val mGoogleApiClient: GoogleApiClient by lazy {
+    internal val mGoogleApiClient: GoogleApiClient by lazy {
         GoogleApiClient.Builder(this)
                 .addApi(Games.API).addScope(Games.SCOPE_GAMES)
                 .addConnectionCallbacks(this)
@@ -48,13 +48,6 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     private var mMatchReceived: TurnBasedMatch? = null
 
     internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
-    private val mProgressBar: ProgressDialog by lazy {
-        ProgressDialog(this, R.style.ProgressDialog).apply {
-            setCancelable(true)
-            setProgressStyle(ProgressDialog.STYLE_SPINNER)
-            setMessage(getString(R.string.connecting))
-        }
-    }
 
     private val mSignInPrompt: Dialog by lazy {
         AlertDialog.Builder(this)
@@ -197,11 +190,24 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
         dialog.show()
     }
 
-    private fun showSpinner() {
+
+    //region SpinnerView
+
+    private val mProgressBar: ProgressDialog by lazy {
+        ProgressDialog(this, R.style.ProgressDialog).apply {
+            setCancelable(true)
+            setProgressStyle(ProgressDialog.STYLE_SPINNER)
+            setMessage(getString(R.string.connecting))
+        }
+    }
+
+    override fun showSpinner() {
         mProgressBar.show()
     }
 
-    private fun dismissSpinner() {
+    override fun dismissSpinner() {
         mProgressBar.dismiss()
     }
+
+    //endregion
 }

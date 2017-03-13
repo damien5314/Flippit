@@ -3,6 +3,7 @@ package com.ddiehl.android.reversi.game
 import android.app.Activity
 import android.app.Dialog
 import android.app.ProgressDialog
+import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Color
@@ -114,8 +115,13 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         }
     }
 
-    private lateinit var mGoogleApiClient: GoogleApiClient
+    private val mGoogleApiClient: GoogleApiClient by lazy {
+        (activity as MultiPlayerMatchActivity).mGoogleApiClient
+    }
     private lateinit var mAchievementManager: AchievementManager
+
+    // FIXME: Abstract this to an interface, assign in onAttach
+    private var mActivity: MultiPlayerMatchActivity? = null
 
     private var mMatch: TurnBasedMatch? = null
     private var mPlayer: Participant? = null
@@ -156,6 +162,23 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
     fun getTurnBasedMatch(): TurnBasedMatch?
             = arguments.getParcelable(Multiplayer.EXTRA_TURN_BASED_MATCH)
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        multiPlayer {
+            if (context is MultiPlayerMatchActivity) {
+                mActivity = context
+            } else {
+                throw RuntimeException("Context must be a MultiPlayerMatchActivity")
+            }
+        }
+    }
+
+    override fun onDetach() {
+        mActivity = null
+        super.onDetach()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -172,9 +195,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
             mSignInOnStart = autoConnectPreference
 
             // Initialize Games API client
-            val client = (activity as MultiPlayerMatchActivity).mGoogleApiClient
-            mAchievementManager = AchievementManager.get(client)
-            mGoogleApiClient = client
+            mAchievementManager = AchievementManager.get(mGoogleApiClient)
 
             mMatch = getTurnBasedMatch()
         }
@@ -353,7 +374,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
             }
 
             mUpdatingMatch = true
-            showSpinner()
+            mActivity?.showSpinner()
             mBoard.commitPiece(s, playerColor) // FIXME: requestClaimSpace?
             saveMatchData()
 
@@ -666,7 +687,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
                 showErrorDialog(result)
             } else {
                 autoConnectPreference = true
-                showSpinner()
+                mActivity?.showSpinner()
                 mGoogleApiClient.connect()
             }
         }
@@ -760,7 +781,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
                     .setAutoMatchCriteria(autoMatchCriteria)
                     .build()
 
-            showSpinner()
+            mActivity?.showSpinner()
             Games.TurnBasedMultiplayer.createMatch(mGoogleApiClient, matchConfig)
                     .setResultCallback { processResult(it) }
         } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
@@ -832,7 +853,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
 
     private fun processResult(result: TurnBasedMultiplayer.UpdateMatchResult) {
         mMatch = result.match
-        dismissSpinner()
+        mActivity?.dismissSpinner()
 
         if (checkStatusCode(result.status.statusCode)) {
             updateMatch(mMatch!!)
@@ -861,7 +882,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
 
         mBoard.restoreState(playerData)
         displayBoard()
-        dismissSpinner()
+        mActivity?.dismissSpinner()
 
         // Commit opponent's moves to the deserialized Board object
         // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
@@ -1069,7 +1090,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         }
 
         clearBoard()
-        dismissSpinner()
+        mActivity?.dismissSpinner()
 
         when (statusCode) {
             GamesStatusCodes.STATUS_MULTIPLAYER_ERROR_NOT_TRUSTED_TESTER -> {
@@ -1158,7 +1179,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
     private fun onRematchConfirm() =
             DialogInterface.OnClickListener { _, _ ->
                 if (!mGoogleApiClient.isConnected) {
-                    showSpinner()
+                    mActivity?.showSpinner()
                     Games.TurnBasedMultiplayer.rematch(mGoogleApiClient, mMatch!!.matchId)
                             .setResultCallback { result -> processResult(result) }
                     mMatch = null
@@ -1199,14 +1220,6 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
                 mMatchMessageIcon2.startAnimation(mRightFadeOut)
             }
         }
-    }
-
-    private fun showSpinner() {
-        mProgressBar.show()
-    }
-
-    private fun dismissSpinner() {
-        mProgressBar.dismiss()
     }
 
     private fun showDialog(dialog: Dialog) {
@@ -1383,7 +1396,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
 
     private fun processResultFinishMatch(result: TurnBasedMultiplayer.UpdateMatchResult) {
         mUpdatingMatch = false
-        dismissSpinner()
+        mActivity?.dismissSpinner()
         if (checkStatusCode(result.status.statusCode)) {
             mMatch = result.match
             mPlayer = currentPlayer
