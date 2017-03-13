@@ -493,18 +493,10 @@ class MatchFragment : Fragment(),
             val difficulty = m1PSettings.aiDifficulty
             val move: BoardSpace?
             when (difficulty) {
-                1 -> {
-                    move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
-                }
-                2 -> {
-                    val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
-                    move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
-                }
-                else -> {
-                    move = null
-                }
+                1 -> move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
+                2 -> move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
+                else -> move = null
             }
-
             Observable.just(move)
         }
                 .delay(CPU_TURN_DELAY_MS, TimeUnit.MILLISECONDS)
