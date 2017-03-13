@@ -10,6 +10,7 @@ import android.support.v7.app.AlertDialog
 import android.support.v7.widget.Toolbar
 import butterknife.bindView
 import com.ddiehl.android.reversi.R
+import com.ddiehl.android.reversi.toast
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.common.api.GoogleApiClient
@@ -53,23 +54,15 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
                 .setTitle(getString(R.string.dialog_sign_in_title))
                 .setMessage(getString(R.string.dialog_sign_in_message))
                 .setPositiveButton(getString(R.string.dialog_sign_in_confirm)) { _, _ ->
-//                    setAutoConnectPreference(true)
                     connectGoogleApiClient()
                 }
                 .setNegativeButton(getString(R.string.dialog_sign_in_cancel)) { _, _ -> }
-                .setOnCancelListener { mQueuedAction = null }
                 .create()
     }
 
     private val mSignInOnStart = false
     private val mResolvingError = false
     private val mStartMatchOnStart = false
-
-    private var mQueuedAction: QueuedAction? = null
-
-    private enum class QueuedAction {
-        StartMultiplayer, StartMultiplayerMatch
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -112,11 +105,11 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     }
 
     public override fun onStop() {
-        super.onStop()
-
         if (mGoogleApiClient!!.isConnected) {
             mGoogleApiClient!!.disconnect()
         }
+
+        super.onStop()
     }
 
     private fun connectGoogleApiClient() {
@@ -166,12 +159,9 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     }
 
     override fun onConnected(bundle: Bundle?) {
-        Timber.d("onConnected")
+        toast("Connected to GPGS")
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
-
-//        dismissSpinner()
-//        Toast.makeText(this, "Connected to Google Play", Toast.LENGTH_SHORT).show()
 
         if (bundle != null && bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
             mMatchReceived = bundle.getParcelable<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)

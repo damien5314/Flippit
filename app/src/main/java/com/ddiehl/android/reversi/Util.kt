@@ -1,15 +1,19 @@
 package com.ddiehl.android.reversi
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Handler
 import android.support.annotation.ColorInt
+import android.support.annotation.StringRes
+import android.support.v4.app.Fragment
 import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.Animation
 import android.widget.ImageView
+import android.widget.Toast
 import timber.log.Timber
 
 fun delay(ms: Long, f: () -> Unit) {
@@ -32,6 +36,22 @@ fun Animation.onAnimationEnd(f: () -> Unit) {
                 }
             }
     )
+}
+
+fun Activity.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, message, duration).show()
+}
+
+fun Activity.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, messageResId, duration).show()
+}
+
+fun Fragment.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, message, duration).show()
+}
+
+fun Fragment.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, messageResId, duration).show()
 }
 
 fun displayMetrics(context: Context) {
