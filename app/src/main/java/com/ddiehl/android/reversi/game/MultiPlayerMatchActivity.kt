@@ -37,7 +37,14 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     private var mAutoStartSignInFlow = true
     private var mSignInClicked = false
 
-    private var mGoogleApiClient: GoogleApiClient? = null
+    val mGoogleApiClient: GoogleApiClient by lazy {
+        GoogleApiClient.Builder(this)
+                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build()
+    }
+
     private var mMatchReceived: TurnBasedMatch? = null
 
     internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
@@ -80,16 +87,6 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
                     .add(R.id.fragment_container, fragment)
                     .commit()
         }
-
-        mGoogleApiClient = setupApiClient()
-    }
-
-    private fun setupApiClient(): GoogleApiClient {
-        return GoogleApiClient.Builder(this)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build()
     }
 
     private fun displaySignInPrompt() {
@@ -105,8 +102,8 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     }
 
     public override fun onStop() {
-        if (mGoogleApiClient!!.isConnected) {
-            mGoogleApiClient!!.disconnect()
+        if (mGoogleApiClient.isConnected) {
+            mGoogleApiClient.disconnect()
         }
 
         super.onStop()
@@ -120,7 +117,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
             return
         }
 
-        mGoogleApiClient!!.connect()
+        mGoogleApiClient.connect()
     }
 
     override fun onConnectionFailed(connectionResult: ConnectionResult) {
@@ -160,6 +157,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
 
     override fun onConnected(bundle: Bundle?) {
         toast("Connected to GPGS")
+        dismissSpinner()
         // The player is signed in. Hide the sign-in button and allow the
         // player to proceed.
 
@@ -167,19 +165,9 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
             mMatchReceived = bundle.getParcelable<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
         }
 
-        if (mStartMatchOnStart && mMatchReceived != null || mQueuedAction == QueuedAction.StartMultiplayerMatch) {
-            mQueuedAction = null
-            start(mMatchReceived)
+        if (mStartMatchOnStart && mMatchReceived != null) {
+            // TODO: Start received match
         }
-
-        if (mQueuedAction == QueuedAction.StartMultiplayer) {
-            mQueuedAction = null
-            start(null)
-        }
-    }
-
-    private fun start(match: TurnBasedMatch?) {
-
     }
 
     override fun onConnectionSuspended(i: Int) {
@@ -194,16 +182,11 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
             RC_RESOLVE_ERROR -> {
                 mResolvingConnectionFailure = false
                 if (resultCode == Activity.RESULT_OK) {
-                    if (!mGoogleApiClient!!.isConnecting && !mGoogleApiClient!!.isConnected) {
+                    if (!mGoogleApiClient.isConnecting && !mGoogleApiClient.isConnected) {
                         connectGoogleApiClient()
                     }
                 }
             }
-//            RC_NORMAL, RC_START_MATCH -> {
-//                if (resultCode == SettingsActivity.RESULT_SIGN_OUT) {
-//                    setAutoConnectPreference(false)
-//                }
-//            }
         }
     }
 

@@ -32,6 +32,7 @@ import com.google.android.gms.games.multiplayer.Multiplayer
 import com.google.android.gms.games.multiplayer.Participant
 import com.google.android.gms.games.multiplayer.ParticipantResult
 import com.google.android.gms.games.multiplayer.realtime.RoomConfig
+import com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdateReceivedListener
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer
@@ -45,7 +46,7 @@ import timber.log.Timber
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class MatchFragment : Fragment() {
+class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
 
     companion object {
         // Delay between animations for the waiting message
@@ -131,6 +132,8 @@ class MatchFragment : Fragment() {
     private var mUpdatingMatch = false
     private var mIsSignedIn = false
 
+    private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
+
     //endregion
 
 
@@ -169,7 +172,7 @@ class MatchFragment : Fragment() {
             mSignInOnStart = autoConnectPreference
 
             // Initialize Games API client
-            val client = buildGoogleApiClient()
+            val client = (activity as MultiPlayerMatchActivity).mGoogleApiClient
             mAchievementManager = AchievementManager.get(client)
             mGoogleApiClient = client
 
@@ -276,7 +279,6 @@ class MatchFragment : Fragment() {
 
         multiPlayer {
             if (!mGoogleApiClient.isConnected) {
-                mQueuedAction = QueuedAction.NEW_MATCH
                 displaySignInPrompt()
             } else {
                 val intent: Intent = Games.TurnBasedMultiplayer
@@ -290,7 +292,6 @@ class MatchFragment : Fragment() {
         // Button is hidden in single player
         multiPlayer {
             if (!mGoogleApiClient.isConnected) {
-                mQueuedAction = QueuedAction.SELECT_MATCH
                 displaySignInPrompt()
             } else {
                 val intent = Games.TurnBasedMultiplayer.getInboxIntent(mGoogleApiClient)
@@ -656,16 +657,6 @@ class MatchFragment : Fragment() {
 
     //region Multi Player fragment
 
-    // Create the Google API Client with access to Plus and Games
-    internal fun buildGoogleApiClient(): GoogleApiClient {
-        return GoogleApiClient.Builder(activity)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
-                .addApi(Games.API).addScope(Games.SCOPE_GAMES)
-                .build()
-    }
-
     private fun connectGoogleApiClient() {
         multiPlayer {
             // Check if Google Play Services are available
@@ -681,31 +672,10 @@ class MatchFragment : Fragment() {
         }
     }
 
-    override fun onConnected(bundle: Bundle?) {
-
-        dismissSpinner()
-        mIsSignedIn = true
-
-        if (mSignOutOnConnect) {
-            signOutFromGooglePlay()
-            return
-        }
-
-        registerMatchUpdateListener(true)
-
-        if (mMatch != null) {
-            if (mMatch!!.data == null) {
-                startMatch(mMatch!!)
-            } else {
-                updateMatch(mMatch!!)
-            }
-        }
-    }
-
     private fun registerMatchUpdateListener(shouldRegister: Boolean) {
         Games.TurnBasedMultiplayer.unregisterMatchUpdateListener(mGoogleApiClient)
         if (shouldRegister) {
-            Games.TurnBasedMultiplayer.registerMatchUpdateListener(mGoogleApiClient, this)
+            Games.TurnBasedMultiplayer.registerMatchUpdateListener(mGoogleApiClient, activity as OnTurnBasedMatchUpdateReceivedListener)
         }
     }
 
@@ -1287,7 +1257,6 @@ class MatchFragment : Fragment() {
         }
 
         if (!mGoogleApiClient.isConnected) {
-            mQueuedAction = QueuedAction.FORFEIT_MATCH
             displaySignInPrompt()
             return
         }
@@ -1459,13 +1428,13 @@ class MatchFragment : Fragment() {
         get() = if (mPlayer === mLightPlayer) mLightScore else mDarkScore
 
     private fun showAchievements() {
-        if (mGoogleApiClient.isConnected) {
-            val intent = Games.Achievements.getAchievementsIntent(mGoogleApiClient)
-            startActivityForResult(intent, RC_SHOW_ACHIEVEMENTS)
-        } else {
-            mQueuedAction = QueuedAction.SHOW_ACHIEVEMENTS
+        if (!mGoogleApiClient.isConnected) {
             displaySignInPrompt()
+            return
         }
+
+        val intent = Games.Achievements.getAchievementsIntent(mGoogleApiClient)
+        startActivityForResult(intent, RC_SHOW_ACHIEVEMENTS)
     }
 
     private var autoConnectPreference: Boolean
