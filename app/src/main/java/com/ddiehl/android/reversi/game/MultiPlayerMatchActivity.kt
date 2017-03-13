@@ -7,6 +7,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.Toolbar
+import butterknife.bindView
 import com.ddiehl.android.reversi.R
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
@@ -37,6 +39,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     private var mGoogleApiClient: GoogleApiClient? = null
     private var mMatchReceived: TurnBasedMatch? = null
 
+    internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
     private val mProgressBar: ProgressDialog by lazy {
         ProgressDialog(this, R.style.ProgressDialog).apply {
             setCancelable(true)
@@ -71,6 +74,9 @@ class MultiPlayerMatchActivity : BaseGameActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.match_activity)
+
+        setSupportActionBar(mToolbar)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         val fm = supportFragmentManager
         var fragment: Fragment? = fm.findFragmentById(R.id.fragment_container)
