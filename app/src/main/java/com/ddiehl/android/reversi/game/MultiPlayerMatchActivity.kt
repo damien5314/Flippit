@@ -147,7 +147,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
         connectGoogleApiClient()
     }
 
-    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    public override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
         when (requestCode) {
