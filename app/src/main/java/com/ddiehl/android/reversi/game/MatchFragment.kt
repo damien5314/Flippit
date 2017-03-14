@@ -274,6 +274,8 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
     }
 
     override fun onStop() {
+        dismissMessage()
+
         multiPlayer {
             if (mGoogleApiClient.isConnected) {
                 registerMatchUpdateListener(false)
@@ -451,10 +453,10 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         val fadeOut = loadAnimation(context, R.anim.playermove_fadeout)
         val fadeIn = loadAnimation(context, R.anim.playermove_fadein)
 
-        fadeOut.onAnimationEnd {
+        fadeOut.setListener(onEnd = {
             view.setBackgroundResource(resId)
             view.startAnimation(fadeIn)
-        }
+        })
 
         view.startAnimation(fadeOut)
     }
@@ -1191,35 +1193,38 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
     private fun onRematchCancel() = DialogInterface.OnClickListener { _, _ -> }
 
     private fun initializeWaitingAnimations() {
-        mMatchMessageIcon1.setBackgroundResource(R.drawable.player_icon_p1)
-        mMatchMessageIcon2.setBackgroundResource(R.drawable.player_icon_p2)
+        val icon1 = mMatchMessageIcon1
+        val icon2 = mMatchMessageIcon2
 
-        mRightFadeOut.onAnimationEnd {
+        icon1.setBackgroundResource(R.drawable.player_icon_p1)
+        icon2.setBackgroundResource(R.drawable.player_icon_p2)
+
+        mRightFadeOut.setListener(onEnd = {
             // Flip background resources & start animation
-            mMatchMessageIcon2.setBackgroundResource(
+            icon2.setBackgroundResource(
                     if (mMatchMessageIcon2Color) R.drawable.player_icon_p1
                     else R.drawable.player_icon_p2
             )
             mMatchMessageIcon2Color = !mMatchMessageIcon2Color
-            mMatchMessageIcon2.startAnimation(mRightFadeIn)
-        }
+            icon2.startAnimation(mRightFadeIn)
+        })
 
-        mLeftFadeOut.onAnimationEnd {
+        mLeftFadeOut.setListener(onEnd = {
             // Flip background resources & start animation
-            mMatchMessageIcon1.setBackgroundResource(
+            icon1.setBackgroundResource(
                     if (mMatchMessageIcon1Color) R.drawable.player_icon_p1
                     else R.drawable.player_icon_p2
             )
             mMatchMessageIcon1Color = !mMatchMessageIcon1Color
-            mMatchMessageIcon1.startAnimation(mLeftFadeIn)
-        }
+            icon1.startAnimation(mLeftFadeIn)
+        })
 
-        mLeftFadeIn.onAnimationEnd {
+        mLeftFadeIn.setListener(onEnd = {
             delay(WAITING_MESSAGE_FADE_DELAY_MS) {
-                mMatchMessageIcon1.startAnimation(mLeftFadeOut)
-                mMatchMessageIcon2.startAnimation(mRightFadeOut)
+                icon1.startAnimation(mLeftFadeOut)
+                icon2.startAnimation(mRightFadeOut)
             }
-        }
+        })
     }
 
     private fun showDialog(dialog: Dialog) {

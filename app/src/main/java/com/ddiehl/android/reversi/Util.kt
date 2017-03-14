@@ -25,15 +25,18 @@ fun delay(ms: Long, f: () -> Unit) {
 /**
  * [Animation] extension function to invoke a method after the animation is finished
  */
-fun Animation.onAnimationEnd(f: () -> Unit) {
+fun Animation.setListener(
+        onStart: (() -> Unit)? = null,
+        onEnd: (() -> Unit)? = null,
+        onRepeat: (() -> Unit)? = null
+) {
     setAnimationListener(
             object: Animation.AnimationListener {
-                override fun onAnimationRepeat(animation: Animation?) { }
-                override fun onAnimationStart(animation: Animation?) { }
-
+                override fun onAnimationStart(animation: Animation?) { onStart?.invoke() }
                 override fun onAnimationEnd(animation: Animation?) {
-                    f.invoke()
+                    onEnd?.invoke()
                 }
+                override fun onAnimationRepeat(animation: Animation?) { onRepeat?.invoke() }
             }
     )
 }
