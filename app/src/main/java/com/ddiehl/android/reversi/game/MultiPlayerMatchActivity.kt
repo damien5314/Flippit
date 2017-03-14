@@ -120,7 +120,7 @@ class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
     }
 
     override fun onSignInFailed() {
-        Timber.d("Sign In FAILED: %s", gameHelper.signInError.toString())
+        Timber.d("Sign In FAILED: %s", gameHelper.signInError?.toString())
     }
 
     override fun onSignInSucceeded() {
