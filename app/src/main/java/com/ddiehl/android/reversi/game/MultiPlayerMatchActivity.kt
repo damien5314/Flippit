@@ -176,7 +176,6 @@ class MultiPlayerMatchActivity : BaseGameActivity(), SpinnerView,
         ProgressDialog(this, R.style.ProgressDialog).apply {
             setCancelable(true)
             setProgressStyle(ProgressDialog.STYLE_SPINNER)
-            setMessage(getString(R.string.connecting))
         }
     }
 
