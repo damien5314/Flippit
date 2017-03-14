@@ -37,7 +37,6 @@ import com.google.android.gms.games.multiplayer.turnbased.OnTurnBasedMatchUpdate
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer
-import com.google.android.gms.plus.Plus
 import com.jakewharton.rxbinding.view.RxView
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -71,6 +70,21 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
             }
         }
     }
+
+    /**
+     * TODO
+     * So we discovered BaseGameUtils has its own instance of GoogleApiClient through GameHelper
+     * that is being connected, because our Activity extends from BaseGameActivity.
+     *
+     * BaseGameUtils has a lot of helpful code and implementation that we could leverage if we can
+     * figure out how to migrate to the base class features.
+     *
+     * For the purposes of getting the current changes in this branch merged, it might be a good
+     * idea to revert from extending from BaseGameUtils and get our app back in a stable state.
+     *
+     * Later on we can try to rewrite things to utilize BaseGameUtils functionality, if it might help
+     * the user experience.
+     */
 
     internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
     internal val mPlayerOneScore by bindView<TextView>(R.id.score_p1)
@@ -817,7 +831,6 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         mSignOutOnConnect = false
         autoConnectPreference = false
         if (mGoogleApiClient.isConnected && mIsSignedIn) {
-            Plus.AccountApi.clearDefaultAccount(mGoogleApiClient)
             Games.signOut(mGoogleApiClient)
         }
         mIsSignedIn = false
@@ -1260,11 +1273,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER)
         val isSignedIn = mGoogleApiClient.isConnected
         settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn)
-        val accountName = if (isSignedIn) {
-            Plus.AccountApi.getAccountName(mGoogleApiClient)
-        } else {
-            "" // FIXME: Should just pass in `null` here
-        }
+        val accountName = ""
         settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT, accountName)
         startActivityForResult(settings, RC_SETTINGS)
     }
