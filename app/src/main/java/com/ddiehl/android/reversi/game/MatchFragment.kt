@@ -130,7 +130,7 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
     }
 
     private val mGoogleApiClient: GoogleApiClient by lazy {
-        (activity as MultiPlayerMatchActivity).mGoogleApiClient
+        (activity as MultiPlayerMatchActivity).getGoogleApiClient()
     }
     private lateinit var mAchievementManager: AchievementManager
 
