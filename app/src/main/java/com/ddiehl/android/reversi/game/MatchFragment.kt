@@ -525,10 +525,11 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         while (i.hasNext()) {
             val s = i.next()
             if (s.isOwned) {
-                if (s.color == ReversiColor.LIGHT)
+                if (s.color == ReversiColor.LIGHT) {
                     p1c++
-                else
+                } else {
                     p2c++
+                }
             }
         }
         mP1.score = p1c
