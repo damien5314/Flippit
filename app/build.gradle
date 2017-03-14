@@ -40,6 +40,7 @@ android {
 
 dependencies {
     compile project(':BaseGameUtils')
+    compile project(':logging')
 
     // Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"
@@ -59,9 +60,6 @@ dependencies {
 
     // Views
     compile "me.relex:circleindicator:$CIRCLE_INDICATOR_VERSION"
-
-    // Debugging
-    compile "com.jakewharton.timber:timber:$TIMBER_VERSION"
 
     // Testing
     testCompile "junit:junit:$JUNIT_VERSION"
