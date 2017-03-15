@@ -1,6 +1,6 @@
 package com.ddiehl.android.reversi.game
 
-interface SpinnerView {
+interface MatchView {
     fun showSpinner()
     fun dismissSpinner()
 }
