@@ -1,15 +1,19 @@
 package com.ddiehl.android.reversi
 
+import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Handler
 import android.support.annotation.ColorInt
+import android.support.annotation.StringRes
+import android.support.v4.app.Fragment
 import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
 import android.view.animation.Animation
 import android.widget.ImageView
+import android.widget.Toast
 import timber.log.Timber
 
 fun delay(ms: Long, f: () -> Unit) {
@@ -21,17 +25,34 @@ fun delay(ms: Long, f: () -> Unit) {
 /**
  * [Animation] extension function to invoke a method after the animation is finished
  */
-fun Animation.onAnimationEnd(f: () -> Unit) {
+fun Animation.setListener(
+        onStart: (() -> Unit)? = null,
+        onEnd: (() -> Unit)? = null,
+        onRepeat: (() -> Unit)? = null
+) {
     setAnimationListener(
             object: Animation.AnimationListener {
-                override fun onAnimationRepeat(animation: Animation?) { }
-                override fun onAnimationStart(animation: Animation?) { }
-
-                override fun onAnimationEnd(animation: Animation?) {
-                    f.invoke()
-                }
+                override fun onAnimationStart(animation: Animation?) { onStart?.invoke() }
+                override fun onAnimationEnd(animation: Animation?) { onEnd?.invoke() }
+                override fun onAnimationRepeat(animation: Animation?) { onRepeat?.invoke() }
             }
     )
+}
+
+fun Activity.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, message, duration).show()
+}
+
+fun Activity.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, messageResId, duration).show()
+}
+
+fun Fragment.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, message, duration).show()
+}
+
+fun Fragment.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, messageResId, duration).show()
 }
 
 fun displayMetrics(context: Context) {
