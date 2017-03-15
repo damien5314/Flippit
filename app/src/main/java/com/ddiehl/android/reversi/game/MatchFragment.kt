@@ -71,21 +71,6 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         }
     }
 
-    /**
-     * TODO
-     * So we discovered BaseGameUtils has its own instance of GoogleApiClient through GameHelper
-     * that is being connected, because our Activity extends from BaseGameActivity.
-     *
-     * BaseGameUtils has a lot of helpful code and implementation that we could leverage if we can
-     * figure out how to migrate to the base class features.
-     *
-     * For the purposes of getting the current changes in this branch merged, it might be a good
-     * idea to revert from extending from BaseGameUtils and get our app back in a stable state.
-     *
-     * Later on we can try to rewrite things to utilize BaseGameUtils functionality, if it might help
-     * the user experience.
-     */
-
     internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
     internal val mPlayerOneScore by bindView<TextView>(R.id.score_p1)
     internal val mPlayerTwoScore by bindView<TextView>(R.id.score_p2)
@@ -727,7 +712,9 @@ class MatchFragment : Fragment(), OnTurnBasedMatchUpdateReceivedListener {
         showDialog(dialog)
     }
 
-    fun onSignInConfirm() = DialogInterface.OnClickListener { _, _ -> connectGoogleApiClient() }
+    fun onSignInConfirm() = DialogInterface.OnClickListener { _, _ ->
+        mActivity?.gameHelper?.beginUserInitiatedSignIn()
+    }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
