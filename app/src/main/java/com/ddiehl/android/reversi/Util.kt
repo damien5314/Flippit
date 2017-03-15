@@ -11,6 +11,7 @@ import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.animation.Animation
 import android.widget.ImageView
 import android.widget.Toast
@@ -52,6 +53,14 @@ fun Fragment.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 }
 
 fun Fragment.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, messageResId, duration).show()
+}
+
+fun View.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, message, duration).show()
+}
+
+fun View.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(context, messageResId, duration).show()
 }
 

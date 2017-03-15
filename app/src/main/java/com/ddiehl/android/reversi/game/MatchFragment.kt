@@ -5,24 +5,24 @@ import android.app.Dialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.graphics.Color
 import android.preference.PreferenceManager
 import android.support.annotation.DrawableRes
 import android.support.annotation.LayoutRes
 import android.support.v4.app.ActivityCompat.startActivityForResult
 import android.support.v4.content.ContextCompat
-import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.app.AlertDialog
 import android.util.AttributeSet
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils.loadAnimation
 import android.widget.*
-import butterknife.ButterKnife
 import butterknife.bindView
 import com.ddiehl.android.reversi.*
-import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
-import com.ddiehl.android.reversi.model.*
+import com.ddiehl.android.reversi.model.Board
+import com.ddiehl.android.reversi.model.ReversiColor
+import com.ddiehl.android.reversi.model.ReversiPlayer
 import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GooglePlayServicesUtil
@@ -39,13 +39,9 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatchConfig
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer
 import com.jakewharton.rxbinding.view.RxView
-import rx.Observable
-import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
-import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
 
@@ -78,10 +74,6 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
     internal val mMatchMessageIcon1 by bindView<ImageView>(R.id.match_message_icon_1)
     internal val mMatchMessageIcon2 by bindView<ImageView>(R.id.match_message_icon_2)
 
-    private var mCurrentPlayer: ReversiPlayer? = null
-    private var mPlayerWithFirstTurn: ReversiPlayer? = null
-    private var mMatchInProgress: Boolean = false
-
     private var mDisplayedDialog: Dialog? = null
 
     private val mLeftFadeOut: Animation by lazy { loadAnimation(context, R.anim.waitingmessage_fadeout) }
@@ -91,8 +83,6 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
     private var mMatchMessageIcon1Color = false
     private var mMatchMessageIcon2Color = true
 
-    private val mBoard: Board = Board(8, 8)
-
 
     //region Multi Player fragment fields
 
@@ -101,23 +91,6 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
     }
 
     private var mMatchView: MatchView
-
-    private var mMatch: TurnBasedMatch? = null
-    private var mPlayer: Participant? = null
-    private var mOpponent: Participant? = null
-    private var mLightPlayer: Participant? = null
-    private var mDarkPlayer: Participant? = null
-    private var mMatchData: ByteArray? = null
-    private var mLightScore: Int = 0
-    private var mDarkScore: Int = 0
-
-    private var mSignInOnStart = true
-    private var mSignOutOnConnect = false
-    private var mResolvingError = false
-    private var mUpdatingMatch = false
-    private var mIsSignedIn = false
-
-    private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
 
     //endregion
 
@@ -145,75 +118,29 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
         initMatchGrid(mMatchGridView)
         mMatchGridView.visibility = View.GONE
 
-        singlePlayer {
-            // Hide select match panel for single player
-            mSelectMatchButton.visibility = View.GONE
-
-            // Restore saved state if it exists
-            val savedData = m1PSavedState.board
-            if (savedData != null) {
-                mCurrentPlayer = if (m1PSavedState.currentPlayer) mP1 else mP2
-                mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mP1 else mP2
-                mBoard.restoreState(savedData)
-                updateBoardUi()
-                displayBoard()
-                updateScoreDisplay()
-                mMatchInProgress = true
-            } else {
-                mMatchInProgress = false
-            }
-        }
-
-        multiPlayer {
-            initializeWaitingAnimations()
-        }
+        initializeWaitingAnimations()
     }
 
-    override fun onDestroyView() {
-        ButterKnife.reset(this)
-        super.onDestroyView()
-    }
 
-    override fun onStart() {
-        super.onStart()
-        if (mSignInOnStart) {
-            connectGoogleApiClient()
-        }
-    }
+    //region Public API
 
-    override fun onResume() {
-        super.onResume()
-
-        singlePlayer {
-            mP1.name = m1PSettings.playerName
-            if (mMatchInProgress && mCurrentPlayer!!.isCPU) {
-                executeCpuMove()
+    fun updateBoardUi(board: Board, animate: Boolean = false) {
+        for (i in 0..mMatchGridView.childCount - 1) {
+            val row = mMatchGridView.getChildAt(i) as ViewGroup
+            for (j in 0..row.childCount - 1) {
+                val space = row.getChildAt(j)
+                updateSpace(space, board, i, j, animate)
             }
         }
     }
 
-    override fun onPause() {
-        singlePlayer {
-            if (mMatchInProgress) {
-                m1PSavedState.save(mBoard, mCurrentPlayer!!, mPlayerWithFirstTurn!!)
-            }
-        }
-
-        super.onPause()
+    fun showMatchButtons(newGame: Boolean, selectGame: Boolean) {
+        mSelectMatchButton.visibility = if (newGame) View.VISIBLE else View.GONE
+        mSelectMatchButton.visibility = if (selectGame) View.VISIBLE else View.GONE
     }
 
-    override fun onStop() {
-        dismissMessage()
+    //endregion
 
-        multiPlayer {
-            if (mGoogleApiClient.isConnected) {
-                registerMatchUpdateListener(false)
-                mGoogleApiClient.disconnect()
-            }
-        }
-
-        super.onStop()
-    }
 
     private fun onStartNewMatchClicked() {
         singlePlayer {
@@ -333,16 +260,6 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
         return Action1 { throwable -> toast(throwable.message!!) }
     }
 
-    private fun updateBoardUi(animate: Boolean = false) {
-        for (i in 0..mMatchGridView.childCount - 1) {
-            val row = mMatchGridView.getChildAt(i) as ViewGroup
-            for (j in 0..row.childCount - 1) {
-                val space = row.getChildAt(j)
-                updateSpace(space, mBoard, i, j, animate)
-            }
-        }
-    }
-
     private fun updateSpace(view: View, board: Board, row: Int, col: Int, animate: Boolean) {
         val space = board.spaceAt(row, col)
         if (space.color == null) {
@@ -397,74 +314,6 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
             mPlayerWithFirstTurn = if (mPlayerWithFirstTurn === mP1) mP2 else mP1
         }
         mCurrentPlayer = mPlayerWithFirstTurn
-    }
-
-    fun calculateMatchState() {
-        val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
-
-        // If opponent can make a move, it's his turn
-        if (mBoard.hasMove(opponent.color)) {
-            mCurrentPlayer = opponent
-        }
-        // Opponent has no move, keep turn
-        else if (mBoard.hasMove(mCurrentPlayer!!.color)) {
-            val message = getString(R.string.no_moves, opponent.name)
-            toast(message)
-        }
-        // No moves remaining, end of match
-        else {
-            updateScoreDisplay()
-            endMatch()
-            return
-        }
-
-        updateScoreDisplay()
-
-        // If the current player is CPU, tell it to execute a move
-        if (mCurrentPlayer!!.isCPU) {
-            executeCpuMove()
-        }
-    }
-
-    internal fun executeCpuMove() {
-        Observable.defer {
-            val difficulty = m1PSettings.aiDifficulty
-            val move: BoardSpace?
-            when (difficulty) {
-                1 -> move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
-                2 -> move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
-                else -> move = null
-            }
-            Observable.just(move)
-        }
-                .delay(CPU_TURN_DELAY_MS, TimeUnit.MILLISECONDS)
-                .subscribeOn(Schedulers.computation())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ space ->
-                    mBoard.commitPiece(space!!, mCurrentPlayer!!.color)
-                    updateBoardUi(true)
-                    calculateMatchState()
-                })
-    }
-
-    fun updateScoreDisplay() {
-        var p1c = 0
-        var p2c = 0
-        val i = mBoard.iterator()
-        while (i.hasNext()) {
-            val s = i.next()
-            if (s.isOwned) {
-                if (s.color == ReversiColor.LIGHT) {
-                    p1c++
-                } else {
-                    p2c++
-                }
-            }
-        }
-        mP1.score = p1c
-        mP2.score = p2c
-        updateScoreForPlayer(mP1)
-        updateScoreForPlayer(mP2)
     }
 
     fun updateScoreForPlayer(p: ReversiPlayer) {
@@ -580,30 +429,18 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
     fun showWinningToast(winner: ReversiPlayer?) {
         val text =
                 if (winner == null) {
-                    getString(R.string.winner_none)
+                    context.getString(R.string.winner_none)
                 } else if (winner === mP1) {
-                    getString(R.string.winner_p1)
+                    context.getString(R.string.winner_p1)
                 } else {
-                    getString(R.string.winner_cpu)
+                    context.getString(R.string.winner_cpu)
                 }
-
         toast(text, Toast.LENGTH_LONG)
     }
 
 
     //region Options menu
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-
-        singlePlayer {
-            inflater.inflate(R.menu.single_player, menu)
-        }
-
-        multiPlayer {
-            inflater.inflate(R.menu.multi_player, menu)
-        }
-    }
 
     //endregion
 
@@ -1090,7 +927,7 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
         }
     }
 
-    private fun dismissMessage() {
+    fun dismissMessage() {
         mMatchMessageView.visibility = View.INVISIBLE
         mMatchMessageTextView.text = ""
         mLeftFadeOut.cancel()
@@ -1372,16 +1209,6 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
     private val playerScore: Int
         get() = if (mPlayer === mLightPlayer) mLightScore else mDarkScore
 
-    private fun showAchievements() {
-        if (!mGoogleApiClient.isConnected) {
-            displaySignInPrompt()
-            return
-        }
-
-        val intent = Games.Achievements.getAchievementsIntent(mGoogleApiClient)
-        startActivityForResult(intent, RC_SHOW_ACHIEVEMENTS)
-    }
-
     private var autoConnectPreference: Boolean
         get() = PreferenceManager.getDefaultSharedPreferences(activity).getBoolean(PREF_AUTO_SIGN_IN, false)
         set(b) {
@@ -1389,111 +1216,6 @@ class MatchFragment : FrameLayout, OnTurnBasedMatchUpdateReceivedListener {
             val prefs = PreferenceManager.getDefaultSharedPreferences(activity)
             prefs.edit().putBoolean(PREF_AUTO_SIGN_IN, b).apply()
         }
-
-    override fun onPrepareOptionsMenu(menu: Menu) {
-        super.onPrepareOptionsMenu(menu)
-        MenuTintUtils.tintAllIcons(menu, Color.WHITE)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            android.R.id.home -> {
-                if (!activity.isFinishing) {
-                    activity.finish()
-                }
-                return true
-            }
-            R.id.action_new_match -> {
-                onStartNewMatchClicked()
-                return true
-            }
-            R.id.action_settings -> {
-                val settings = Intent(activity, SettingsActivity::class.java)
-                settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER)
-                startActivity(settings)
-                return true
-            }
-            R.id.action_how_to_play -> {
-                val intent = Intent(activity, HowToPlayActivity::class.java)
-                startActivity(intent)
-                return true
-            }
-        }
-
-        when (item.itemId) {
-            R.id.action_create_match -> {
-                onStartNewMatchClicked()
-                return true
-            }
-            R.id.action_select_match -> {
-                onSelectMatchClicked()
-                return true
-            }
-            R.id.action_how_to_play -> {
-                val intent = Intent(activity, HowToPlayActivity::class.java)
-                startActivity(intent)
-                return true
-            }
-            R.id.action_close_match -> {
-                clearBoard()
-                return true
-            }
-            R.id.action_forfeit_match -> {
-                forfeitMatchSelected()
-                return true
-            }
-            R.id.action_achievements -> {
-                showAchievements()
-                return true
-            }
-            R.id.action_settings -> {
-                settingsSelected()
-                return true
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
-    }
-
-    // Added for testing full end-to-end multiplayer flow
-    private fun autoplayIfEnabled() {
-        if (!mUpdatingMatch && AUTOMATED_MULTIPLAYER
-                && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
-                && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-            delay(500) {
-                val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
-                val bestMove = ComputerAI.getBestMove_d3(mBoard, color)
-                handleSpaceClick(bestMove.y, bestMove.x)
-            }
-        }
-    }
-
-    // Used for converting Board to debugging text
-    private fun bytesToString(bytes: ByteArray?): String {
-        if (bytes == null)
-            return ""
-
-        val buf = StringBuilder()
-
-        buf.append("\n")
-        for (i in 0..63) {
-            buf.append(bytes[i].toString())
-        }
-        buf.append("\n")
-        for (i in 64..99) {
-            buf.append(bytes[i].toString()).append(" ")
-        }
-        buf.append("\n")
-        for (i in 100..163) {
-            buf.append(bytes[i].toString())
-        }
-        buf.append("\n")
-        for (i in 164..199) {
-            buf.append(bytes[i].toString()).append(" ")
-        }
-
-        return buf.toString()
-    }
 
     //endregion
 }

@@ -4,14 +4,21 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.LayoutRes
-import android.support.v7.widget.Toolbar
-import butterknife.bindView
+import android.support.v4.app.ActivityCompat
+import com.ddiehl.android.reversi.AUTOMATED_MULTIPLAYER
 import com.ddiehl.android.reversi.R
+import com.ddiehl.android.reversi.delay
+import com.ddiehl.android.reversi.model.BoardSpace
+import com.ddiehl.android.reversi.model.ComputerAI
+import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.toast
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.games.Games
+import com.google.android.gms.games.multiplayer.Participant
 import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch
 import com.google.example.games.basegameutils.GameHelper
 import timber.log.Timber
+import java.util.*
 
 class MultiPlayerMatchActivity : BaseMatchActivity(),
         MatchView, GameHelper.GameHelperListener {
@@ -33,17 +40,29 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                 .apply { enableDebugLog(true) }
     }
 
+    private var mMatch: TurnBasedMatch? = null
+    private var mPlayer: Participant? = null
+    private var mOpponent: Participant? = null
+    private var mLightPlayer: Participant? = null
+    private var mDarkPlayer: Participant? = null
+    private var mMatchData: ByteArray? = null
+    private var mLightScore: Int = 0
+    private var mDarkScore: Int = 0
+
+    private var mSignInOnStart = true
+    private var mSignOutOnConnect = false
+    private var mResolvingError = false
+    private var mUpdatingMatch = false
+    private var mIsSignedIn = false
+    private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
+
     private var mResolvingConnectionFailure = false
     private var mAutoStartSignInFlow = true
     private var mSignInClicked = false
 
-    fun getGoogleApiClient(): GoogleApiClient = mHelper.apiClient
     private lateinit var mAchievementManager: AchievementManager
 
     private var mMatchReceived: TurnBasedMatch? = null
-
-    internal val mToolbar by bindView<Toolbar>(R.id.toolbar)
-
     private val mStartMatchOnStart = false
 
 
@@ -60,7 +79,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
         // Initialize Games API client
-        mAchievementManager = AchievementManager.get(getGoogleApiClient())
+        mAchievementManager = AchievementManager.get(getApiClient())
     }
 
     override fun onStart() {
@@ -69,6 +88,11 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     override fun onStop() {
+        if (getApiClient().isConnected) {
+            registerMatchUpdateListener(false)
+            getApiClient().disconnect()
+        }
+
         super.onStop()
         mHelper.onStop()
     }
@@ -135,6 +159,15 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     //endregion
 
+    override fun showAchievements() {
+        if (!getApiClient().isConnected) {
+            displaySignInPrompt()
+            return
+        }
+
+        val intent = Games.Achievements.getAchievementsIntent(mGoogleApiClient)
+        ActivityCompat.startActivityForResult(intent, MatchFragment.RC_SHOW_ACHIEVEMENTS)
+    }
 
 //    override fun onConnected(bundle: Bundle?) {
 //        toast("Connected to GPGS")
@@ -170,4 +203,17 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     //endregion
+
+    // For testing full end-to-end multiplayer flow
+    private fun autoplayIfEnabled() {
+        if (!mUpdatingMatch && AUTOMATED_MULTIPLAYER
+                && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
+                && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+            delay(500) {
+                val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
+                val bestMove = ComputerAI.getBestMove_d3(mBoard, color)
+                handleSpaceClick(bestMove.y, bestMove.x)
+            }
+        }
+    }
 }
