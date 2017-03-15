@@ -10,7 +10,7 @@ class Flippit : Application() {
 
         // Set up logging trees
         if (BuildConfig.DEBUG) {
-            Timber.plant(LogcatLoggingTree(LogcatLogger()))
+            Timber.plant(Timber.DebugTree())
         }
     }
 }
