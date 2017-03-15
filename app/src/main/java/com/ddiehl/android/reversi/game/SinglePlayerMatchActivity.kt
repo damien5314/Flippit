@@ -52,8 +52,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
             mCurrentPlayer = if (m1PSavedState.currentPlayer) mP1 else mP2
             mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mP1 else mP2
             mBoard.restoreState(savedData)
-            mMatchFragment.updateBoardUi()
-            mMatchFragment.displayBoard()
+            mMatchFragment.updateBoardUi(mBoard)
+            mMatchFragment.displayBoard(mBoard)
             updateScoreDisplay()
             mMatchInProgress = true
         } else {
@@ -142,8 +142,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
         }
         mP1.score = p1c
         mP2.score = p2c
-        mMatchFragment.updateScoreForPlayer(mP1)
-        mMatchFragment.updateScoreForPlayer(mP2)
+        mMatchFragment.updateScoreForPlayer(mP1.score, null)
+        mMatchFragment.updateScoreForPlayer(null, mP2.score)
     }
 
 
@@ -185,6 +185,27 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
         return Action1 { throwable -> toast(throwable.message!!) }
     }
 
+    override fun endMatch() {
+        if (mP1.score != mP2.score) {
+            val diff = 64 - mP1.score - mP2.score
+
+            if (mP1.score > mP2.score) { // P1 wins
+                mP1.score += diff
+                mMatchFragment.updateScoreForPlayer(mP1.score, null)
+                mMatchFragment.showWinningToast(mP1.color)
+            } else { // P2 wins
+                mP2.score += diff
+                mMatchFragment.updateScoreForPlayer(null, mP2.score)
+                mMatchFragment.showWinningToast(mP2.color)
+            }
+        } else {
+            mMatchFragment.showWinningToast(null)
+        }
+        switchFirstTurn()
+        m1PSavedState.clear()
+        mMatchInProgress = false
+    }
+
     //endregion
 
 
@@ -192,7 +213,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
 
     override fun onStartNewMatchClicked() {
         mBoard.reset()
-        mMatchFragment.displayBoard()
+        mMatchFragment.displayBoard(mBoard)
         switchFirstTurn()
         updateScoreDisplay()
         mMatchInProgress = true
@@ -205,6 +226,15 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
 
     override fun onSelectMatchClicked() {
         // Button is hidden in single player
+    }
+
+    private fun switchFirstTurn() {
+        if (mPlayerWithFirstTurn == null) {
+            mPlayerWithFirstTurn = mP1
+        } else {
+            mPlayerWithFirstTurn = if (mPlayerWithFirstTurn === mP1) mP2 else mP1
+        }
+        mCurrentPlayer = mPlayerWithFirstTurn
     }
 
     override fun clearBoard() {

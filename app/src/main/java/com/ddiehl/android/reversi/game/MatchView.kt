@@ -6,4 +6,5 @@ interface MatchView {
     fun onStartNewMatchClicked()
     fun onSelectMatchClicked()
     fun handleSpaceClick(row: Int, col: Int)
+    fun endMatch()
 }
