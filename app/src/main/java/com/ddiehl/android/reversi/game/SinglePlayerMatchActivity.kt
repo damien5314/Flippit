@@ -10,7 +10,9 @@ import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.model.ReversiPlayer
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
+import rx.functions.Action1
 import rx.schedulers.Schedulers
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
 class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
@@ -144,6 +146,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
         mMatchFragment.updateScoreForPlayer(mP2)
     }
 
+
     //region MatchView
 
     private val mProgressBar: ProgressDialog by lazy {
@@ -159,6 +162,65 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
 
     override fun dismissSpinner() {
         mProgressBar.dismiss()
+    }
+
+    override fun handleSpaceClick(row: Int, col: Int) {
+        Timber.d("Piece clicked @ $row $col")
+        if (mCurrentPlayer!!.isCPU) {
+            // Do nothing, it's a CPU's turn
+        } else {
+            mBoard.requestClaimSpace(row, col, mCurrentPlayer!!.color)
+                    .subscribe(onSpaceClaimed(), onSpaceClaimError())
+        }
+    }
+
+    private fun onSpaceClaimed(): Action1<Boolean> {
+        return Action1 {
+            mMatchFragment.updateBoardUi(mBoard, true)
+            calculateMatchState()
+        }
+    }
+
+    private fun onSpaceClaimError(): Action1<Throwable> {
+        return Action1 { throwable -> toast(throwable.message!!) }
+    }
+
+    //endregion
+
+
+    //region Options menu actions
+
+    override fun onStartNewMatchClicked() {
+        mBoard.reset()
+        mMatchFragment.displayBoard()
+        switchFirstTurn()
+        updateScoreDisplay()
+        mMatchInProgress = true
+
+        // CPU takes first move if it has turn
+        if (mCurrentPlayer!!.isCPU) {
+            executeCpuMove()
+        }
+    }
+
+    override fun onSelectMatchClicked() {
+        // Button is hidden in single player
+    }
+
+    override fun clearBoard() {
+        mMatchFragment.clearBoard()
+    }
+
+    override fun forfeitMatchSelected() {
+        TODO("not implemented")
+    }
+
+    override fun showAchievements() {
+        TODO("not implemented")
+    }
+
+    override fun settingsSelected() {
+        TODO("not implemented")
     }
 
     //endregion
