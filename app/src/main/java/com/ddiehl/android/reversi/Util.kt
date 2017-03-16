@@ -3,6 +3,7 @@ package com.ddiehl.android.reversi
 import android.app.Activity
 import android.content.Context
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.annotation.StringRes
@@ -62,6 +63,22 @@ fun View.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 
 fun View.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(context, messageResId, duration).show()
+}
+
+/**
+ * Execute [f] inly if the current Android SDK version is [version] or newer.
+ * Do nothing otherwise.
+ */
+inline fun doFromSdk(version: Int, f: () -> Unit) {
+    if (Build.VERSION.SDK_INT >= version) f()
+}
+
+/**
+ * Execute [f] only if the current Android SDK version is [version].
+ * Do nothing otherwise.
+ */
+inline fun doIfSdk(version: Int, f: () -> Unit) {
+    if (Build.VERSION.SDK_INT == version) f()
 }
 
 fun displayMetrics(context: Context) {
