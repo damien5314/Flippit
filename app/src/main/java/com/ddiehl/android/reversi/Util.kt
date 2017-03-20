@@ -69,13 +69,20 @@ fun View.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT)
 /**
  * Start an Activity from the passed Context.
  */
-inline fun <reified T> startActivity(context: Context) {
+inline fun <reified T> startActivity(context: Context, vararg extras: Pair<String, Any>) {
     val intent = Intent(context, T::class.java)
+
+    extras.forEach {
+        if (it.second is Int) {
+            intent.putExtra(it.first, it.second as Int)
+        }
+    }
+
     context.startActivity(intent)
 }
 
 /**
- * Execute [f] inly if the current Android SDK version is [version] or newer.
+ * Execute [f] only if the current Android SDK version is [version] or newer.
  * Do nothing otherwise.
  */
 inline fun doFromSdk(version: Int, f: () -> Unit) {
