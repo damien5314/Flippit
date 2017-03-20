@@ -27,7 +27,7 @@ abstract class BaseMatchActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.multi_player, menu)
+        menuInflater.inflate(R.menu.game_menu, menu)
         return true
     }
 
