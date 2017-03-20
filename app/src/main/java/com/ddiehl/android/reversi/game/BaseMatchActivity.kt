@@ -12,6 +12,7 @@ import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
 import com.ddiehl.android.reversi.model.Board
 import com.ddiehl.android.reversi.settings.SettingsActivity
+import com.ddiehl.android.reversi.startActivity
 
 abstract class BaseMatchActivity : AppCompatActivity() {
 
@@ -33,6 +34,25 @@ abstract class BaseMatchActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         MenuTintUtils.tintAllIcons(menu, Color.WHITE)
+
+        menu.findItem(R.id.action_new_match).isVisible = true
+        menu.findItem(R.id.action_how_to_play).isVisible = true
+        menu.findItem(R.id.action_settings).isVisible = true
+
+        if (this is SinglePlayerMatchActivity) {
+            menu.findItem(R.id.action_select_match).isVisible = false
+            menu.findItem(R.id.action_close_match).isVisible = false
+            menu.findItem(R.id.action_forfeit_match).isVisible = false
+            menu.findItem(R.id.action_achievements).isVisible = false
+        }
+
+        if (this is MultiPlayerMatchActivity) {
+            menu.findItem(R.id.action_select_match).isVisible = true
+            menu.findItem(R.id.action_close_match).isVisible = true
+            menu.findItem(R.id.action_forfeit_match).isVisible = true
+            menu.findItem(R.id.action_achievements).isVisible = true
+        }
+
         return true
     }
 
@@ -46,31 +66,21 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 onStartNewMatchClicked()
                 return true
             }
+            R.id.action_how_to_play -> {
+                startActivity<HowToPlayActivity>(this)
+                return true
+            }
             R.id.action_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)
                 intent.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_SINGLE_PLAYER)
                 startActivity(intent)
                 return true
             }
-            R.id.action_how_to_play -> {
-                val intent = Intent(this, HowToPlayActivity::class.java)
-                startActivity(intent)
-                return true
-            }
         }
 
         when (item.itemId) {
-            R.id.action_create_match -> {
-                onStartNewMatchClicked()
-                return true
-            }
             R.id.action_select_match -> {
                 onSelectMatchClicked()
-                return true
-            }
-            R.id.action_how_to_play -> {
-                val intent = Intent(this, HowToPlayActivity::class.java)
-                startActivity(intent)
                 return true
             }
             R.id.action_close_match -> {
@@ -83,10 +93,6 @@ abstract class BaseMatchActivity : AppCompatActivity() {
             }
             R.id.action_achievements -> {
                 showAchievements()
-                return true
-            }
-            R.id.action_settings -> {
-                settingsSelected()
                 return true
             }
         }

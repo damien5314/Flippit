@@ -2,6 +2,7 @@ package com.ddiehl.android.reversi
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Handler
@@ -63,6 +64,14 @@ fun View.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 
 fun View.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(context, messageResId, duration).show()
+}
+
+/**
+ * Start an Activity from the passed Context.
+ */
+inline fun <reified T> startActivity(context: Context) {
+    val intent = Intent(context, T::class.java)
+    context.startActivity(intent)
 }
 
 /**
