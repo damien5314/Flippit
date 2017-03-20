@@ -3,6 +3,7 @@ package com.ddiehl.android.reversi.game
 import android.app.ProgressDialog
 import android.os.Bundle
 import android.support.annotation.LayoutRes
+import android.view.View
 import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ComputerAI
@@ -15,7 +16,7 @@ import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
+class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
     companion object {
         private @LayoutRes val LAYOUT_RES_ID = R.layout.match_activity
@@ -37,6 +38,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
 
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        mMatchFragment.mMatchMessageView.visibility = View.INVISIBLE
 
         mP1 = ReversiPlayer(ReversiColor.LIGHT, getString(R.string.player1_label_default))
         mP2 = ReversiPlayer(ReversiColor.DARK, getString(R.string.player2_label))
@@ -164,7 +167,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
         mProgressBar.dismiss()
     }
 
-    override fun handleSpaceClick(row: Int, col: Int) {
+    override fun onSpaceClick(row: Int, col: Int) {
         Timber.d("Piece clicked @ $row $col")
         if (mCurrentPlayer!!.isCPU) {
             // Do nothing, it's a CPU's turn

@@ -33,7 +33,7 @@ import timber.log.Timber
 import java.util.*
 
 class MultiPlayerMatchActivity : BaseMatchActivity(),
-        MatchView, GameHelper.GameHelperListener, OnTurnBasedMatchUpdateReceivedListener {
+        IMatchView, GameHelper.GameHelperListener, OnTurnBasedMatchUpdateReceivedListener {
 
     companion object {
         private @LayoutRes val LAYOUT_RES_ID = R.layout.match_activity
@@ -268,7 +268,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mProgressBar.dismiss()
     }
 
-    override fun handleSpaceClick(row: Int, col: Int) {
+    override fun onSpaceClick(row: Int, col: Int) {
         Timber.d("Piece clicked @ $row $col")
         if (mUpdatingMatch || !mQueuedMoves.isEmpty()) {
             Timber.d("Error: Still evaluating last move")
@@ -1067,7 +1067,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             delay(500) {
                 val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
                 val bestMove = ComputerAI.getBestMove_d3(mBoard, color)
-                handleSpaceClick(bestMove.y, bestMove.x)
+                onSpaceClick(bestMove.y, bestMove.x)
             }
         }
     }

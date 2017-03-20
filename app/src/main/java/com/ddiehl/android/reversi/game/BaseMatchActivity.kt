@@ -16,7 +16,7 @@ import com.ddiehl.android.reversi.settings.SettingsActivity
 abstract class BaseMatchActivity : AppCompatActivity() {
 
     protected val mToolbar by bindView<Toolbar>(R.id.toolbar)
-    protected val mMatchFragment by bindView<MatchFragment>(R.id.match_fragment)
+    protected val mMatchFragment by bindView<MatchView>(R.id.match_fragment)
 
     protected val mBoard: Board = Board(8, 8)
 
