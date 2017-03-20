@@ -76,9 +76,6 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
-        }
-
-        when (item.itemId) {
             R.id.action_select_match -> {
                 onSelectMatchClicked()
                 return true
