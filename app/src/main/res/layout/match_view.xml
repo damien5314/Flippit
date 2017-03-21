@@ -91,7 +91,6 @@
 
         </LinearLayout>
 
-        <!--android:background="@color/board_color"-->
         <LinearLayout
             android:id="@+id/game_area"
             android:layout_width="match_parent"

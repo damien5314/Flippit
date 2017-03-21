@@ -6,7 +6,7 @@ import com.ddiehl.android.reversi.byteArrayToString
 import rx.Observable
 import rx.functions.Func0
 
-class Board(val height: Int, val width: Int) {
+class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
 
     data class MoveDirection(val dx: Int, val dy: Int)
 
@@ -29,8 +29,8 @@ class Board(val height: Int, val width: Int) {
 
     fun restoreState(saved: String) {
         var index = 0
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
+        for (y in 0 until height) {
+            for (x in 0 until width) {
                 val c = saved[index++]
 
                 when (c) {
@@ -51,7 +51,7 @@ class Board(val height: Int, val width: Int) {
 
     fun reset() {
         // Set the color of each space to null first
-        iterator().forEach { space -> space.color = null }
+        forEach { space -> space.color = null }
 
         // Then set the center 4 spaces to the starting configuration
         spaces[3][3].color = ReversiColor.LIGHT
@@ -62,8 +62,8 @@ class Board(val height: Int, val width: Int) {
 
     fun copy(): Board {
         val copy = Board(height, width)
-        for (y in 0..height - 1) {
-            for (x in 0..width - 1) {
+        for (y in 0 until height) {
+            for (x in 0 until width) {
                 copy.spaces[y][x] = spaces[y][x].copy()
             }
         }
@@ -71,7 +71,7 @@ class Board(val height: Int, val width: Int) {
     }
 
     fun hasMove(color: ReversiColor): Boolean {
-        for (space in iterator()) {
+        forEach { space ->
             MOVE_DIRECTIONS
                     .filter { !space.isOwned }
                     .filter { (dx, dy) -> isWithinBounds(space.x + dx, space.y + dy) }
@@ -166,24 +166,18 @@ class Board(val height: Int, val width: Int) {
         }
     }
 
-    fun getNumSpacesForColor(c: ReversiColor) =
-            iterator().asSequence().count { space ->
-                space.isOwned && space.color == c
-            }
+    fun getNumSpacesForColor(color: ReversiColor) = count { it.isOwned && it.color == color }
 
     val numberOfEmptySpaces: Int
-        get() = iterator().asSequence().count { space -> !space.isOwned }
+        get() = count { !it.isOwned }
 
     fun serialize(): ByteArray {
         val out = ByteArray(64)
-        var index = 0
-        for (space in iterator()) {
-            if (!space.isOwned) {
-                out[index++] = 0
-            } else if (space.color == ReversiColor.LIGHT) {
-                out[index++] = 1
-            } else {
-                out[index++] = 2
+        forEachIndexed { index, space ->
+            when {
+                !space.isOwned -> out[index] = 0
+                space.color == ReversiColor.LIGHT -> out[index] = 1
+                else -> out[index] = 2
             }
         }
         return out
@@ -201,15 +195,13 @@ class Board(val height: Int, val width: Int) {
         return spaces[row][col]
     }
 
-    fun iterator(): BoardIterator {
-        return BoardIterator(this)
-    }
+    override fun iterator(): Iterator<BoardSpace> = BoardIterator(this)
 
     override fun toString(): String {
         val sb = StringBuilder()
         sb.append("\n")
-        for (row in 0..height - 1) {
-            (0..width - 1)
+        for (row in 0 until height) {
+            (0 until width)
                     .map { col -> getSpaceAt(col, row) }
                     .forEach {
                         if (!it.isOwned)

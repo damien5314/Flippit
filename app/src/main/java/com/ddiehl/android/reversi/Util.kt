@@ -2,7 +2,9 @@ package com.ddiehl.android.reversi
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Handler
 import android.support.annotation.ColorInt
 import android.support.annotation.StringRes
@@ -11,6 +13,7 @@ import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.DisplayMetrics
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.animation.Animation
 import android.widget.ImageView
 import android.widget.Toast
@@ -53,6 +56,45 @@ fun Fragment.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
 
 fun Fragment.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(context, messageResId, duration).show()
+}
+
+fun View.toast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, message, duration).show()
+}
+
+fun View.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(context, messageResId, duration).show()
+}
+
+/**
+ * Start an Activity from the passed Context.
+ */
+inline fun <reified T> startActivity(context: Context, vararg extras: Pair<String, Any>) {
+    val intent = Intent(context, T::class.java)
+
+    extras.forEach {
+        if (it.second is Int) {
+            intent.putExtra(it.first, it.second as Int)
+        }
+    }
+
+    context.startActivity(intent)
+}
+
+/**
+ * Execute [f] only if the current Android SDK version is [version] or newer.
+ * Do nothing otherwise.
+ */
+inline fun doFromSdk(version: Int, f: () -> Unit) {
+    if (Build.VERSION.SDK_INT >= version) f()
+}
+
+/**
+ * Execute [f] only if the current Android SDK version is [version].
+ * Do nothing otherwise.
+ */
+inline fun doIfSdk(version: Int, f: () -> Unit) {
+    if (Build.VERSION.SDK_INT == version) f()
 }
 
 fun displayMetrics(context: Context) {
@@ -121,7 +163,7 @@ fun byteArrayToString(array: ByteArray): String {
 object MenuTintUtils {
 
     fun tintAllIcons(menu: Menu, @ColorInt color: Int) {
-        for (i in 0..menu.size() - 1) {
+        for (i in 0 until menu.size()) {
             val item = menu.getItem(i)
             tintMenuItemIcon(color, item)
             tintShareIconIfPresent(color, item)

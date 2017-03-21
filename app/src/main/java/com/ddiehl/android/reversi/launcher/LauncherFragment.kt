@@ -1,6 +1,5 @@
 package com.ddiehl.android.reversi.launcher
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
@@ -10,6 +9,7 @@ import butterknife.ButterKnife
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.game.MultiPlayerMatchActivity
 import com.ddiehl.android.reversi.game.SinglePlayerMatchActivity
+import com.ddiehl.android.reversi.startActivity
 
 class LauncherFragment : Fragment() {
 
@@ -32,12 +32,10 @@ class LauncherFragment : Fragment() {
     }
 
     private fun onSinglePlayerClicked() {
-        val intent = Intent(activity, SinglePlayerMatchActivity::class.java)
-        startActivity(intent)
+        startActivity<SinglePlayerMatchActivity>(context)
     }
 
     private fun onMultiPlayerClicked() {
-        val intent = Intent(activity, MultiPlayerMatchActivity::class.java)
-        startActivity(intent)
+        startActivity<MultiPlayerMatchActivity>(context)
     }
 }

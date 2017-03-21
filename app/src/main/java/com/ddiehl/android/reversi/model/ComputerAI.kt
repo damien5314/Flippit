@@ -22,10 +22,7 @@ object ComputerAI {
         var best: BoardSpace? = null
         var bestValue = 0
 
-        val iterator = board.iterator()
-
-        while (iterator.hasNext()) {
-            val space = iterator.next()
+        board.forEach { space ->
             if (!space.isOwned) {
                 val value = board.spacesCapturedWithMove(space, player.color)
                 if (value > bestValue) {
@@ -42,12 +39,11 @@ object ComputerAI {
      * Finds the space on the board which would result in a board configuration leaving the
      * opposing player with the least choices.
      */
-    fun getBestMove_d2(board: Board, color: ReversiColor): BoardSpace {
+    fun getBestMove_d2(board: Board, color: ReversiColor): BoardSpace? {
         var best: BoardSpace? = null
         var bestVal = 999
-        val i = board.iterator()
-        while (i.hasNext()) {
-            val space = i.next()
+
+        board.forEach { space ->
             if (!space.isOwned) {
                 if (board.spacesCapturedWithMove(space, color) > 0) {
                     // Copy board to identical object
@@ -64,67 +60,59 @@ object ComputerAI {
             }
         }
 
-        return best!!
+        return best
     }
 
     /**
      * Finds space which maximizes space value * number of spaces obtained
      */
-    fun getBestMove_d3(board: Board, color: ReversiColor): BoardSpace {
+    fun getBestMove_d3(board: Board, color: ReversiColor): BoardSpace? {
         val moveValues = HashMap<BoardSpace, Int>()
 
         val spaceValueWeight = 1
         val spacesCapturedWeight = 0 // Not factoring in captured spaces at the moment
 
-        for (space in board.iterator()) {
-            if (!space.isOwned) {
-                if (board.spacesCapturedWithMove(space, color) > 0) {
-                    val moveValue: Int
-                    // Copy board to identical object
-                    val copy = board.copy()
-                    // Play move on copied board object
-                    copy.commitPiece(copy.getSpaceAt(space.x, space.y), color)
-                    val movesOpenedForOpponent = getPossibleMoves(copy, color.opposite())
-                    if (movesOpenedForOpponent == 0) {
-                        moveValue = 999
-                    } else {
-                        moveValue =
-                                getSpaceValue(space) * spaceValueWeight +
-                                        board.spacesCapturedWithMove(space, color) * spacesCapturedWeight
-                    }
-                    moveValues.put(space, moveValue)
+        board.forEach { space ->
+            if (board.spacesCapturedWithMove(space, color) > 0) {
+                val moveValue: Int
+                // Copy board to identical object
+                val copy = board.copy()
+                // Play move on copied board object
+                copy.commitPiece(copy.getSpaceAt(space.x, space.y), color)
+                val movesOpenedForOpponent = getPossibleMoves(copy, color.opposite())
+                if (movesOpenedForOpponent == 0) {
+                    moveValue = 999
+                } else {
+                    moveValue =
+                            getSpaceValue(space) * spaceValueWeight +
+                                    board.spacesCapturedWithMove(space, color) * spacesCapturedWeight
                 }
+                moveValues.put(space, moveValue)
             }
         }
 
         // Add all of the moves with the best value to a HashSet
         var bestValue = Integer.MIN_VALUE
         val bestMoves = HashSet<BoardSpace>()
-        for (s in moveValues.keys) {
-            val value = moveValues[s]
+        for (space in moveValues.keys) {
+            val value = moveValues[space]
             if (value!! > bestValue) {
                 bestValue = value
                 bestMoves.clear()
-                bestMoves.add(s)
+                bestMoves.add(space)
             } else if (value == bestValue) {
-                bestMoves.add(s)
+                bestMoves.add(space)
             }
         }
 
         // Select a move out of the spaces with the best calculated value
-        return bestMoves.maxBy { getSpaceValue(it) }!!
+        return bestMoves.maxBy { getSpaceValue(it) }
     }
 
     private fun getPossibleMoves(board: Board, color: ReversiColor): Int {
-        var possible = 0
-
-        for (space in board.iterator()) {
-            if (!space.isOwned) {
-                if (board.spacesCapturedWithMove(space, color) > 0) possible++
-            }
+        return board.count { space ->
+            !space.isOwned && board.spacesCapturedWithMove(space, color) > 0
         }
-
-        return possible
     }
 
     private fun getSpaceValue(s: BoardSpace): Int {
