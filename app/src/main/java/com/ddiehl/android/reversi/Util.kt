@@ -163,7 +163,7 @@ fun byteArrayToString(array: ByteArray): String {
 object MenuTintUtils {
 
     fun tintAllIcons(menu: Menu, @ColorInt color: Int) {
-        for (i in 0..menu.size() - 1) {
+        for (i in 0 until menu.size()) {
             val item = menu.getItem(i)
             tintMenuItemIcon(color, item)
             tintShareIconIfPresent(color, item)

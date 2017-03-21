@@ -1019,7 +1019,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             // Copy the serialized Board into the appropriate place in match data
             System.arraycopy(playerBoard, 0, mMatchData!!, startIndex, playerBoard.size)
             // Clear out the first 16 nodes following, which were the other player's previous moves
-            for (clearIndex in startIndex + 64..startIndex + 64 + 16 - 1)
+            for (clearIndex in startIndex + 64 until startIndex + 64 + 16)
                 mMatchData!![clearIndex] = 0
         }
     }
@@ -1067,7 +1067,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             delay(500) {
                 val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
                 val bestMove = ComputerAI.getBestMove_d3(mBoard, color)
-                onSpaceClick(bestMove.y, bestMove.x)
+                if (bestMove != null) {
+                    onSpaceClick(bestMove.y, bestMove.x)
+                }
             }
         }
     }

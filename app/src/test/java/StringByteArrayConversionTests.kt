@@ -13,7 +13,7 @@ class StringByteArrayConversionTests {
 
         assertEquals(10, byteArray.size)
 
-        for (i in string.indices) {
+        byteArray.indices.forEach { i ->
             assertEquals(string[i], byteArray[i].toChar())
         }
     }
@@ -27,7 +27,7 @@ class StringByteArrayConversionTests {
 
         assertEquals(arrayLength, string.length)
 
-        for (i in byteArray.indices) {
+        byteArray.indices.forEach { i ->
             assertEquals(byteArray[i], string[i].toString().toByte())
         }
     }

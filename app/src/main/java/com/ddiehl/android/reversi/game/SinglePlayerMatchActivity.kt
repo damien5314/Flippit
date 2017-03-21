@@ -130,21 +130,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     }
 
     fun updateScoreDisplay() {
-        var p1c = 0
-        var p2c = 0
-
-        mBoard.iterator().forEach { space ->
-            if (space.isOwned) {
-                if (space.color == ReversiColor.LIGHT) {
-                    p1c++
-                } else {
-                    p2c++
-                }
-            }
-        }
-
-        mP1.score = p1c
-        mP2.score = p2c
+        mP1.score = mBoard.count { it.isOwned && it.color == ReversiColor.LIGHT }
+        mP2.score = mBoard.count { it.isOwned && it.color == ReversiColor.DARK }
         mMatchFragment.updateScoreForPlayer(mP1.score, null)
         mMatchFragment.updateScoreForPlayer(null, mP2.score)
     }

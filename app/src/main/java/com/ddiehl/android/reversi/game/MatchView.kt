@@ -88,9 +88,9 @@ class MatchView : FrameLayout {
     //region Public API
 
     fun updateBoardUi(board: Board, animate: Boolean = false) {
-        for (i in 0..mMatchGridView.childCount - 1) {
+        for (i in 0 until mMatchGridView.childCount) {
             val row = mMatchGridView.getChildAt(i) as ViewGroup
-            for (j in 0..row.childCount - 1) {
+            for (j in 0 until row.childCount) {
                 val space = row.getChildAt(j)
                 updateSpace(space, board, i, j, animate)
             }
@@ -111,9 +111,9 @@ class MatchView : FrameLayout {
 
 
     private fun initMatchGrid(grid: ViewGroup) {
-        for (i in 0..grid.childCount - 1) {
+        for (i in 0 until grid.childCount) {
             val row = grid.getChildAt(i) as ViewGroup
-            for (j in 0..row.childCount - 1) {
+            for (j in 0 until row.childCount) {
                 val space = row.getChildAt(j)
 
                 RxView.clicks(space)

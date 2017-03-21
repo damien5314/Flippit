@@ -55,7 +55,7 @@ class SettingsFragment : PreferenceFragment(), SharedPreferences.OnSharedPrefere
 
     private fun initSummary(p: Preference) {
         if (p is PreferenceGroup) {
-            for (i in 0..p.preferenceCount - 1) {
+            for (i in 0 until p.preferenceCount) {
                 initSummary(p.getPreference(i))
             }
         } else {
