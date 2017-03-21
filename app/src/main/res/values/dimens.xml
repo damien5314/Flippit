@@ -26,4 +26,14 @@
     <dimen name="how_to_play_image_padding">6dp</dimen>
     <dimen name="player_label_text_size">16sp</dimen>
 
+    <dimen name="settings_group_border_size">1dp</dimen>
+    <dimen name="settings_item_height">72dp</dimen>
+    <dimen name="settings_item_margin">16dp</dimen>
+    <dimen name="settings_item_divider_padding">16dp</dimen>
+
+    <dimen name="user_settings_primary_text_size">16sp</dimen>
+    <dimen name="user_settings_button_text_size">@dimen/user_settings_primary_text_size</dimen>
+    <dimen name="user_settings_actionbar_size">40dp</dimen>
+    <dimen name="user_settings_actionbar_icon_size">24dp</dimen>
+
 </resources>

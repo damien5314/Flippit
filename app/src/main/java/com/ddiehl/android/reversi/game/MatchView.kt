@@ -57,21 +57,20 @@ class MatchView : FrameLayout {
     // Activity implements this
     private var mMatchView: IMatchView
 
-    constructor(context: Context?) : this(context, null)
+    constructor(context: Context) : this(context, null)
 
-    constructor(context: Context?, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
 
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr) {
         init(context, attrs, defStyleAttr)
         mMatchView = context as IMatchView
     }
 
-    private fun init(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) {
+    private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
         LayoutInflater.from(context)
                 .inflate(LAYOUT_RES_ID, this, true)
 
-        // FIXME NPE?
         mStartNewMatchButton.setOnClickListener { mMatchView.onStartNewMatchClicked() }
         mSelectMatchButton.setOnClickListener { mMatchView.onSelectMatchClicked() }
 

@@ -27,4 +27,27 @@
     <color name="link_blue">#4E76C9</color>
     <color name="hover_gold">#C29F37</color>
 
+    <!-- Grays -->
+    <color name="gray20">#2d3639</color>
+    <!-- default type color -->
+    <color name="gray30">#455358</color>
+    <color name="gray60">#97a5aa</color>
+    <!-- default disabled color -->
+    <color name="gray70">#c0cace</color>
+    <color name="gray80">#dadee0</color>
+    <color name="gray90">#f0f0f0</color>
+
+    <color name="lighter_quiz">#C7D7EC</color>
+    <color name="lightest_quiz">#E8F0FA</color>
+    <color name="frost">#C1CCD2</color>
+    <color name="light_frost">#D9DFE2</color>
+    <color name="lighter_frost">#F2F5F7</color>
+
+    <color name="list_card_border_normal">@color/gray80</color>
+    <color name="list_card_border_focused">@color/hover_gold</color>
+    <color name="user_settings_item_divider">@color/light_frost</color>
+    <color name="user_settings_profile_image_border_color">@color/frost</color>
+    <color name="user_settings_profile_image_divider">@color/lightest_quiz</color>
+    <color name="user_settings_change_profile_image_icon_tint">@color/primary</color>
+
 </resources>
