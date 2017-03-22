@@ -11,10 +11,6 @@ import com.ddiehl.android.reversi.R
 class SettingsActivity : AppCompatActivity() {
 
     companion object {
-        val EXTRA_SETTINGS_MODE = "settings_mode"
-        val EXTRA_IS_SIGNED_IN = "is_signed_in"
-        val EXTRA_SIGNED_IN_ACCOUNT = "signed_in_account"
-
         val SETTINGS_MODE_SINGLE_PLAYER = 101
         val SETTINGS_MODE_MULTI_PLAYER = 102
         val RESULT_SIGN_IN = 201
@@ -22,16 +18,26 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     val mToolbar by bindView<Toolbar>(R.id.toolbar)
+    val mSettingsView by bindView<SettingsView>(R.id.settings_view)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.settings_activity)
+        window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.gray90))
 
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-
         setTitle(R.string.settings)
-        window.decorView.setBackgroundColor(ContextCompat.getColor(this, R.color.gray90))
+    }
+
+    override fun onStart() {
+        super.onStart()
+        bindUi()
+    }
+
+    private fun bindUi() {
+        val singlePlayerSettings = SinglePlayerSettings(this)
+        mSettingsView.bindSettings(singlePlayerSettings)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

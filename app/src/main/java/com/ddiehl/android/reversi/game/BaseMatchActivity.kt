@@ -11,8 +11,6 @@ import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
 import com.ddiehl.android.reversi.model.Board
 import com.ddiehl.android.reversi.settings.SettingsActivity
-import com.ddiehl.android.reversi.settings.SettingsActivity.Companion.EXTRA_SETTINGS_MODE
-import com.ddiehl.android.reversi.settings.SettingsActivity.Companion.SETTINGS_MODE_SINGLE_PLAYER
 import com.ddiehl.android.reversi.startActivity
 
 abstract class BaseMatchActivity : AppCompatActivity() {
@@ -72,7 +70,7 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_settings -> {
-                startActivity<SettingsActivity>(this, Pair(EXTRA_SETTINGS_MODE, SETTINGS_MODE_SINGLE_PLAYER))
+                startActivity<SettingsActivity>(this)
                 return true
             }
             R.id.action_select_match -> {

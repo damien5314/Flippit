@@ -9,6 +9,7 @@ import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ComputerAI
 import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.model.ReversiPlayer
+import com.ddiehl.android.reversi.settings.SinglePlayerSettings
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -86,8 +87,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
             val difficulty = m1PSettings.aiDifficulty
             val move: BoardSpace?
             when (difficulty) {
-                1 -> move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
-                2 -> move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
+                AiDifficulty.EASY -> move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
+                AiDifficulty.HARD -> move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
                 else -> move = null
             }
             Observable.just(move)

@@ -6,6 +6,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
+import android.widget.TextView
+import butterknife.bindView
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.getString
 
@@ -14,6 +16,8 @@ class SettingsView : FrameLayout {
     companion object {
         private val LAYOUT_RES_ID = R.layout.settings_view
     }
+
+    val mDifficultyValueText by bindView<TextView>(R.id.settings_difficulty_value)
 
     constructor(context: Context) : this(context, null)
 
@@ -27,6 +31,10 @@ class SettingsView : FrameLayout {
     private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
         LayoutInflater.from(context)
                 .inflate(LAYOUT_RES_ID, this, true)
+    }
+
+    fun bindSettings(singlePlayerSettings: SinglePlayerSettings) {
+        mDifficultyValueText.setText(singlePlayerSettings.aiDifficulty.nameResId)
     }
 
     private fun showDialogForSignOut() {

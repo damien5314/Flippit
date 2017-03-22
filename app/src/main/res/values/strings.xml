@@ -47,6 +47,8 @@
     <string name="settings_dialog_sign_out_confirm">Sign Out</string>
     <string name="settings_dialog_sign_out_cancel">Cancel</string>
     <string name="sign_out_confirmation">Signed out from Google Play</string>
+    <string name="ai_difficulty_easy">Easy</string>
+    <string name="ai_difficulty_hard">Hard</string>
 
     <string name="winner_you">You win</string>
     <string name="winner_light">Light wins</string>

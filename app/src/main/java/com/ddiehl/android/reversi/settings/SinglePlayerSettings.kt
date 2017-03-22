@@ -1,8 +1,9 @@
-package com.ddiehl.android.reversi.game
+package com.ddiehl.android.reversi.settings
 
 import android.content.Context
 import android.content.SharedPreferences
 import com.ddiehl.android.reversi.R
+import com.ddiehl.android.reversi.game.AiDifficulty
 
 class SinglePlayerSettings(context: Context) {
 
@@ -20,8 +21,10 @@ class SinglePlayerSettings(context: Context) {
         get() = prefs.getString(PREF_PLAYER_NAME, context.getString(R.string.player1_label_default))
         set(value) = prefs.edit().putString(PREF_PLAYER_NAME, value).apply()
 
-
-    var aiDifficulty: Int
-        get() = prefs.getInt(PREF_AI_DIFFICULTY, 1)
-        set(value) = prefs.edit().putInt(PREF_AI_DIFFICULTY, value).apply()
+    var aiDifficulty: AiDifficulty
+        get() {
+            val pref = prefs.getInt(SinglePlayerSettings.PREF_AI_DIFFICULTY, AiDifficulty.EASY.value)
+            return AiDifficulty.valueOf(pref)
+        }
+        set(value) = prefs.edit().putInt(PREF_AI_DIFFICULTY, value.value).apply()
 }

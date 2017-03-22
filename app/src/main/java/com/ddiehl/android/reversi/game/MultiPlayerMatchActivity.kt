@@ -473,11 +473,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     override fun settingsSelected() {
         val settings = Intent(this, SettingsActivity::class.java)
-        settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER)
-        val isSignedIn = getApiClient().isConnected
-        settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn)
-        val accountName = ""
-        settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT, accountName)
         startActivityForResult(settings, RC_SETTINGS)
     }
 
