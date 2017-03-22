@@ -2,8 +2,8 @@
 <resources>
 
     <string-array name="pref_ai_difficulty_entries">
-        <item name="pref_ai_difficulty_easy">@string/pref_ai_difficulty_easy</item>
-        <item name="pref_ai_difficulty_hard">@string/pref_ai_difficulty_hard</item>
+        <item name="pref_ai_difficulty_easy">@string/ai_difficulty_easy</item>
+        <item name="pref_ai_difficulty_hard">@string/ai_difficulty_hard</item>
     </string-array>
 
     <integer-array name="pref_ai_difficulty_values">

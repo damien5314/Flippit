@@ -5,10 +5,12 @@ import android.app.AlertDialog
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import butterknife.bindView
 import com.ddiehl.android.reversi.R
+import com.ddiehl.android.reversi.game.AiDifficulty
 import com.ddiehl.android.reversi.getString
 
 class SettingsView : FrameLayout {
@@ -17,6 +19,7 @@ class SettingsView : FrameLayout {
         private val LAYOUT_RES_ID = R.layout.settings_view
     }
 
+    val mDifficultySettingLayout by bindView<ViewGroup>(R.id.settings_difficulty)
     val mDifficultyValueText by bindView<TextView>(R.id.settings_difficulty_value)
 
     constructor(context: Context) : this(context, null)
@@ -35,6 +38,30 @@ class SettingsView : FrameLayout {
 
     fun bindSettings(singlePlayerSettings: SinglePlayerSettings) {
         mDifficultyValueText.setText(singlePlayerSettings.aiDifficulty.nameResId)
+        mDifficultySettingLayout.setOnClickListener {
+            showDifficultySettingDialog(singlePlayerSettings)
+        }
+    }
+
+    private fun showDifficultySettingDialog(settings: SinglePlayerSettings) {
+        val entries = context.resources.getStringArray(R.array.pref_ai_difficulty_entries)
+        val values = context.resources.getIntArray(R.array.pref_ai_difficulty_values)
+        val selected = values.indexOfFirst { value -> value == settings.aiDifficulty.value }
+
+        AlertDialog.Builder(context)
+                .setSingleChoiceItems(entries, selected, {
+                    dialog, which ->
+                    // Get AiDifficulty selected in UI
+                    val difficulty = AiDifficulty.valueOf(values[which])
+                    settings.aiDifficulty = difficulty
+
+                    // Rebind settings to UI
+                    bindSettings(settings)
+
+                    // Dismiss dialog
+                    dialog.dismiss()
+                })
+                .show()
     }
 
     private fun showDialogForSignOut() {
