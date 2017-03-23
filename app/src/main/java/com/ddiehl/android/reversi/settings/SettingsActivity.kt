@@ -13,7 +13,6 @@ class SettingsActivity : AppCompatActivity() {
     companion object {
         val SETTINGS_MODE_SINGLE_PLAYER = 101
         val SETTINGS_MODE_MULTI_PLAYER = 102
-        val RESULT_SIGN_IN = 201
         val RESULT_SIGN_OUT = 202
     }
 

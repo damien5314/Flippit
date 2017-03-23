@@ -53,7 +53,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mRequestedClients = GameHelper.CLIENT_GAMES
     private val mHelper: GameHelper by lazy {
         GameHelper(this, mRequestedClients)
-                .apply { enableDebugLog(true) }
+                .apply {
+                    if (BuildConfig.DEBUG) enableDebugLog(true)
+                }
     }
 
     private var mMatch: TurnBasedMatch? = null
@@ -65,7 +67,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mLightScore: Int = 0
     private var mDarkScore: Int = 0
 
-    private var mSignInOnStart = true
     private var mSignOutOnConnect = false
     private var mResolvingError = false
     private var mUpdatingMatch = false
@@ -126,6 +127,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun signOut() {
+        Timber.d("[DCD] signOut called")
+        mIsSignedIn = false
         mHelper.signOut()
     }
 
@@ -155,9 +158,13 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     //region GameHelper.Listener
 
     override fun onSignInSucceeded() {
-        Timber.d("Sign In SUCCESS")
-        toast("Connected to Games Services")
+        Timber.d("[DCD] Sign In SUCCESS")
         dismissSpinner()
+
+        if (mSignOutOnConnect) {
+            mSignOutOnConnect = false
+            signOut()
+        }
     }
 
     override fun onSignInFailed() {
@@ -822,8 +829,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             }
         } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
-            mIsSignedIn = false
-            signOutFromGooglePlay()
+            signOut()
         } else {
             showErrorDialog(resultCode)
         }
@@ -856,8 +862,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                     .setResultCallback { processResult(it) }
         } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
-            mIsSignedIn = false
-            signOutFromGooglePlay()
+            signOut()
         } else {
             showErrorDialog(resultCode)
         }
@@ -866,30 +871,17 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun handleShowAchievementsResult(resultCode: Int) {
         if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
-            mIsSignedIn = false
-            signOutFromGooglePlay()
+            signOut()
         }
     }
 
     private fun handleSettingsResult(resultCode: Int) {
         when (resultCode) {
-            SettingsActivity.RESULT_SIGN_IN -> connectGoogleApiClient()
-            SettingsActivity.RESULT_SIGN_OUT -> mSignOutOnConnect = true
+            SettingsActivity.RESULT_SIGN_OUT -> {
+                // User signed out
+                signOut()
+            }
         }
-    }
-
-    private fun signOutFromGooglePlay() {
-        toast(R.string.sign_out_confirmation)
-
-        mSignOutOnConnect = false
-        if (getApiClient().isConnected && mIsSignedIn) {
-            Games.signOut(getApiClient())
-        }
-        mIsSignedIn = false
-        getApiClient().disconnect()
-
-        setResult(SettingsActivity.RESULT_SIGN_OUT)
-        finish()
     }
 
     private fun processResult(result: TurnBasedMultiplayer.InitiateMatchResult) {

@@ -12,6 +12,7 @@ import butterknife.bindView
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.game.AiDifficulty
 import com.ddiehl.android.reversi.getString
+import com.ddiehl.android.reversi.toast
 
 class SettingsView : FrameLayout {
 
@@ -21,6 +22,7 @@ class SettingsView : FrameLayout {
 
     val mDifficultySettingLayout by bindView<ViewGroup>(R.id.settings_difficulty)
     val mDifficultyValueText by bindView<TextView>(R.id.settings_difficulty_value)
+    val mSignOutLayout by bindView<ViewGroup>(R.id.settings_sign_out)
 
     constructor(context: Context) : this(context, null)
 
@@ -40,6 +42,9 @@ class SettingsView : FrameLayout {
         mDifficultyValueText.setText(singlePlayerSettings.aiDifficulty.nameResId)
         mDifficultySettingLayout.setOnClickListener {
             showDifficultySettingDialog(singlePlayerSettings)
+        }
+        mSignOutLayout.setOnClickListener {
+            showDialogForSignOut()
         }
     }
 
@@ -69,8 +74,10 @@ class SettingsView : FrameLayout {
                 .setTitle(getString(R.string.settings_dialog_sign_out_title))
                 .setMessage(getString(R.string.settings_dialog_sign_out_message))
                 .setPositiveButton(getString(R.string.settings_dialog_sign_out_confirm)) { _, _ ->
-                    (context as Activity).setResult(SettingsActivity.RESULT_SIGN_OUT)
-                    (context as Activity).finish()
+                    toast(R.string.sign_out_confirmation)
+                    val context = context as Activity
+                    context.setResult(SettingsActivity.RESULT_SIGN_OUT)
+                    context.finish()
                 }
                 .setNegativeButton(getString(R.string.settings_dialog_sign_out_cancel)) { _, _ -> }
                 .setCancelable(true)

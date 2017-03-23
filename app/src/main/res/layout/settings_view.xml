@@ -42,6 +42,20 @@
 
                 </LinearLayout>
 
+                <LinearLayout
+                    android:id="@+id/settings_sign_out"
+                    style="@style/SettingsItem"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_sign_out"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </LinearLayout>

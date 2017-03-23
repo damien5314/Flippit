@@ -10,7 +10,6 @@ import com.ddiehl.android.reversi.MenuTintUtils
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
 import com.ddiehl.android.reversi.model.Board
-import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.ddiehl.android.reversi.startActivity
 
 abstract class BaseMatchActivity : AppCompatActivity() {
@@ -70,7 +69,7 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_settings -> {
-                startActivity<SettingsActivity>(this)
+                settingsSelected()
                 return true
             }
             R.id.action_select_match -> {
