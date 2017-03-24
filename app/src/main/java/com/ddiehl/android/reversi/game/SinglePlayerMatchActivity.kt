@@ -1,6 +1,7 @@
 package com.ddiehl.android.reversi.game
 
 import android.app.ProgressDialog
+import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.LayoutRes
 import android.view.View
@@ -9,6 +10,7 @@ import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ComputerAI
 import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.model.ReversiPlayer
+import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.ddiehl.android.reversi.settings.SinglePlayerSettings
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
@@ -21,6 +23,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
     companion object {
         private @LayoutRes val LAYOUT_RES_ID = R.layout.match_activity
+
+        private val RC_SETTINGS = 1006
     }
 
     private val m1PSavedState: SinglePlayerSavedState by lazy { SinglePlayerSavedState(this) }
@@ -233,15 +237,16 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     }
 
     override fun forfeitMatchSelected() {
-        TODO("not implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun showAchievements() {
-        TODO("not implemented")
+        throw UnsupportedOperationException()
     }
 
     override fun settingsSelected() {
-        TODO("not implemented")
+        val settings = Intent(this, SettingsActivity::class.java)
+        startActivityForResult(settings, RC_SETTINGS)
     }
 
     //endregion

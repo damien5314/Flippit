@@ -127,7 +127,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun signOut() {
-        Timber.d("[DCD] signOut called")
         mIsSignedIn = false
         mHelper.signOut()
     }
@@ -158,7 +157,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     //region GameHelper.Listener
 
     override fun onSignInSucceeded() {
-        Timber.d("[DCD] Sign In SUCCESS")
         dismissSpinner()
 
         if (mSignOutOnConnect) {

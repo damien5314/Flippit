@@ -30,10 +30,10 @@ class SettingsView : FrameLayout {
 
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int)
             : super(context, attrs, defStyleAttr) {
-        init(context, attrs, defStyleAttr)
+        init(context)
     }
 
-    private fun init(context: Context, attrs: AttributeSet?, defStyleAttr: Int) {
+    private fun init(context: Context) {
         LayoutInflater.from(context)
                 .inflate(LAYOUT_RES_ID, this, true)
     }
