@@ -75,9 +75,9 @@ class SettingsView : FrameLayout {
                 .setMessage(getString(R.string.settings_dialog_sign_out_message))
                 .setPositiveButton(getString(R.string.settings_dialog_sign_out_confirm)) { _, _ ->
                     toast(R.string.sign_out_confirmation)
-                    val context = context as Activity
-                    context.setResult(SettingsActivity.RESULT_SIGN_OUT)
-                    context.finish()
+                    val activity = context as Activity
+                    activity.setResult(SettingsActivity.RESULT_SIGN_OUT)
+                    activity.finish()
                 }
                 .setNegativeButton(getString(R.string.settings_dialog_sign_out_cancel)) { _, _ -> }
                 .setCancelable(true)
