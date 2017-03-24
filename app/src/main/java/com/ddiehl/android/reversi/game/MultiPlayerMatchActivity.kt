@@ -80,7 +80,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private lateinit var mAchievementManager: AchievementManager
 
     private var mMatchReceived: TurnBasedMatch? = null
-    private val mStartMatchOnStart = false
+    private var mStartMatchOnStart = false
 
 
     //region BaseGameActivity
@@ -878,6 +878,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun handleSettingsResult(resultCode: Int) {
         when (resultCode) {
             SettingsActivity.RESULT_SIGN_OUT -> {
+                mSignOutOnConnect = true
+
                 // User signed out
                 signOut()
             }
