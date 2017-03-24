@@ -7,7 +7,7 @@
 
         <size android:height="1dp" />
 
-        <solid android:color="@color/user_settings_item_divider" />
+        <solid android:color="@color/settings_group_item_divider" />
 
     </shape>
 

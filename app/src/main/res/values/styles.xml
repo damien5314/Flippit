@@ -17,7 +17,7 @@
     <!-- Base application theme. -->
     <style name="DarkBG" parent="AppTheme">
         <!-- app background color -->
-        <item name="android:windowBackground">@color/imgur_black</item>
+        <item name="android:windowBackground">@color/primary_dark</item>
     </style>
 
     <!-- Base application theme. -->

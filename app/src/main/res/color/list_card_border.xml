@@ -2,10 +2,10 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:color="@color/list_card_border_focused"
+        android:color="@color/settings_group_border_focused"
         android:state_focused="true"/>
 
     <item
-        android:color="@color/list_card_border_normal" />
+        android:color="@color/settings_group_border_normal" />
 
 </selector>
