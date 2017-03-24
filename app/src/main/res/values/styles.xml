@@ -17,7 +17,7 @@
     <!-- Base application theme. -->
     <style name="DarkBG" parent="AppTheme">
         <!-- app background color -->
-        <item name="android:windowBackground">@color/imgur_black</item>
+        <item name="android:windowBackground">@color/primary_dark</item>
     </style>
 
     <!-- Base application theme. -->
@@ -120,6 +120,40 @@
         <item name="android:textSize">20sp</item>
         <!-- Set title color -->
         <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="SettingsButton">
+        <item name="android:textColor">?attr/colorAccent</item>
+        <item name="android:textSize">@dimen/settings_button_text_size</item>
+    </style>
+
+    <style name="SettingsScreen">
+        <item name="android:showDividers">beginning|middle|end</item>
+        <item name="android:divider">@drawable/spacer_8dp_h</item>
+    </style>
+
+    <style name="SettingsGroup">
+        <item name="android:orientation">vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@drawable/settings_group_bg</item>
+        <item name="android:showDividers">middle</item>
+        <item name="android:divider">@drawable/divider_settings_group_listitem</item>
+    </style>
+
+    <style name="SettingsItem">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/settings_item_height</item>
+        <item name="android:padding">@dimen/settings_item_margin</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+    </style>
+
+    <style name="SettingsDivider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">?android:attr/listDivider</item>
     </style>
 
 </resources>

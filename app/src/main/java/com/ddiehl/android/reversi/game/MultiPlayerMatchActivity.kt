@@ -53,7 +53,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mRequestedClients = GameHelper.CLIENT_GAMES
     private val mHelper: GameHelper by lazy {
         GameHelper(this, mRequestedClients)
-                .apply { enableDebugLog(true) }
+                .apply {
+                    if (BuildConfig.DEBUG) enableDebugLog(true)
+                }
     }
 
     private var mMatch: TurnBasedMatch? = null
@@ -65,7 +67,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mLightScore: Int = 0
     private var mDarkScore: Int = 0
 
-    private var mSignInOnStart = true
     private var mSignOutOnConnect = false
     private var mResolvingError = false
     private var mUpdatingMatch = false
@@ -79,7 +80,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private lateinit var mAchievementManager: AchievementManager
 
     private var mMatchReceived: TurnBasedMatch? = null
-    private val mStartMatchOnStart = false
+    private var mStartMatchOnStart = false
 
 
     //region BaseGameActivity
@@ -126,6 +127,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun signOut() {
+        mIsSignedIn = false
         mHelper.signOut()
     }
 
@@ -155,9 +157,12 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     //region GameHelper.Listener
 
     override fun onSignInSucceeded() {
-        Timber.d("Sign In SUCCESS")
-        toast("Connected to Games Services")
         dismissSpinner()
+
+        if (mSignOutOnConnect) {
+            mSignOutOnConnect = false
+            signOut()
+        }
     }
 
     override fun onSignInFailed() {
@@ -473,11 +478,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     override fun settingsSelected() {
         val settings = Intent(this, SettingsActivity::class.java)
-        settings.putExtra(SettingsActivity.EXTRA_SETTINGS_MODE, SettingsActivity.SETTINGS_MODE_MULTI_PLAYER)
-        val isSignedIn = getApiClient().isConnected
-        settings.putExtra(SettingsActivity.EXTRA_IS_SIGNED_IN, isSignedIn)
-        val accountName = ""
-        settings.putExtra(SettingsActivity.EXTRA_SIGNED_IN_ACCOUNT, accountName)
         startActivityForResult(settings, RC_SETTINGS)
     }
 
@@ -827,8 +827,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             }
         } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
-            mIsSignedIn = false
-            signOutFromGooglePlay()
+            signOut()
         } else {
             showErrorDialog(resultCode)
         }
@@ -861,8 +860,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                     .setResultCallback { processResult(it) }
         } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
-            mIsSignedIn = false
-            signOutFromGooglePlay()
+            signOut()
         } else {
             showErrorDialog(resultCode)
         }
@@ -871,30 +869,19 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun handleShowAchievementsResult(resultCode: Int) {
         if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
             // User signed out
-            mIsSignedIn = false
-            signOutFromGooglePlay()
+            signOut()
         }
     }
 
     private fun handleSettingsResult(resultCode: Int) {
         when (resultCode) {
-            SettingsActivity.RESULT_SIGN_IN -> connectGoogleApiClient()
-            SettingsActivity.RESULT_SIGN_OUT -> mSignOutOnConnect = true
+            SettingsActivity.RESULT_SIGN_OUT -> {
+                mSignOutOnConnect = true
+
+                // User signed out
+                signOut()
+            }
         }
-    }
-
-    private fun signOutFromGooglePlay() {
-        toast(R.string.sign_out_confirmation)
-
-        mSignOutOnConnect = false
-        if (getApiClient().isConnected && mIsSignedIn) {
-            Games.signOut(getApiClient())
-        }
-        mIsSignedIn = false
-        getApiClient().disconnect()
-
-        setResult(SettingsActivity.RESULT_SIGN_OUT)
-        finish()
     }
 
     private fun processResult(result: TurnBasedMultiplayer.InitiateMatchResult) {

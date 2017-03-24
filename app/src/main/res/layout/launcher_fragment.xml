@@ -20,7 +20,7 @@
         android:id="@+id/button_start_1p"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@color/imgur_black_light"
+        android:background="@color/light_black"
         android:text="@string/button_start_1p"
         android:textColor="@color/white_70"
         android:textSize="22sp"/>
@@ -33,7 +33,7 @@
         android:id="@+id/button_start_mp"
         android:layout_width="match_parent"
         android:layout_height="72dp"
-        android:background="@color/imgur_black_light"
+        android:background="@color/light_black"
         android:text="@string/button_start_mp"
         android:textColor="@color/white_70"
         android:textSize="22sp"/>

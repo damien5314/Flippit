@@ -20,6 +20,6 @@ class HowToPlayFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater?, container: ViewGroup?, state: Bundle?): View
-            = inflater!!.inflate(arguments.getInt(ARG_LAYOUT_ID), container, false)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, state: Bundle?): View
+            = inflater.inflate(arguments.getInt(ARG_LAYOUT_ID), container, false)
 }

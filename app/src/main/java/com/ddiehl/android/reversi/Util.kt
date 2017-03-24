@@ -66,6 +66,10 @@ fun View.toast(@StringRes messageResId: Int, duration: Int = Toast.LENGTH_SHORT)
     Toast.makeText(context, messageResId, duration).show()
 }
 
+fun View.getString(@StringRes resId: Int): String {
+    return context.getString(resId)
+}
+
 /**
  * Start an Activity from the passed Context.
  */

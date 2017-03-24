@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".settings.SettingsActivity">
+
+        <LinearLayout
+            style="@style/SettingsScreen"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                style="@style/SettingsGroup">
+
+                <LinearLayout
+                    android:id="@+id/settings_difficulty"
+                    style="@style/SettingsItem"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/pref_ai_difficulty"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:id="@+id/settings_difficulty_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/secondary_text"
+                        android:textSize="16sp"
+                        tools:text="@string/ai_difficulty_easy"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/settings_sign_out"
+                    style="@style/SettingsItem"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_sign_out"
+                        android:textColor="@color/primary_text"
+                        android:textSize="16sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</android.support.design.widget.CoordinatorLayout>
