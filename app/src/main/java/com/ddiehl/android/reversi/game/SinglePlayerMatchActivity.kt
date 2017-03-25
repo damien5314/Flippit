@@ -86,25 +86,34 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         super.onPause()
     }
 
-    internal fun executeCpuMove() {
-        Observable.defer {
-            val difficulty = m1PSettings.aiDifficulty
-            val move: BoardSpace?
-            when (difficulty) {
-                AiDifficulty.EASY -> move = ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
-                AiDifficulty.HARD -> move = ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
-                else -> move = null
-            }
-            Observable.just(move)
-        }
+    private fun executeCpuMove() {
+        getCpuMove()
                 .delay(CPU_TURN_DELAY_MS, TimeUnit.MILLISECONDS)
                 .subscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ space ->
-                    mBoard.commitPiece(space!!, mCurrentPlayer!!.color)
-                    mMatchFragment.updateBoardUi(mBoard, true)
-                    calculateMatchState()
+                    if (space == null) {
+                        val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
+                        toast(getString(R.string.no_moves, opponent.name))
+                    } else {
+                        mBoard.commitPiece(space, mCurrentPlayer!!.color)
+                        mMatchFragment.updateBoardUi(mBoard, true)
+                        calculateMatchState()
+                    }
                 })
+    }
+
+    private fun getCpuMove(): Observable<BoardSpace?> {
+        return Observable.defer {
+            val difficulty = m1PSettings.aiDifficulty
+            val move: BoardSpace? =
+                    when (difficulty) {
+                        AiDifficulty.EASY -> ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
+                        AiDifficulty.HARD -> ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
+                        else -> throw IllegalArgumentException("Invalid difficulty: " + difficulty.name)
+                    }
+            Observable.just(move)
+        }
     }
 
     fun calculateMatchState() {
