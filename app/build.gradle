@@ -1,5 +1,21 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        // https://docs.fabric.io/android/changelog.html#fabric-gradle-plugin
+        classpath 'io.fabric.tools:gradle:1.22.1'
+    }
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'io.fabric'
+
+repositories {
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
@@ -28,6 +44,7 @@ android {
             applicationIdSuffix ".debug"
             versionNameSuffix "-dev"
             minifyEnabled false
+            ext.enableCrashlytics = false
         }
         release {
             debuggable false
@@ -40,6 +57,12 @@ android {
 
 dependencies {
     compile project(':BaseGameUtils')
+    compile project(':logging')
+
+    // Crashlytics
+    compile("com.crashlytics.sdk.android:crashlytics:$CRASHLYTICS_VERSION@aar") {
+        transitive = true;
+    }
 
     // Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$KOTLIN_VERSION"

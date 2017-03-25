@@ -28,7 +28,7 @@ dependencies {
     compile "com.android.support:appcompat-v7:$SUPPORT_LIBRARY_VERSION"
 
     compile "com.jakewharton.timber:timber:$TIMBER_VERSION"
-    compile("com.crashlytics.sdk.android:crashlytics:$CRASHLYTICS_VERSION@aar") {
+    provided("com.crashlytics.sdk.android:crashlytics:$CRASHLYTICS_VERSION@aar") {
         transitive = true
     }
 
