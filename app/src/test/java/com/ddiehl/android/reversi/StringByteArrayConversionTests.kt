@@ -1,5 +1,4 @@
-
-import com.ddiehl.android.reversi.byteArrayToString
+package com.ddiehl.android.reversi
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 

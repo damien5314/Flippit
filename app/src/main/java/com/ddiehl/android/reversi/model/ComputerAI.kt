@@ -1,6 +1,7 @@
 package com.ddiehl.android.reversi.model
 
 import java.util.*
+import kotlin.collections.ArrayList
 
 object ComputerAI {
 
@@ -18,13 +19,13 @@ object ComputerAI {
     /**
      * Finds the space on the board which would capture the most spaces for Player p.
      */
-    fun getBestMove_d1(board: Board, player: ReversiPlayer): BoardSpace? {
+    fun getBestMove_d1(board: Board, color: ReversiColor): BoardSpace? {
         var best: BoardSpace? = null
         var bestValue = 0
 
         board.forEach { space ->
             if (!space.isOwned) {
-                val value = board.spacesCapturedWithMove(space, player.color)
+                val value = board.spacesCapturedWithMove(space, color)
                 if (value > bestValue) {
                     best = space
                     bestValue = value
@@ -69,34 +70,33 @@ object ComputerAI {
     fun getBestMove_d3(board: Board, color: ReversiColor): BoardSpace? {
         val moveValues = HashMap<BoardSpace, Int>()
 
-        val spaceValueWeight = 1
-        val spacesCapturedWeight = 0 // Not factoring in captured spaces at the moment
+        val spaceValueWeight = 1 // Value of space according to the value map
+        val spacesCapturedWeight = 0 // Value of spaces captured with space
 
         board.forEach { space ->
             if (board.spacesCapturedWithMove(space, color) > 0) {
-                val moveValue: Int
                 // Copy board to identical object
                 val copy = board.copy()
                 // Play move on copied board object
                 copy.commitPiece(copy.getSpaceAt(space.x, space.y), color)
                 val movesOpenedForOpponent = getPossibleMoves(copy, color.opposite())
                 if (movesOpenedForOpponent == 0) {
-                    moveValue = 999
+                    // Moves that leave the opponent with no options are best, short-circuit here
+                    return space
                 } else {
-                    moveValue =
-                            getSpaceValue(space) * spaceValueWeight +
-                                    board.spacesCapturedWithMove(space, color) * spacesCapturedWeight
+                    val spaceValue = getSpaceValue(space) * spaceValueWeight
+                    val capturedValue = board.spacesCapturedWithMove(space, color) * spacesCapturedWeight
+                    moveValues.put(space, spaceValue + capturedValue)
                 }
-                moveValues.put(space, moveValue)
             }
         }
 
         // Add all of the moves with the best value to a HashSet
         var bestValue = Integer.MIN_VALUE
-        val bestMoves = HashSet<BoardSpace>()
+        val bestMoves = ArrayList<BoardSpace>()
         for (space in moveValues.keys) {
-            val value = moveValues[space]
-            if (value!! > bestValue) {
+            val value = moveValues[space]!!
+            if (value > bestValue) {
                 bestValue = value
                 bestMoves.clear()
                 bestMoves.add(space)

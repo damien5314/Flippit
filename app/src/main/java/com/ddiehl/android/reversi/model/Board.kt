@@ -27,7 +27,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
         restoreState(byteArrayToString(saved))
     }
 
-    fun restoreState(saved: String) {
+    fun restoreState(saved: String): Board {
         var index = 0
         for (y in 0 until height) {
             for (x in 0 until width) {
@@ -40,6 +40,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
                 }
             }
         }
+        return this
     }
 
     private val spaces: Array<Array<BoardSpace>> =
@@ -120,6 +121,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
 
     internal fun spacesCapturedWithMove(space: BoardSpace, playerColor: ReversiColor): Int =
             MOVE_DIRECTIONS
+                    .filter { space.color == null }
                     .filter { (dx, dy) -> isWithinBounds(space.x + dx, space.y + dy) }
                     .sumBy { (dx, dy) ->
                         moveValueInDirection(space, dx, dy, playerColor)
@@ -198,22 +200,26 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
     override fun iterator(): Iterator<BoardSpace> = BoardIterator(this)
 
     override fun toString(): String {
-        val sb = StringBuilder()
-        sb.append("\n")
+        val string = StringBuilder()
+        string.append("\n")
+
         for (row in 0 until height) {
             (0 until width)
                     .map { col -> getSpaceAt(col, row) }
                     .forEach {
-                        if (!it.isOwned)
-                            sb.append("0 ")
-                        else if (it.color == ReversiColor.LIGHT)
-                            sb.append("1 ")
-                        else
-                            sb.append("2 ")
+                        val char = when {
+                            !it.isOwned ->
+                                "0 "
+                            it.color == ReversiColor.LIGHT ->
+                                "1 "
+                            else ->
+                                "2 "
+                        }
+                        string.append(char)
                     }
-            if (row != spaces.size - 1)
-                sb.append("\n")
+            string.append(if (row != spaces.size - 1) "\n" else "")
         }
-        return sb.toString()
+
+        return string.toString()
     }
 }
