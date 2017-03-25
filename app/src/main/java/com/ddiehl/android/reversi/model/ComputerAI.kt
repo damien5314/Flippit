@@ -1,6 +1,8 @@
 package com.ddiehl.android.reversi.model
 
+import timber.log.Timber
 import java.util.*
+import kotlin.collections.ArrayList
 
 object ComputerAI {
 
@@ -73,6 +75,7 @@ object ComputerAI {
         val spacesCapturedWeight = 0 // Not factoring in captured spaces at the moment
 
         board.forEach { space ->
+            Timber.d(space.toString())
             if (board.spacesCapturedWithMove(space, color) > 0) {
                 val moveValue: Int
                 // Copy board to identical object
@@ -93,10 +96,10 @@ object ComputerAI {
 
         // Add all of the moves with the best value to a HashSet
         var bestValue = Integer.MIN_VALUE
-        val bestMoves = HashSet<BoardSpace>()
+        val bestMoves = ArrayList<BoardSpace>()
         for (space in moveValues.keys) {
-            val value = moveValues[space]
-            if (value!! > bestValue) {
+            val value = moveValues[space]!!
+            if (value > bestValue) {
                 bestValue = value
                 bestMoves.clear()
                 bestMoves.add(space)

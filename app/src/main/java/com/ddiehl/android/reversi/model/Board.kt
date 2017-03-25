@@ -121,6 +121,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
 
     internal fun spacesCapturedWithMove(space: BoardSpace, playerColor: ReversiColor): Int =
             MOVE_DIRECTIONS
+                    .filter { space.color == null }
                     .filter { (dx, dy) -> isWithinBounds(space.x + dx, space.y + dy) }
                     .sumBy { (dx, dy) ->
                         moveValueInDirection(space, dx, dy, playerColor)

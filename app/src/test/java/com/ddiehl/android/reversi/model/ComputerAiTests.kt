@@ -1,11 +1,12 @@
 package com.ddiehl.android.reversi.model
 
+import com.ddiehl.android.reversi.BaseTest
 import com.ddiehl.android.reversi.readBoardFromFile
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Test
 
-class ComputerAiTests {
+class ComputerAiTests : BaseTest() {
 
     @Test
     fun verifyCpuMoveD1_colorIsNull() {
