@@ -60,7 +60,7 @@ dependencies {
     compile project(':logging')
 
     // Crashlytics
-    compile('com.crashlytics.sdk.android:crashlytics:2.6.7@aar') {
+    compile("com.crashlytics.sdk.android:crashlytics:$CRASHLYTICS_VERSION@aar") {
         transitive = true;
     }
 
