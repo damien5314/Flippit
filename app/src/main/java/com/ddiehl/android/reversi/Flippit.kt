@@ -3,6 +3,10 @@ package com.ddiehl.android.reversi
 import android.app.Application
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
+import com.ddiehl.android.logging.CrashlyticsLogger
+import com.ddiehl.android.logging.CrashlyticsLoggingTree
+import com.ddiehl.android.logging.LogcatLogger
+import com.ddiehl.android.logging.LogcatLoggingTree
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 
@@ -13,7 +17,9 @@ class Flippit : Application() {
 
         // Set up logging trees
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
+            Timber.plant(LogcatLoggingTree(LogcatLogger()))
+        } else {
+            Timber.plant(CrashlyticsLoggingTree(CrashlyticsLogger()))
         }
 
         // Initialize Crashlytics
