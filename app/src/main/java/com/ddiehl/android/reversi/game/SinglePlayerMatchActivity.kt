@@ -108,7 +108,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
             val difficulty = m1PSettings.aiDifficulty
             val move: BoardSpace? =
                     when (difficulty) {
-                        AiDifficulty.EASY -> ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!)
+                        AiDifficulty.EASY -> ComputerAI.getBestMove_d1(mBoard, mCurrentPlayer!!.color)
                         AiDifficulty.HARD -> ComputerAI.getBestMove_d3(mBoard, mCurrentPlayer!!.color)
                         else -> throw IllegalArgumentException("Invalid difficulty: " + difficulty.name)
                     }

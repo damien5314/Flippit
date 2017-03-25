@@ -18,13 +18,13 @@ object ComputerAI {
     /**
      * Finds the space on the board which would capture the most spaces for Player p.
      */
-    fun getBestMove_d1(board: Board, player: ReversiPlayer): BoardSpace? {
+    fun getBestMove_d1(board: Board, color: ReversiColor): BoardSpace? {
         var best: BoardSpace? = null
         var bestValue = 0
 
         board.forEach { space ->
             if (!space.isOwned) {
-                val value = board.spacesCapturedWithMove(space, player.color)
+                val value = board.spacesCapturedWithMove(space, color)
                 if (value > bestValue) {
                     best = space
                     bestValue = value
