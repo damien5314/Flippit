@@ -1,6 +1,5 @@
 package com.ddiehl.android.reversi.model
 
-import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -71,26 +70,24 @@ object ComputerAI {
     fun getBestMove_d3(board: Board, color: ReversiColor): BoardSpace? {
         val moveValues = HashMap<BoardSpace, Int>()
 
-        val spaceValueWeight = 1
-        val spacesCapturedWeight = 0 // Not factoring in captured spaces at the moment
+        val spaceValueWeight = 1 // Value of space according to the value map
+        val spacesCapturedWeight = 0 // Value of spaces captured with space
 
         board.forEach { space ->
-            Timber.d(space.toString())
             if (board.spacesCapturedWithMove(space, color) > 0) {
-                val moveValue: Int
                 // Copy board to identical object
                 val copy = board.copy()
                 // Play move on copied board object
                 copy.commitPiece(copy.getSpaceAt(space.x, space.y), color)
                 val movesOpenedForOpponent = getPossibleMoves(copy, color.opposite())
                 if (movesOpenedForOpponent == 0) {
-                    moveValue = 999
+                    // Moves that leave the opponent with no options are best, short-circuit here
+                    return space
                 } else {
-                    moveValue =
-                            getSpaceValue(space) * spaceValueWeight +
-                                    board.spacesCapturedWithMove(space, color) * spacesCapturedWeight
+                    val spaceValue = getSpaceValue(space) * spaceValueWeight
+                    val capturedValue = board.spacesCapturedWithMove(space, color) * spacesCapturedWeight
+                    moveValues.put(space, spaceValue + capturedValue)
                 }
-                moveValues.put(space, moveValue)
             }
         }
 

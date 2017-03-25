@@ -200,22 +200,26 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
     override fun iterator(): Iterator<BoardSpace> = BoardIterator(this)
 
     override fun toString(): String {
-        val sb = StringBuilder()
-        sb.append("\n")
+        val string = StringBuilder()
+        string.append("\n")
+
         for (row in 0 until height) {
             (0 until width)
                     .map { col -> getSpaceAt(col, row) }
                     .forEach {
-                        if (!it.isOwned)
-                            sb.append("0 ")
-                        else if (it.color == ReversiColor.LIGHT)
-                            sb.append("1 ")
-                        else
-                            sb.append("2 ")
+                        val char = when {
+                            !it.isOwned ->
+                                "0 "
+                            it.color == ReversiColor.LIGHT ->
+                                "1 "
+                            else ->
+                                "2 "
+                        }
+                        string.append(char)
                     }
-            if (row != spaces.size - 1)
-                sb.append("\n")
+            string.append(if (row != spaces.size - 1) "\n" else "")
         }
-        return sb.toString()
+
+        return string.toString()
     }
 }
