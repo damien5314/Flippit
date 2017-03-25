@@ -44,6 +44,7 @@ android {
             applicationIdSuffix ".debug"
             versionNameSuffix "-dev"
             minifyEnabled false
+            ext.enableCrashlytics = false
         }
         release {
             debuggable false

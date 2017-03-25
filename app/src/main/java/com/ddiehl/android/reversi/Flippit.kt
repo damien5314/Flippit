@@ -2,6 +2,7 @@ package com.ddiehl.android.reversi
 
 import android.app.Application
 import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.core.CrashlyticsCore
 import io.fabric.sdk.android.Fabric
 import timber.log.Timber
 
@@ -16,6 +17,10 @@ class Flippit : Application() {
         }
 
         // Initialize Crashlytics
-        Fabric.with(this, Crashlytics())
+        val crashlyticsCore = CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build()
+        val crashlytics = Crashlytics.Builder()
+                .core(crashlyticsCore)
+                .build()
+        Fabric.with(this, crashlytics)
     }
 }
