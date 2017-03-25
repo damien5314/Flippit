@@ -27,7 +27,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
         restoreState(byteArrayToString(saved))
     }
 
-    fun restoreState(saved: String) {
+    fun restoreState(saved: String): Board {
         var index = 0
         for (y in 0 until height) {
             for (x in 0 until width) {
@@ -40,6 +40,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
                 }
             }
         }
+        return this
     }
 
     private val spaces: Array<Array<BoardSpace>> =
