@@ -10,19 +10,42 @@ import com.ddiehl.android.reversi.MenuTintUtils
 import com.ddiehl.android.reversi.R
 import com.ddiehl.android.reversi.howtoplay.HowToPlayActivity
 import com.ddiehl.android.reversi.model.Board
+import com.ddiehl.android.reversi.model.GameState
 import com.ddiehl.android.reversi.startActivity
 
 abstract class BaseMatchActivity : AppCompatActivity() {
 
     protected val mToolbar by bindView<Toolbar>(R.id.toolbar)
-    protected val mMatchFragment by bindView<MatchView>(R.id.match_fragment)
+    protected val mMatchView by bindView<MatchView>(R.id.match_view)
 
     protected val mBoard: Board = Board(8, 8)
+    protected var mGameState: GameState? = null
 
     override fun onStop() {
-        mMatchFragment.dismissMessage()
-
+        mMatchView.dismissMessage()
         super.onStop()
+    }
+
+    protected fun refreshUi() {
+        when (mGameState) {
+            GameState.NOT_STARTED -> {
+                mMatchView.clearBoard()
+            }
+            GameState.LIGHT_TURN -> {
+                mMatchView.displayBoard(mBoard)
+            }
+            GameState.DARK_TURN -> {
+                mMatchView.displayBoard(mBoard)
+            }
+            GameState.LIGHT_WIN -> TODO()
+            GameState.DARK_WIN -> TODO()
+            GameState.MATCH_CANCELLED -> {
+                mMatchView.clearBoard()
+            }
+            GameState.LIGHT_FORFEIT -> TODO()
+            GameState.DARK_FORFEIT -> TODO()
+            null -> TODO()
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -77,7 +100,8 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_close_match -> {
-                clearBoard()
+                mGameState = GameState.NOT_STARTED
+                refreshUi()
                 return true
             }
             R.id.action_forfeit_match -> {
@@ -95,7 +119,6 @@ abstract class BaseMatchActivity : AppCompatActivity() {
 
     abstract fun onStartNewMatchClicked()
     abstract fun onSelectMatchClicked()
-    abstract fun clearBoard()
     abstract fun forfeitMatchSelected()
     abstract fun showAchievements()
     abstract fun settingsSelected()

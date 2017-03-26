@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ComputerAI
+import com.ddiehl.android.reversi.model.GameState
 import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.google.android.gms.common.ConnectionResult
@@ -32,6 +33,10 @@ import com.google.example.games.basegameutils.GameHelper
 import timber.log.Timber
 import java.util.*
 
+/**
+ * TODO
+ * Try to take all accesses of MatchView and refactor them to setGameState -> refreshUi()
+ */
 class MultiPlayerMatchActivity : BaseMatchActivity(),
         IMatchView, GameHelper.GameHelperListener, OnTurnBasedMatchUpdateReceivedListener {
 
@@ -80,7 +85,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mMatchReceived: TurnBasedMatch? = null
     private var mStartMatchOnStart = false
 
-
     //region BaseGameActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,6 +97,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
+        mGameState = GameState.NOT_STARTED
         mAchievementManager = AchievementManager.get(getApiClient())
     }
 
@@ -149,7 +154,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     //endregion
 
-
     //region GameHelper.Listener
 
     override fun onSignInSucceeded() {
@@ -171,7 +175,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     //endregion
 
-
+    // fixme These are duplicates of the properties above?
     private val currentPlayer: Participant
         get() {
             val currentPlayerId = Games.Players.getCurrentPlayerId(getApiClient())
@@ -249,8 +253,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                 .show()
     }
 
-    fun onSignInConfirm() = DialogInterface.OnClickListener { _, _ -> beginUserInitiatedSignIn() }
-
+    fun onSignInConfirm() = DialogInterface.OnClickListener {
+        _, _ -> beginUserInitiatedSignIn()
+    }
 
     //region MatchView
 
@@ -321,17 +326,17 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         if (mMatch!!.status == TurnBasedMatch.MATCH_STATUS_COMPLETE) {
             when (mPlayer!!.result.result) {
                 ParticipantResult.MATCH_RESULT_WIN -> {
-                    mMatchFragment.displayMessage(getString(R.string.winner_you))
+                    mMatchView.displayMessage(getString(R.string.winner_you))
                 }
                 ParticipantResult.MATCH_RESULT_TIE -> {
-                    mMatchFragment.displayMessage(getString(R.string.winner_tie))
+                    mMatchView.displayMessage(getString(R.string.winner_tie))
                 }
                 ParticipantResult.MATCH_RESULT_LOSS -> {
                     val msg = if (mPlayer === mLightPlayer) R.string.winner_dark else R.string.winner_light
-                    mMatchFragment.displayMessage(getString(msg))
+                    mMatchView.displayMessage(getString(msg))
                 }
                 else -> {
-                    mMatchFragment.displayMessage(getString(R.string.match_complete))
+                    mMatchView.displayMessage(getString(R.string.match_complete))
                 }
             }
 
@@ -358,7 +363,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                             ParticipantResult.PLACING_UNINITIALIZED
                     )
                     val msg = if (mPlayer === mLightPlayer) R.string.winner_you else R.string.winner_light
-                    mMatchFragment.displayMessage(getString(msg))
+                    mMatchView.displayMessage(getString(msg))
                 } else {
                     winnerResult = ParticipantResult(
                             mDarkPlayer!!.participantId,
@@ -371,7 +376,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                             ParticipantResult.PLACING_UNINITIALIZED
                     )
                     val msg = if (mPlayer === mDarkPlayer) R.string.winner_you else R.string.winner_dark
-                    mMatchFragment.displayMessage(getString(msg))
+                    mMatchView.displayMessage(getString(msg))
                 }
             } else {
                 winnerResult = ParticipantResult(
@@ -384,7 +389,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                         ParticipantResult.MATCH_RESULT_TIE,
                         ParticipantResult.PLACING_UNINITIALIZED
                 )
-                mMatchFragment.displayMessage(getString(R.string.winner_tie))
+                mMatchView.displayMessage(getString(R.string.winner_tie))
             }
 
             // Call finishMatch() with result parameters
@@ -398,7 +403,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     //endregion
-
 
     //region Options menu actions
 
@@ -419,11 +423,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             val intent = Games.TurnBasedMultiplayer.getInboxIntent(getApiClient())
             startActivityForResult(intent, RC_VIEW_MATCHES)
         }
-    }
-
-    override fun clearBoard() {
-        mMatch = null
-        mMatchFragment.clearBoard()
     }
 
     override fun forfeitMatchSelected() {
@@ -479,7 +478,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     //endregion
 
-
     private fun showCancelMatchDialog() {
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_cancel_match_title))
@@ -495,7 +493,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             displaySignInPrompt()
         } else {
             Games.TurnBasedMultiplayer.cancelMatch(getApiClient(), mMatch!!.matchId)
-                    .setResultCallback { result -> processResult(result) }
+                    .setResultCallback {
+                        result -> processResult(result)
+                    }
         }
     }
 
@@ -598,14 +598,14 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         }
     }
 
-
     private fun checkStatusCode(statusCode: Int): Boolean {
-        if (statusCode == GamesStatusCodes.STATUS_OK ||
-                statusCode == GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED) {
+        if (statusCode == GamesStatusCodes.STATUS_OK
+                || statusCode == GamesStatusCodes.STATUS_NETWORK_ERROR_OPERATION_DEFERRED) {
             return true
         }
 
-        clearBoard()
+        mMatch = null
+        mMatchView.clearBoard()
         dismissSpinner()
 
         when (statusCode) {
@@ -705,7 +705,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun processResultLeaveMatch(result: TurnBasedMultiplayer.LeaveMatchResult) {
         if (result.status.isSuccess) {
             toast(R.string.match_canceled_toast)
-            clearBoard()
+            mMatch = null
+            mGameState = GameState.MATCH_CANCELLED
+            refreshUi()
         } else {
             toast(R.string.cancel_fail)
         }
@@ -714,7 +716,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun processResult(result: TurnBasedMultiplayer.CancelMatchResult) {
         if (result.status.isSuccess) {
             toast(R.string.match_canceled_toast)
-            clearBoard()
+            mGameState = GameState.MATCH_CANCELLED
+            refreshUi()
         } else {
             toast(R.string.cancel_fail)
         }
@@ -743,7 +746,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private val playerScore: Int
         get() = if (mPlayer === mLightPlayer) mLightScore else mDarkScore
 
-
     private fun updateScore() {
         mLightScore = mBoard.getNumSpacesForColor(ReversiColor.LIGHT)
         mDarkScore = mBoard.getNumSpacesForColor(ReversiColor.DARK)
@@ -757,7 +759,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             }
         }
 
-        mMatchFragment.showScore(mLightScore, mDarkScore)
+        mMatchView.showScore(mLightScore, mDarkScore)
     }
 
     private fun registerMatchUpdateListener(shouldRegister: Boolean) {
@@ -895,7 +897,13 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mMatchData = null
         mBoard.reset()
         saveMatchData()
-        mMatchFragment.displayBoard(mBoard)
+        if (currentPlayerColor == ReversiColor.LIGHT) {
+            mGameState = GameState.LIGHT_TURN
+            refreshUi()
+        } else {
+            mGameState = GameState.DARK_TURN
+            refreshUi()
+        }
         updateScore()
 
         val playerId = Games.Players.getCurrentPlayerId(getApiClient())
@@ -906,13 +914,14 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun processResult(result: TurnBasedMultiplayer.UpdateMatchResult) {
-        mMatch = result.match
+        val match = result.match
         dismissSpinner()
 
         if (checkStatusCode(result.status.statusCode)) {
-            updateMatch(mMatch!!)
+            updateMatch(match)
         }
 
+        mMatch = match
         mUpdatingMatch = false
     }
 
@@ -935,7 +944,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         val playerData = Arrays.copyOfRange(mMatchData!!, startIndex, startIndex + 64)
 
         mBoard.restoreState(playerData)
-        mMatchFragment.displayBoard(mBoard)
+        mMatchView.displayBoard(mBoard)
         dismissSpinner()
 
         // Commit opponent's moves to the deserialized Board object
@@ -955,15 +964,15 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         // Check for inactive match states
         when (mMatch!!.status) {
             TurnBasedMatch.MATCH_STATUS_CANCELED -> {
-                mMatchFragment.displayMessage(getString(R.string.match_canceled))
+                mMatchView.displayMessage(getString(R.string.match_canceled))
                 return
             }
             TurnBasedMatch.MATCH_STATUS_EXPIRED -> {
-                mMatchFragment.displayMessage(getString(R.string.match_expired))
+                mMatchView.displayMessage(getString(R.string.match_expired))
                 return
             }
             TurnBasedMatch.MATCH_STATUS_AUTO_MATCHING -> {
-                mMatchFragment.displayMessage(getString(R.string.match_finding_partner))
+                mMatchView.displayMessage(getString(R.string.match_finding_partner))
                 return
             }
             TurnBasedMatch.MATCH_STATUS_COMPLETE -> {
@@ -975,18 +984,19 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         // OK, it's active. Check on turn status.
         when (mMatch!!.turnStatus) {
             TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN -> {
-                mMatchFragment.dismissMessage()
+                mMatchView.dismissMessage()
 //                autoplayIfEnabled()
             }
             TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN -> {
-                mMatchFragment.displayMessage(getString(R.string.match_opponent_turn))
+                mMatchView.displayMessage(getString(R.string.match_opponent_turn))
             }
             TurnBasedMatch.MATCH_TURN_STATUS_INVITED -> {
-                mMatchFragment.displayMessage(getString(R.string.match_invite_pending))
+                mMatchView.displayMessage(getString(R.string.match_invite_pending))
             }
         }
     }
 
+    // FIXME - Should take a ByteArray and return a new ByteArray, instead of operating on state
     private fun saveMatchData() {
         val playerBoard = mBoard.serialize()
 
@@ -1035,7 +1045,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     override fun onTurnBasedMatchRemoved(matchId: String) {
         if (mMatch != null && mMatch!!.matchId == matchId) {
             toast(R.string.match_removed)
-            clearBoard()
+            mMatch = null
+            mMatchView.clearBoard()
         }
     }
 
