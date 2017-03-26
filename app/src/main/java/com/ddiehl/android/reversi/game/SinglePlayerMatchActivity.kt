@@ -48,8 +48,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
         mP1 = ReversiPlayer(ReversiColor.LIGHT, getString(R.string.player1_label_default))
         mP2 = ReversiPlayer(ReversiColor.DARK, getString(R.string.player2_label))
-        mP1.isCPU(P1_CPU)
-        mP2.isCPU(P2_CPU)
+        mP1.isCPU = P1_CPU
+        mP2.isCPU = P2_CPU
 
         // Hide select match panel for single player
         mMatchView.showMatchButtons(true, false)
@@ -197,6 +197,10 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
             }
         }
     }
+
+    // TODO
+    // We could probably refactor the below to use refreshUi(), but making a Player abstraction
+    // usable in both activity subclasses is probably a prerequisite
 
     override fun endMatch() {
         if (mP1.score != mP2.score) {
