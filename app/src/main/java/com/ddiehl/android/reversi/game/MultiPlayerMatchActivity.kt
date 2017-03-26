@@ -50,9 +50,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         private val RC_SETTINGS = 1006
     }
 
-    private var mRequestedClients = GameHelper.CLIENT_GAMES
     private val mHelper: GameHelper by lazy {
-        GameHelper(this, mRequestedClients)
+        val clients = GameHelper.CLIENT_GAMES
+        GameHelper(this, clients)
                 .apply {
                     if (BuildConfig.DEBUG) enableDebugLog(true)
                 }
@@ -95,7 +95,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        // Initialize Games API client
         mAchievementManager = AchievementManager.get(getApiClient())
     }
 
