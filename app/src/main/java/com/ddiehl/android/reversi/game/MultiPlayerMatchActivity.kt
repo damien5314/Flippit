@@ -15,7 +15,7 @@ import com.ddiehl.android.reversi.model.ComputerAI
 import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.google.android.gms.common.ConnectionResult
-import com.google.android.gms.common.GooglePlayServicesUtil
+import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.games.Games
 import com.google.android.gms.games.GamesActivityResultCodes
@@ -68,9 +68,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mDarkScore: Int = 0
 
     private var mSignOutOnConnect = false
-    private var mResolvingError = false
     private var mUpdatingMatch = false
-    private var mIsSignedIn = false
     private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
 
     private var mResolvingConnectionFailure = false
@@ -126,7 +124,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun signOut() {
-        mIsSignedIn = false
         mHelper.signOut()
     }
 
@@ -675,13 +672,10 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                 .show()
     }
 
-    /* Creates a dialog for an error message */
     private fun showErrorDialog(errorCode: Int) {
-        val dialog = GooglePlayServicesUtil.getErrorDialog(errorCode, this, RC_RESOLVE_ERROR)
-        if (dialog != null) {
-            dialog.setOnDismissListener { mResolvingError = false }
-            dialog.show()
-        }
+        GoogleApiAvailability.getInstance()
+                .getErrorDialog(this, errorCode, RC_RESOLVE_ERROR)
+                .show()
     }
 
     private fun askForRematch() {
@@ -775,7 +769,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     private fun connectGoogleApiClient() {
         // Check if Google Play Services are available
-        val result = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this)
+        val result = GoogleApiAvailability.getInstance()
+                .isGooglePlayServicesAvailable(this)
         if (result != ConnectionResult.SUCCESS) {
             showErrorDialog(result)
         } else {
@@ -806,7 +801,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun handleError(resultCode: Int) {
-        mResolvingError = false
         if (resultCode == Activity.RESULT_OK) {
             if (!getApiClient().isConnecting && !getApiClient().isConnected) {
                 connectGoogleApiClient()

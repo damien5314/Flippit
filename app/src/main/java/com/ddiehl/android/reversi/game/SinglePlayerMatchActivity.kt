@@ -169,7 +169,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     }
 
     override fun onSpaceClick(row: Int, col: Int) {
-        Timber.d("Piece clicked @ $row $col")
+        Timber.d("Space clicked @ $row $col")
         if (mCurrentPlayer!!.isCPU) {
             // Do nothing, it's a CPU's turn
         } else {
@@ -186,7 +186,12 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     }
 
     private fun onSpaceClaimError(): Action1<Throwable> {
-        return Action1 { throwable -> toast(throwable.message!!) }
+        return Action1 { throwable ->
+            val msg = throwable.message
+            if (msg != null) {
+                Timber.d(throwable.message)
+            }
+        }
     }
 
     override fun endMatch() {
