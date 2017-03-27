@@ -30,8 +30,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     private val m1PSavedState: SinglePlayerSavedState by lazy { SinglePlayerSavedState(this) }
     private val m1PSettings: SinglePlayerSettings by lazy { SinglePlayerSettings(this) }
 
-    private lateinit var mP1: ReversiPlayer
-    private lateinit var mP2: ReversiPlayer
+    private lateinit var mPlayerLight: ReversiPlayer
+    private lateinit var mPlayerDark: ReversiPlayer
 
     private var mCurrentPlayer: ReversiPlayer? = null
     private var mPlayerWithFirstTurn: ReversiPlayer? = null
@@ -46,10 +46,10 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
         mMatchView.mMatchMessageView.visibility = View.INVISIBLE
 
-        mP1 = ReversiPlayer(ReversiColor.LIGHT, getString(R.string.player1_label_default))
-        mP2 = ReversiPlayer(ReversiColor.DARK, getString(R.string.player2_label))
-        mP1.isCPU = P1_CPU
-        mP2.isCPU = P2_CPU
+        mPlayerLight = ReversiPlayer(ReversiColor.LIGHT, getString(R.string.player1_label))
+        mPlayerDark = ReversiPlayer(ReversiColor.DARK, getString(R.string.player2_label))
+        mPlayerLight.isCPU = P1_CPU
+        mPlayerDark.isCPU = P2_CPU
 
         // Hide select match panel for single player
         mMatchView.showMatchButtons(true, false)
@@ -57,8 +57,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         // Restore saved state if it exists
         val savedData = m1PSavedState.board
         if (savedData != null) {
-            mCurrentPlayer = if (m1PSavedState.currentPlayer) mP1 else mP2
-            mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mP1 else mP2
+            mCurrentPlayer = if (m1PSavedState.currentPlayer) mPlayerLight else mPlayerDark
+            mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mPlayerLight else mPlayerDark
             mBoard.restoreState(savedData)
             mMatchView.updateBoardUi(mBoard)
             mMatchView.displayBoard(mBoard)
@@ -72,7 +72,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     override fun onResume() {
         super.onResume()
 
-        mP1.name = m1PSettings.playerName
+        mPlayerLight.name = m1PSettings.playerName
         if (mMatchInProgress && mCurrentPlayer!!.isCPU) {
             executeCpuMove()
         }
@@ -93,7 +93,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({ space ->
                     if (space == null) {
-                        val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
+                        val opponent = if (mCurrentPlayer === mPlayerLight) mPlayerDark else mPlayerLight
                         toast(getString(R.string.no_moves, opponent.name))
                     } else {
                         mBoard.commitPiece(space, mCurrentPlayer!!.color)
@@ -117,7 +117,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     }
 
     fun calculateMatchState() {
-        val opponent = if (mCurrentPlayer === mP1) mP2 else mP1
+        val opponent = if (mCurrentPlayer === mPlayerLight) mPlayerDark else mPlayerLight
 
         val playerHasMove = mBoard.hasMove(mCurrentPlayer!!.color)
         val opponentHasMove = mBoard.hasMove(opponent.color)
@@ -148,10 +148,10 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     }
 
     fun updateScoreDisplay() {
-        mP1.score = mBoard.count { it.isOwned && it.color == ReversiColor.LIGHT }
-        mP2.score = mBoard.count { it.isOwned && it.color == ReversiColor.DARK }
-        mMatchView.updateScoreForPlayer(mP1.score, null)
-        mMatchView.updateScoreForPlayer(null, mP2.score)
+        mPlayerLight.score = mBoard.count { it.isOwned && it.color == ReversiColor.LIGHT }
+        mPlayerDark.score = mBoard.count { it.isOwned && it.color == ReversiColor.DARK }
+        mMatchView.updateScoreForPlayer(mPlayerLight.score, null)
+        mMatchView.updateScoreForPlayer(null, mPlayerDark.score)
     }
 
 
@@ -203,20 +203,20 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     // usable in both activity subclasses is probably a prerequisite
 
     override fun endMatch() {
-        if (mP1.score != mP2.score) {
-            val diff = 64 - mP1.score - mP2.score
+        if (mPlayerLight.score != mPlayerDark.score) {
+            val diff = 64 - mPlayerLight.score - mPlayerDark.score
 
-            if (mP1.score > mP2.score) { // P1 wins
-                mP1.score += diff
-                mMatchView.updateScoreForPlayer(mP1.score, null)
-                mMatchView.showWinningToast(mP1.color)
+            if (mPlayerLight.score > mPlayerDark.score) { // P1 wins
+                mPlayerLight.score += diff
+                mMatchView.updateScoreForPlayer(mPlayerLight.score, null)
+                mMatchView.displayMessage(getString(R.string.winner_p1))
             } else { // P2 wins
-                mP2.score += diff
-                mMatchView.updateScoreForPlayer(null, mP2.score)
-                mMatchView.showWinningToast(mP2.color)
+                mPlayerDark.score += diff
+                mMatchView.updateScoreForPlayer(null, mPlayerDark.score)
+                mMatchView.displayMessage(getString(R.string.winner_cpu))
             }
         } else {
-            mMatchView.showWinningToast(null)
+            mMatchView.displayMessage(getString(R.string.winner_tie))
         }
         switchFirstTurn()
         m1PSavedState.clear()
@@ -247,9 +247,9 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
     private fun switchFirstTurn() {
         if (mPlayerWithFirstTurn == null) {
-            mPlayerWithFirstTurn = mP1
+            mPlayerWithFirstTurn = mPlayerLight
         } else {
-            mPlayerWithFirstTurn = if (mPlayerWithFirstTurn === mP1) mP2 else mP1
+            mPlayerWithFirstTurn = if (mPlayerWithFirstTurn === mPlayerLight) mPlayerDark else mPlayerLight
         }
         mCurrentPlayer = mPlayerWithFirstTurn
     }

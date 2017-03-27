@@ -10,7 +10,10 @@ import android.support.v4.content.ContextCompat
 import android.support.v7.app.AlertDialog
 import android.widget.Toast
 import com.ddiehl.android.reversi.*
-import com.ddiehl.android.reversi.model.*
+import com.ddiehl.android.reversi.model.BoardSpace
+import com.ddiehl.android.reversi.model.ComputerAI
+import com.ddiehl.android.reversi.model.ReversiColor
+import com.ddiehl.android.reversi.model.ReversiPlayer
 import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -30,10 +33,6 @@ import com.google.example.games.basegameutils.GameHelper
 import timber.log.Timber
 import java.util.*
 
-/**
- * TODO
- * Try to take all accesses of MatchView and refactor them to setGameState -> refreshUi()
- */
 class MultiPlayerMatchActivity : BaseMatchActivity(),
         IMatchView, GameHelper.GameHelperListener, OnTurnBasedMatchUpdateReceivedListener {
 
@@ -94,7 +93,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mGameState = GameState.NOT_STARTED
         mAchievementManager = AchievementManager.get(getApiClient())
     }
 
@@ -688,8 +686,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         if (result.status.isSuccess) {
             toast(R.string.match_canceled_toast)
             mMatch = null
-            mGameState = GameState.MATCH_CANCELLED
-            refreshUi()
+            mMatchView.clearBoard()
         } else {
             toast(R.string.cancel_fail)
         }
@@ -698,8 +695,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun processResult(result: TurnBasedMultiplayer.CancelMatchResult) {
         if (result.status.isSuccess) {
             toast(R.string.match_canceled_toast)
-            mGameState = GameState.MATCH_CANCELLED
-            refreshUi()
+            mMatchView.clearBoard()
         } else {
             toast(R.string.cancel_fail)
         }
@@ -778,7 +774,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         // Returned from the 'Select Match' dialog
             RC_VIEW_MATCHES -> handleSelectMatchResult(result, data)
 
-        // Returned from 'Select players to Invite' dialog
+        // Returned from 'Start new Match' dialog
             RC_SELECT_PLAYERS -> handleSelectPlayersResult(result, data)
 
         // Returned from achievements screen
@@ -884,15 +880,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mMatchData = null
         mBoard.reset()
         saveMatchData()
-
-        if (mPlayer!!.color == ReversiColor.LIGHT) {
-            mGameState = GameState.LIGHT_TURN
-            refreshUi()
-        } else {
-            mGameState = GameState.DARK_TURN
-            refreshUi()
-        }
-
+        mMatchView.displayBoard(mBoard)
         updateScore(match)
 
         val playerId = Games.Players.getCurrentPlayerId(getApiClient())

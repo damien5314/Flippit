@@ -18,7 +18,7 @@ class SinglePlayerSettings(context: Context) {
             context.getSharedPreferences("PREFS_SINGLE_PLAYER_SETTINGS", Context.MODE_PRIVATE)
 
     var playerName: String
-        get() = prefs.getString(PREF_PLAYER_NAME, context.getString(R.string.player1_label_default))
+        get() = prefs.getString(PREF_PLAYER_NAME, context.getString(R.string.player1_label))
         set(value) = prefs.edit().putString(PREF_PLAYER_NAME, value).apply()
 
     var aiDifficulty: AiDifficulty
