@@ -85,13 +85,15 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        mHelper.setup(this)
-        mHelper.setShowErrorDialogs(true)
-
         setContentView(LAYOUT_RES_ID)
 
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+
+        mHelper.setup(this)
+        mHelper.setShowErrorDialogs(true)
+
+        mMatchView.showScore(false)
 
         mAchievementManager = AchievementManager.get(getApiClient())
     }
@@ -403,7 +405,12 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         }
     }
 
-    override fun forfeitMatchSelected() {
+    override fun onCloseMatchClicked() {
+        mMatchView.clearBoard()
+        mMatchView.showMatchButtons(true, true)
+    }
+
+    override fun onForfeitMatchClicked() {
         if (mMatch == null) {
             toast(R.string.no_match_selected, Toast.LENGTH_LONG)
             return
@@ -439,7 +446,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         }
     }
 
-    override fun showAchievements() {
+    override fun onShowAchievementsClicked() {
         if (!getApiClient().isConnected) {
             displaySignInPrompt()
             return
@@ -449,7 +456,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         startActivityForResult(intent, RC_SHOW_ACHIEVEMENTS)
     }
 
-    override fun settingsSelected() {
+    override fun onSettingsClicked() {
         val settings = Intent(this, SettingsActivity::class.java)
         startActivityForResult(settings, RC_SETTINGS)
     }
@@ -880,6 +887,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mMatchData = null
         mBoard.reset()
         saveMatchData()
+        mMatchView.showScore(true)
         mMatchView.displayBoard(mBoard)
         updateScore(match)
 
@@ -924,6 +932,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         val playerData = Arrays.copyOfRange(mMatchData!!, startIndex, startIndex + 64)
 
         mBoard.restoreState(playerData)
+        mMatchView.showScore(true)
         mMatchView.displayBoard(mBoard)
         dismissSpinner()
 

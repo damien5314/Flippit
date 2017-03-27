@@ -17,7 +17,6 @@ import com.ddiehl.android.reversi.delay
 import com.ddiehl.android.reversi.model.Board
 import com.ddiehl.android.reversi.model.ReversiColor
 import com.ddiehl.android.reversi.setListener
-import com.ddiehl.android.reversi.toast
 import com.jakewharton.rxbinding.view.RxView
 
 class MatchView : FrameLayout {
@@ -33,6 +32,7 @@ class MatchView : FrameLayout {
     }
 
     internal val mMatchGridView by bindView<TableLayout>(R.id.match_grid)
+    internal val mScoreOverlay by bindView<ViewGroup>(R.id.score_overlay)
     internal val mPlayerOneScore by bindView<TextView>(R.id.score_p1)
     internal val mPlayerTwoScore by bindView<TextView>(R.id.score_p2)
     internal val mPlayerOneLabel by bindView<TextView>(R.id.p1_label)
@@ -183,18 +183,6 @@ class MatchView : FrameLayout {
         updateBoardUi(board)
     }
 
-    fun showWinningToast(color: ReversiColor?) {
-        val text =
-                if (color == null) {
-                    context.getString(R.string.winner_none)
-                } else if (color == ReversiColor.LIGHT) {
-                    context.getString(R.string.winner_p1)
-                } else if (color == ReversiColor.DARK) {
-                    context.getString(R.string.winner_cpu)
-                } else throw IllegalStateException("Passed invalid color: " + color.name)
-        toast(text, Toast.LENGTH_LONG)
-    }
-
     fun clearBoard() {
         mPlayerTwoScore.text = ""
         mBoardPanelView.visibility = View.VISIBLE
@@ -253,5 +241,9 @@ class MatchView : FrameLayout {
                 icon2.startAnimation(mRightFadeOut)
             }
         })
+    }
+
+    fun showScore(show: Boolean) {
+        mScoreOverlay.visibility = if (show) View.VISIBLE else View.GONE
     }
 }

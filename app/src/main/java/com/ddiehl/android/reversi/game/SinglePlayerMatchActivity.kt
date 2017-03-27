@@ -4,7 +4,6 @@ import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.LayoutRes
-import android.view.View
 import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ComputerAI
@@ -44,7 +43,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mMatchView.mMatchMessageView.visibility = View.INVISIBLE
+        mMatchView.showScore(false)
+        mMatchView.dismissMessage()
 
         mPlayerLight = ReversiPlayer(ReversiColor.LIGHT, getString(R.string.player1_label))
         mPlayerDark = ReversiPlayer(ReversiColor.DARK, getString(R.string.player2_label))
@@ -60,6 +60,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
             mCurrentPlayer = if (m1PSavedState.currentPlayer) mPlayerLight else mPlayerDark
             mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mPlayerLight else mPlayerDark
             mBoard.restoreState(savedData)
+            mMatchView.showScore(true)
             mMatchView.updateBoardUi(mBoard)
             mMatchView.displayBoard(mBoard)
             updateScoreDisplay()
@@ -198,10 +199,6 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         }
     }
 
-    // TODO
-    // We could probably refactor the below to use refreshUi(), but making a Player abstraction
-    // usable in both activity subclasses is probably a prerequisite
-
     override fun endMatch() {
         if (mPlayerLight.score != mPlayerDark.score) {
             val diff = 64 - mPlayerLight.score - mPlayerDark.score
@@ -230,6 +227,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
     override fun onStartNewMatchClicked() {
         mBoard.reset()
+        mMatchView.showScore(true)
         mMatchView.displayBoard(mBoard)
         switchFirstTurn()
         updateScoreDisplay()
@@ -241,9 +239,29 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         }
     }
 
+    override fun onCloseMatchClicked() {
+        mMatchView.clearBoard()
+        mMatchView.showMatchButtons(true, false)
+    }
+
     override fun onSelectMatchClicked() {
         // Button is hidden in single player
     }
+
+    override fun onForfeitMatchClicked() {
+        throw UnsupportedOperationException()
+    }
+
+    override fun onShowAchievementsClicked() {
+        throw UnsupportedOperationException()
+    }
+
+    override fun onSettingsClicked() {
+        val settings = Intent(this, SettingsActivity::class.java)
+        startActivityForResult(settings, RC_SETTINGS)
+    }
+
+    //endregion
 
     private fun switchFirstTurn() {
         if (mPlayerWithFirstTurn == null) {
@@ -253,19 +271,4 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         }
         mCurrentPlayer = mPlayerWithFirstTurn
     }
-
-    override fun forfeitMatchSelected() {
-        throw UnsupportedOperationException()
-    }
-
-    override fun showAchievements() {
-        throw UnsupportedOperationException()
-    }
-
-    override fun settingsSelected() {
-        val settings = Intent(this, SettingsActivity::class.java)
-        startActivityForResult(settings, RC_SETTINGS)
-    }
-
-    //endregion
 }

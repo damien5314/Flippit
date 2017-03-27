@@ -68,7 +68,7 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_settings -> {
-                settingsSelected()
+                onSettingsClicked()
                 return true
             }
             R.id.action_select_match -> {
@@ -76,15 +76,15 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_close_match -> {
-                mMatchView.clearBoard()
+                onCloseMatchClicked()
                 return true
             }
             R.id.action_forfeit_match -> {
-                forfeitMatchSelected()
+                onForfeitMatchClicked()
                 return true
             }
             R.id.action_achievements -> {
-                showAchievements()
+                onShowAchievementsClicked()
                 return true
             }
         }
@@ -94,7 +94,8 @@ abstract class BaseMatchActivity : AppCompatActivity() {
 
     abstract fun onStartNewMatchClicked()
     abstract fun onSelectMatchClicked()
-    abstract fun forfeitMatchSelected()
-    abstract fun showAchievements()
-    abstract fun settingsSelected()
+    abstract fun onCloseMatchClicked()
+    abstract fun onForfeitMatchClicked()
+    abstract fun onShowAchievementsClicked()
+    abstract fun onSettingsClicked()
 }
