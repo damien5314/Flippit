@@ -179,21 +179,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         else return match.getParticipant(darkId)
     }
 
-//    override fun onConnected(bundle: Bundle?) {
-//        toast("Connected to GPGS")
-//        dismissSpinner()
-//        // The player is signed in. Hide the sign-in button and allow the
-//        // player to proceed.
-//
-//        if (bundle != null && bundle.containsKey(Multiplayer.EXTRA_TURN_BASED_MATCH)) {
-//            mMatchReceived = bundle.getParcelable<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
-//        }
-//
-//        if (mStartMatchOnStart && mMatchReceived != null) {
-//            // TODO: Start received match
-//        }
-//    }
-
     private fun displaySignInPrompt() {
         AlertDialog.Builder(this)
                 .setTitle(getString(R.string.dialog_sign_in_title))
@@ -231,15 +216,22 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             return
         }
 
-        if (mMatch!!.status != TurnBasedMatch.MATCH_STATUS_ACTIVE ||
-                mMatch!!.turnStatus != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+        if (mMatch!!.status != TurnBasedMatch.MATCH_STATUS_ACTIVE) {
+            Timber.d("Error: Match is not active")
             return
         }
 
-        val s = mBoard.spaceAt(row, col)
-
-        if (s.isOwned)
+        if (mMatch!!.turnStatus != TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
+            Timber.d("Error: Not player's turn")
             return
+        }
+
+        val space = mBoard.spaceAt(row, col)
+
+        if (space.isOwned) {
+            Timber.d("Error: Space is owned")
+            return
+        }
 
         if (!getApiClient().isConnected) {
             displaySignInPrompt()
@@ -248,14 +240,14 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
         val playerColor = getCurrentPlayerColor()
 
-        if (mBoard.spacesCapturedWithMove(s, playerColor) == 0) {
-            toast(R.string.bad_move)
+        if (mBoard.spacesCapturedWithMove(space, playerColor) == 0) {
+            Timber.d("Error: Invalid move")
             return
         }
 
         mUpdatingMatch = true
         showSpinner()
-        mBoard.commitPiece(s, playerColor) // FIXME: requestClaimSpace?
+        mBoard.commitPiece(space, playerColor)
         saveMatchData()
 
         // Add selected piece to the end of mMatchData array
@@ -265,7 +257,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         while (mMatchData!![nextIndex].toInt() != 0) {
             nextIndex += 1
         }
-        mMatchData!![nextIndex] = mBoard.getSpaceNumber(s)
+        mMatchData!![nextIndex] = mBoard.getSpaceNumber(space)
 
         updateMatchState(mMatch!!)
     }

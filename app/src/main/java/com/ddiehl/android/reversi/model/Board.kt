@@ -123,9 +123,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
             MOVE_DIRECTIONS
                     .filter { space.color == null }
                     .filter { (dx, dy) -> isWithinBounds(space.x + dx, space.y + dy) }
-                    .sumBy { (dx, dy) ->
-                        moveValueInDirection(space, dx, dy, playerColor)
-                    }
+                    .sumBy { (dx, dy) -> moveValueInDirection(space, dx, dy, playerColor) }
 
     private fun moveValueInDirection(space: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {
         // If the move would bring us out of bounds of the board area, just return 0
