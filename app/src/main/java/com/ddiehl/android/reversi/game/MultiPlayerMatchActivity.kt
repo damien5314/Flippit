@@ -642,7 +642,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun showErrorDialog(errorCode: Int) {
         GoogleApiAvailability.getInstance()
                 .getErrorDialog(this, errorCode, RC_RESOLVE_ERROR)
-                .show()
+                ?.show()
     }
 
     private fun askForRematch() {
@@ -781,20 +781,22 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun handleSelectMatchResult(resultCode: Int, data: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            val match = data!!.getParcelableExtra<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
-            if (match != null) {
-                if (match.data == null) {
-                    startMatch(match)
-                } else {
-                    updateMatch(match)
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                val match = data?.getParcelableExtra<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
+                if (match != null) {
+                    if (match.data == null) {
+                        startMatch(match)
+                    } else {
+                        updateMatch(match)
+                    }
                 }
             }
-        } else if (resultCode == GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED) {
-            // User signed out
-            signOut()
-        } else {
-            showErrorDialog(resultCode)
+            GamesActivityResultCodes.RESULT_RECONNECT_REQUIRED -> {
+                // User signed out
+                signOut()
+            }
+            else -> showErrorDialog(resultCode)
         }
     }
 
@@ -901,11 +903,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mPlayer = getCurrentPlayer(match)
         mOpponent = getOpponent(match)
         mMatchData = match.data
-
-//        Timber.d("Match ID: " + mMatch!!.matchId)
-//        Timber.d(bytesToString(mMatchData))
-//        Timber.d("Match Status: " + mMatch!!.status)
-//        Timber.d("Turn Status: " + mMatch!!.turnStatus)
 
         // Grab the appropriate segment from mMatchData based on player's color
         var startIndex = if (getCurrentPlayer(match) === mLightPlayer) 0 else 100
