@@ -52,11 +52,11 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private val mHelper: GameHelper by lazy {
-        val clients = GameHelper.CLIENT_GAMES
-        GameHelper(this, clients)
-                .apply {
-                    if (BuildConfig.DEBUG) enableDebugLog(true)
-                }
+        GameHelper(this, GameHelper.CLIENT_GAMES)
+                .apply { if (BuildConfig.DEBUG) enableDebugLog(true) }
+    }
+    private val mAchievementManager: AchievementManager by lazy {
+        AchievementManager.get(getApiClient())
     }
 
     private var mMatch: TurnBasedMatch? = null
@@ -72,15 +72,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mUpdatingMatch = false
     private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
 
-    private var mResolvingConnectionFailure = false
-    private var mAutoStartSignInFlow = true
-    private var mSignInClicked = false
-
-    private lateinit var mAchievementManager: AchievementManager
-
-    private var mMatchReceived: TurnBasedMatch? = null
-    private var mStartMatchOnStart = false
-
     //region BaseGameActivity
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,8 +85,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mHelper.setShowErrorDialogs(true)
 
         mMatchView.showScore(false)
-
-        mAchievementManager = AchievementManager.get(getApiClient())
     }
 
     override fun onStart() {
@@ -142,6 +131,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
         if (mSignOutOnConnect) {
             mSignOutOnConnect = false
+            mMatchView.clearBoard()
             signOut()
         }
     }
@@ -301,7 +291,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             }
 
             if (mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
-                // Call finishMatch() to close out match for player
+                // Call finishMatch() to close out mMatch!! for player
                 Games.TurnBasedMultiplayer.finishMatch(getApiClient(), mMatch!!.matchId)
                         .setResultCallback {
                             updateMatchResult -> processResultFinishMatch(updateMatchResult)
@@ -543,17 +533,17 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         dismissSpinner()
         if (checkStatusCode(result.status.statusCode)) {
             val match = result.match
-            mPlayer = getCurrentPlayer(match)
+            val player = getCurrentPlayer(match)
             mMatch = match
 
             // Update achievements
-            if (mPlayer!!.gpg!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
+            if (player.gpg!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
                 mAchievementManager.unlock(Achievements.FIRST_WIN)
                 val maxScore = mBoard.width * mBoard.height
                 if (playerScore == maxScore) {
                     mAchievementManager.unlock(Achievements.PERFECT_WIN)
                 }
-            } else if (mPlayer!!.gpg!!.result.result == ParticipantResult.MATCH_RESULT_TIE) {
+            } else if (player.gpg.result.result == ParticipantResult.MATCH_RESULT_TIE) {
                 mAchievementManager.unlock(Achievements.TIE_GAME)
             }
             mAchievementManager.increment(Achievements.TEN_MATCHES, 1)
@@ -843,10 +833,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private fun handleSettingsResult(resultCode: Int) {
         when (resultCode) {
             SettingsActivity.RESULT_SIGN_OUT -> {
-                mSignOutOnConnect = true
-
                 // User signed out
-                signOut()
+                mSignOutOnConnect = true
             }
         }
     }

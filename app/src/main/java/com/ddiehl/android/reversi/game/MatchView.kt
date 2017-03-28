@@ -184,8 +184,9 @@ class MatchView : FrameLayout {
     }
 
     fun clearBoard() {
-        mPlayerTwoScore.text = ""
+        showScore(false)
         mBoardPanelView.visibility = View.VISIBLE
+        dismissMessage()
     }
 
     fun displayMessage(matchMsg: String) {
