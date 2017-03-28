@@ -129,24 +129,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mHelper.signOut()
     }
 
-    private fun enableDebugLog(enabled: Boolean) {
-        mHelper.enableDebugLog(enabled)
-    }
-
     private fun getInvitationId(): String {
         return mHelper.invitationId
-    }
-
-    private fun reconnectClient() {
-        mHelper.reconnectClient()
-    }
-
-    private fun hasSignInError(): Boolean {
-        return mHelper.hasSignInError()
-    }
-
-    private fun getSignInError(): GameHelper.SignInFailureReason {
-        return mHelper.signInError
     }
 
     //endregion
@@ -164,10 +148,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     override fun onSignInFailed() {
         dismissSpinner()
-
-        if (mHelper.hasSignInError()) {
-            toast("Sign in failed: " + mHelper.signInError.toString())
-        }
     }
 
     //endregion
