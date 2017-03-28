@@ -774,6 +774,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         when (resultCode) {
             Activity.RESULT_OK -> {
                 val match = data?.getParcelableExtra<TurnBasedMatch>(Multiplayer.EXTRA_TURN_BASED_MATCH)
+                mMatch = match
                 if (match != null) {
                     if (match.data == null) {
                         startMatch(match)
