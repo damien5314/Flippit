@@ -13,6 +13,8 @@ import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.BoardSpace
 import com.ddiehl.android.reversi.model.ComputerAI
 import com.ddiehl.android.reversi.model.ReversiColor
+import com.ddiehl.android.reversi.model.ReversiColor.DARK
+import com.ddiehl.android.reversi.model.ReversiColor.LIGHT
 import com.ddiehl.android.reversi.model.ReversiPlayer
 import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.google.android.gms.common.ConnectionResult
@@ -67,8 +69,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mOpponent: ReversiPlayer? = null
     private var mLightPlayer: ReversiPlayer? = null
     private var mDarkPlayer: ReversiPlayer? = null
-    private var mLightScore: Int = 0
-    private var mDarkScore: Int = 0
 
     private var mSignOutOnConnect = false
     private var mUpdatingMatch = false
@@ -159,13 +159,13 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     private fun getCurrentPlayerColor(): ReversiColor {
-        if (mPlayer === mLightPlayer) return ReversiColor.LIGHT
-        else return ReversiColor.DARK
+        if (mPlayer === mLightPlayer) return LIGHT
+        else return DARK
     }
 
     private fun getOpponentColor(): ReversiColor {
-        if (mOpponent === mLightPlayer) return ReversiColor.LIGHT
-        else return ReversiColor.DARK
+        if (mOpponent === mLightPlayer) return LIGHT
+        else return DARK
     }
 
     private fun getLightPlayer(match: TurnBasedMatch): Participant {
@@ -180,6 +180,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         if (darkId == null) return null
         else return match.getParticipant(darkId)
     }
+
+    private fun getScore(color: ReversiColor): Int = mBoard.count { it.color == color }
 
     private fun displaySignInPrompt() {
         AlertDialog.Builder(this)
@@ -296,8 +298,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         } else { // Match is not yet finished
             val winnerResult: ParticipantResult
             val loserResult: ParticipantResult
-            if (mLightScore != mDarkScore) {
-                if (mLightScore > mDarkScore) {
+            if (getScore(LIGHT) != getScore(DARK)) {
+                if (getScore(LIGHT) > getScore(DARK)) {
                     winnerResult = ParticipantResult(
                             mLightPlayer!!.gpg!!.participantId,
                             ParticipantResult.MATCH_RESULT_WIN,
@@ -532,6 +534,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             if (player.gpg!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
                 mAchievementManager.unlock(Achievements.FIRST_WIN)
                 val maxScore = mBoard.width * mBoard.height
+                val playerScore = if (mPlayer === mLightPlayer) getScore(LIGHT) else getScore(DARK)
                 if (playerScore == maxScore) {
                     mAchievementManager.unlock(Achievements.PERFECT_WIN)
                 }
@@ -693,23 +696,20 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         updateScore(match)
     }
 
-    private val playerScore: Int
-        get() = if (mPlayer === mLightPlayer) mLightScore else mDarkScore
-
     private fun updateScore(match: TurnBasedMatch) {
-        mLightScore = mBoard.getNumSpacesForColor(ReversiColor.LIGHT)
-        mDarkScore = mBoard.getNumSpacesForColor(ReversiColor.DARK)
+        var light = getScore(LIGHT)
+        var dark = getScore(DARK)
 
         if (match.status == TurnBasedMatch.MATCH_STATUS_COMPLETE && !mUpdatingMatch) {
             // Add remaining spaces to winning count as per Reversi rules
             if (mLightPlayer!!.gpg!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
-                mLightScore += mBoard.numberOfEmptySpaces
+                light += mBoard.numberOfEmptySpaces
             } else if (mDarkPlayer!!.gpg!!.result.result == ParticipantResult.MATCH_RESULT_WIN) {
-                mDarkScore += mBoard.numberOfEmptySpaces
+                dark += mBoard.numberOfEmptySpaces
             }
         }
 
-        mMatchView.showScore(mLightScore, mDarkScore)
+        mMatchView.showScore(light, dark)
     }
 
     private fun registerMatchUpdateListener(shouldRegister: Boolean) {
@@ -873,8 +873,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
         val lightParticipant = getLightPlayer(match)
         val darkParticipant = getDarkPlayer(match)
-        mLightPlayer = ReversiPlayer(ReversiColor.LIGHT, lightParticipant.displayName, lightParticipant)
-        mDarkPlayer = ReversiPlayer(ReversiColor.LIGHT, darkParticipant?.displayName ?: "", darkParticipant)
+        mLightPlayer = ReversiPlayer(LIGHT, lightParticipant.displayName, lightParticipant)
+        mDarkPlayer = ReversiPlayer(LIGHT, darkParticipant?.displayName ?: "", darkParticipant)
 
         mPlayer = getCurrentPlayer(match)
         mOpponent = getOpponent(match)
@@ -1003,7 +1003,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
                 && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
                 && mMatch!!.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_MY_TURN) {
             delay(500) {
-                val color = if (mPlayer === mLightPlayer) ReversiColor.LIGHT else ReversiColor.DARK
+                val color = if (mPlayer === mLightPlayer) LIGHT else DARK
                 val bestMove = ComputerAI.getBestMove_d3(mBoard, color)
                 if (bestMove != null) {
                     onSpaceClick(bestMove.y, bestMove.x)
