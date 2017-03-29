@@ -49,6 +49,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         private val RC_SELECT_PLAYERS = 1004
         private val RC_SHOW_ACHIEVEMENTS = 1005
         private val RC_SETTINGS = 1006
+
+        private val LIGHT_START_INDEX = 0
+        private val DARK_START_INDEX = 100
     }
 
     private val mHelper: GameHelper by lazy {
@@ -64,7 +67,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     private var mOpponent: ReversiPlayer? = null
     private var mLightPlayer: ReversiPlayer? = null
     private var mDarkPlayer: ReversiPlayer? = null
-    private var mMatchData: ByteArray? = null
     private var mLightScore: Int = 0
     private var mDarkScore: Int = 0
 
@@ -209,6 +211,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mProgressBar.dismiss()
     }
 
+    val mMovesThisTurn = ArrayList<BoardSpace>()
+
     override fun onSpaceClick(row: Int, col: Int) {
         Timber.d("Piece clicked @ $row $col")
         if (mUpdatingMatch || !mQueuedMoves.isEmpty()) {
@@ -248,18 +252,18 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mUpdatingMatch = true
         showSpinner()
         mBoard.commitPiece(space, playerColor)
-        saveMatchData()
+        val data = saveMatchData()
 
         // Add selected piece to the end of mMatchData array
         // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
         var nextIndex = if (mPlayer == mLightPlayer) 164 else 64
         // Increase index til we run into an unfilled index
-        while (mMatchData!![nextIndex].toInt() != 0) {
+        while (data[nextIndex].toInt() != 0) {
             nextIndex += 1
         }
-        mMatchData!![nextIndex] = mBoard.getSpaceNumber(space)
+        data[nextIndex] = mBoard.getSpaceNumber(space)
 
-        updateMatchState(mMatch!!)
+        updateMatchState(mMatch!!, data)
     }
 
     override fun endMatch() {
@@ -336,11 +340,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
             // Call finishMatch() with result parameters
             Games.TurnBasedMultiplayer.finishMatch(
-                    getApiClient(), mMatch!!.matchId, mMatchData, winnerResult, loserResult
-            )
-                    .setResultCallback { updateMatchResult ->
-                        processResultFinishMatch(updateMatchResult)
-                    }
+                    getApiClient(), mMatch!!.matchId, saveMatchData(), winnerResult, loserResult
+            ).setResultCallback { updateMatchResult -> processResultFinishMatch(updateMatchResult) }
         }
     }
 
@@ -474,16 +475,15 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         )
         // Give win to other player
         Games.TurnBasedMultiplayer.finishMatch(
-                getApiClient(), mMatch!!.matchId, mMatchData, winnerResult, loserResult
-        )
-                .setResultCallback { result ->
-                    if (result.status.isSuccess) {
-                        toast(R.string.forfeit_success, Toast.LENGTH_LONG)
-                        updateMatch(result.match)
-                    } else {
-                        toast(R.string.forfeit_fail, Toast.LENGTH_LONG)
-                    }
-                }
+                getApiClient(), mMatch!!.matchId, saveMatchData(), winnerResult, loserResult
+        ).setResultCallback { result ->
+            if (result.status.isSuccess) {
+                toast(R.string.forfeit_success, Toast.LENGTH_LONG)
+                updateMatch(result.match)
+            } else {
+                toast(R.string.forfeit_fail, Toast.LENGTH_LONG)
+            }
+        }
     }
 
     private fun showForfeitMatchForbiddenAlert() {
@@ -670,11 +670,11 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         }
     }
 
-    private fun updateMatchState(match: TurnBasedMatch) {
+    private fun updateMatchState(match: TurnBasedMatch, data: ByteArray) {
         // If opponent can make a move, it's his turn
         if (mBoard.hasMove(mOpponent!!.color)) {
             val playerId = if (mOpponent == null) null else mOpponent!!.gpg?.participantId
-            Games.TurnBasedMultiplayer.takeTurn(getApiClient(), match.matchId, mMatchData, playerId)
+            Games.TurnBasedMultiplayer.takeTurn(getApiClient(), match.matchId, data, playerId)
                     .setResultCallback { updateMatchResult -> processResult(updateMatchResult) }
         }
         // Opponent has no move, keep turn
@@ -682,10 +682,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
             val msg = getString(R.string.no_moves, mOpponent!!.gpg!!.displayName)
             toast(msg)
             Games.TurnBasedMultiplayer.takeTurn(
-                    getApiClient(), match.matchId, mMatchData,
-                    mPlayer!!.gpg!!.participantId
-            )
-                    .setResultCallback { updateMatchResult -> processResult(updateMatchResult) }
+                    getApiClient(), match.matchId, data, mPlayer!!.gpg!!.participantId
+            ).setResultCallback { updateMatchResult -> processResult(updateMatchResult) }
         }
         // No moves remaining, end of match
         else {
@@ -834,7 +832,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     private fun processResult(result: TurnBasedMultiplayer.InitiateMatchResult) {
         val match = result.match
-        mMatchData = null
 
         if (checkStatusCode(result.status.statusCode)) {
             if (match.data == null) {
@@ -847,9 +844,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     private fun startMatch(match: TurnBasedMatch) {
         mMatch = match
-        mMatchData = null
         mBoard.reset()
-        saveMatchData()
         mMatchView.showScore(true)
         mMatchView.displayBoard(mBoard)
         updateScore(match)
@@ -857,7 +852,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         val playerId = Games.Players.getCurrentPlayerId(getApiClient())
         val participantId = mMatch!!.getParticipantId(playerId)
         Games.TurnBasedMultiplayer.takeTurn(
-                getApiClient(), match.matchId, mMatchData, participantId
+                getApiClient(), match.matchId, saveMatchData(), participantId
         ).setResultCallback { processResult(it) }
     }
 
@@ -883,11 +878,11 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
         mPlayer = getCurrentPlayer(match)
         mOpponent = getOpponent(match)
-        mMatchData = match.data
+        val matchData = match.data
 
         // Grab the appropriate segment from mMatchData based on player's color
         var startIndex = if (getCurrentPlayer(match) === mLightPlayer) 0 else 100
-        val playerData = Arrays.copyOfRange(mMatchData!!, startIndex, startIndex + 64)
+        val playerData = Arrays.copyOfRange(matchData, startIndex, startIndex + 64)
 
         mBoard.restoreState(playerData)
         mMatchView.showScore(true)
@@ -897,9 +892,9 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         // Commit opponent's moves to the deserialized Board object
         // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
         startIndex += 64
-        while (mMatchData!![startIndex].toInt() != 0) {
-            val s = mBoard.getBoardSpaceFromNum(mMatchData!![startIndex++].toInt())
-            mQueuedMoves.add(s!!)
+        while (matchData[startIndex].toInt() != 0) {
+            val space = mBoard.getBoardSpaceFromNum(matchData[startIndex++].toInt())
+            mQueuedMoves.add(space)
         }
 
         mUpdatingMatch = false
@@ -945,21 +940,24 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mMatch = match
     }
 
-    // FIXME - Should take a ByteArray and return a new ByteArray, instead of operating on state
-    private fun saveMatchData() {
-        val playerBoard = mBoard.serialize()
+    private fun saveMatchData(): ByteArray {
+        val board = mBoard.serialize()
 
-        if (mMatchData == null) {
-            mMatchData = ByteArray(256)
-            System.arraycopy(playerBoard, 0, mMatchData!!, 0, playerBoard.size)
-            System.arraycopy(playerBoard, 0, mMatchData!!, 100, playerBoard.size)
-        } else {
-            val startIndex = if (mPlayer === mLightPlayer) 0 else 100
+        val data = mMatch!!.data ?: ByteArray(256).apply {
+            System.arraycopy(board, 0, this, LIGHT_START_INDEX, board.size)
+            System.arraycopy(board, 0, this, DARK_START_INDEX, board.size)
+        }
+
+        return data.apply {
+            val startIndex = if (mPlayer === mLightPlayer) LIGHT_START_INDEX else DARK_START_INDEX
+
             // Copy the serialized Board into the appropriate place in match data
-            System.arraycopy(playerBoard, 0, mMatchData!!, startIndex, playerBoard.size)
+            System.arraycopy(board, 0, this, startIndex, board.size)
+
             // Clear out the first 16 nodes following, which were the other player's previous moves
-            for (clearIndex in startIndex + 64 until startIndex + 64 + 16)
-                mMatchData!![clearIndex] = 0
+            for (clearIndex in (startIndex + 64 until startIndex + 64 + 16)) {
+                this[clearIndex] = 0
+            }
         }
     }
 
