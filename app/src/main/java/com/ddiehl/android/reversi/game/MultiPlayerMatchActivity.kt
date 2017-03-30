@@ -22,7 +22,7 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch
 import com.google.example.games.basegameutils.GameHelper
 
 class MultiPlayerMatchActivity : BaseMatchActivity(),
-        IMatchView, GameHelper.GameHelperListener {
+        MatchView, GameHelper.GameHelperListener {
 
     companion object {
         private @LayoutRes val LAYOUT_RES_ID = R.layout.match_activity
@@ -60,7 +60,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mHelper.setup(this)
         mHelper.setShowErrorDialogs(true)
 
-        mMatchView.showScore(false)
+        mMatchFragment.showScore(false)
     }
 
     override fun onStart() {
@@ -81,7 +81,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     override fun getGameHelper(): GameHelper = mHelper
 
     override fun clearBoard() {
-        mMatchView.clearBoard()
+        mMatchFragment.clearBoard()
     }
 
     private fun getApiClient(): GoogleApiClient {
@@ -113,7 +113,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
         if (mSignOutOnConnect) {
             mSignOutOnConnect = false
-            mMatchView.clearBoard()
+            mMatchFragment.clearBoard()
             signOut()
         }
     }
@@ -155,23 +155,23 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     override fun showScore(show: Boolean) {
-        mMatchView.showScore(show)
+        mMatchFragment.showScore(show)
     }
 
     override fun showScore(light: Int, dark: Int) {
-        mMatchView.showScore(light, dark)
+        mMatchFragment.showScore(light, dark)
     }
 
     override fun displayMessage(string: String) {
-        mMatchView.displayMessage(string)
+        mMatchFragment.displayMessage(string)
     }
 
     override fun displayMessage(resId: Int) {
-        mMatchView.displayMessage(getString(resId))
+        mMatchFragment.displayMessage(getString(resId))
     }
 
     override fun dismissMessage() {
-        mMatchView.dismissMessage()
+        mMatchFragment.dismissMessage()
     }
 
     override fun onSpaceClick(row: Int, col: Int) {
@@ -179,7 +179,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     override fun displayBoard(board: Board) {
-        mMatchView.displayBoard(board)
+        mMatchFragment.displayBoard(board)
     }
 
     override fun toast(msg: String) {
@@ -218,8 +218,8 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
     }
 
     override fun onCloseMatchClicked() {
-        mMatchView.clearBoard()
-        mMatchView.showMatchButtons(true, true)
+        mMatchFragment.clearBoard()
+        mMatchFragment.showMatchButtons(true, true)
     }
 
     override fun onForfeitMatchClicked() {

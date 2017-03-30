@@ -15,12 +15,12 @@ import com.ddiehl.android.reversi.startActivity
 abstract class BaseMatchActivity : AppCompatActivity() {
 
     protected val mToolbar by bindView<Toolbar>(R.id.toolbar)
-    protected val mMatchView by bindView<MatchView>(R.id.match_view)
+    protected val mMatchFragment by bindView<MatchFragment>(R.id.match_view)
 
     protected val mBoard: Board = Board(8, 8)
 
     override fun onStop() {
-        mMatchView.dismissMessage()
+        mMatchFragment.dismissMessage()
         super.onStop()
     }
 

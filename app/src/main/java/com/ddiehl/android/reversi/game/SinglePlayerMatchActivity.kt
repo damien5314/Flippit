@@ -19,7 +19,7 @@ import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
+class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
 
     companion object {
         private @LayoutRes val LAYOUT_RES_ID = R.layout.match_activity
@@ -44,8 +44,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         setSupportActionBar(mToolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
 
-        mMatchView.showScore(false)
-        mMatchView.dismissMessage()
+        mMatchFragment.showScore(false)
+        mMatchFragment.dismissMessage()
 
         mPlayerLight = ReversiPlayer(ReversiColor.LIGHT, getString(R.string.player1_label))
         mPlayerDark = ReversiPlayer(ReversiColor.DARK, getString(R.string.player2_label))
@@ -53,7 +53,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
         mPlayerDark.isCPU = P2_CPU
 
         // Hide select match panel for single player
-        mMatchView.showMatchButtons(true, false)
+        mMatchFragment.showMatchButtons(true, false)
 
         // Restore saved state if it exists
         val savedData = m1PSavedState.board
@@ -61,9 +61,9 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
             mCurrentPlayer = if (m1PSavedState.currentPlayer) mPlayerLight else mPlayerDark
             mPlayerWithFirstTurn = if (m1PSavedState.firstTurn) mPlayerLight else mPlayerDark
             mBoard.restoreState(savedData)
-            mMatchView.showScore(true)
-            mMatchView.updateBoardUi(mBoard)
-            mMatchView.displayBoard(mBoard)
+            mMatchFragment.showScore(true)
+            mMatchFragment.updateBoardUi(mBoard)
+            mMatchFragment.displayBoard(mBoard)
             updateScoreDisplay()
             mMatchInProgress = true
         } else {
@@ -99,7 +99,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
                         toast(getString(R.string.no_moves, opponent.name))
                     } else {
                         mBoard.commitPiece(space, mCurrentPlayer!!.color)
-                        mMatchView.updateBoardUi(mBoard, true)
+                        mMatchFragment.updateBoardUi(mBoard, true)
                         calculateMatchState()
                     }
                 })
@@ -152,8 +152,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     fun updateScoreDisplay() {
         mPlayerLight.score = mBoard.count { it.isOwned && it.color == ReversiColor.LIGHT }
         mPlayerDark.score = mBoard.count { it.isOwned && it.color == ReversiColor.DARK }
-        mMatchView.updateScoreForPlayer(mPlayerLight.score, null)
-        mMatchView.updateScoreForPlayer(null, mPlayerDark.score)
+        mMatchFragment.updateScoreForPlayer(mPlayerLight.score, null)
+        mMatchFragment.updateScoreForPlayer(null, mPlayerDark.score)
     }
 
 
@@ -186,7 +186,7 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
     private fun onSpaceClaimed(): Action1<Boolean> {
         return Action1 {
-            mMatchView.updateBoardUi(mBoard, true)
+            mMatchFragment.updateBoardUi(mBoard, true)
             calculateMatchState()
         }
     }
@@ -206,15 +206,15 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
             if (mPlayerLight.score > mPlayerDark.score) { // P1 wins
                 mPlayerLight.score += diff
-                mMatchView.updateScoreForPlayer(mPlayerLight.score, null)
-                mMatchView.displayMessage(getString(R.string.winner_p1))
+                mMatchFragment.updateScoreForPlayer(mPlayerLight.score, null)
+                mMatchFragment.displayMessage(getString(R.string.winner_p1))
             } else { // P2 wins
                 mPlayerDark.score += diff
-                mMatchView.updateScoreForPlayer(null, mPlayerDark.score)
-                mMatchView.displayMessage(getString(R.string.winner_cpu))
+                mMatchFragment.updateScoreForPlayer(null, mPlayerDark.score)
+                mMatchFragment.displayMessage(getString(R.string.winner_cpu))
             }
         } else {
-            mMatchView.displayMessage(getString(R.string.winner_tie))
+            mMatchFragment.displayMessage(getString(R.string.winner_tie))
         }
         switchFirstTurn()
         m1PSavedState.clear()
@@ -228,8 +228,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
 
     override fun onStartNewMatchClicked() {
         mBoard.reset()
-        mMatchView.showScore(true)
-        mMatchView.displayBoard(mBoard)
+        mMatchFragment.showScore(true)
+        mMatchFragment.displayBoard(mBoard)
         switchFirstTurn()
         updateScoreDisplay()
         mMatchInProgress = true
@@ -241,8 +241,8 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), IMatchView {
     }
 
     override fun onCloseMatchClicked() {
-        mMatchView.clearBoard()
-        mMatchView.showMatchButtons(true, false)
+        mMatchFragment.clearBoard()
+        mMatchFragment.showMatchButtons(true, false)
     }
 
     override fun onSelectMatchClicked() {
