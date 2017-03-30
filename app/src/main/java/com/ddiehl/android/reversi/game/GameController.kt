@@ -502,6 +502,95 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
         }
     }
 
+    fun cancelMatch() {
+        if (!getApiClient().isConnected) {
+            mMatchView.displaySignInPrompt()
+        } else {
+            Games.TurnBasedMultiplayer.cancelMatch(getApiClient(), mMatch!!.matchId)
+                    .setResultCallback {
+                        result -> processResult(result)
+                    }
+        }
+    }
+
+    private fun processResult(result: TurnBasedMultiplayer.CancelMatchResult) {
+        if (result.status.isSuccess) {
+            mMatchView.toast(R.string.match_canceled_toast)
+            mMatchView.clearBoard()
+        } else {
+            mMatchView.toast(R.string.cancel_fail)
+        }
+    }
+
+    fun rematch() {
+        if (!getApiClient().isConnected) {
+            mMatchView.showSpinner()
+            Games.TurnBasedMultiplayer.rematch(getApiClient(), mMatch!!.matchId)
+                    .setResultCallback { result -> processResult(result) }
+            mMatch = null
+        } else {
+            mMatchView.displaySignInPrompt()
+        }
+    }
+
+    fun selectMatch(match: TurnBasedMatch) {
+        mMatch = match
+        if (match.data == null) {
+            startMatch(match)
+        } else {
+            updateMatch(match)
+        }
+    }
+
+    fun initiateMatch(data: Intent) {
+        val invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS)
+
+        val minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0)
+        val maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0)
+
+        val autoMatchCriteria =
+                if (minAutoMatchPlayers > 0) {
+                    RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0)
+                } else {
+                    mAchievementManager.unlock(Achievements.PLAY_WITH_FRIEND)
+                    null
+                }
+
+        val matchConfig = TurnBasedMatchConfig.builder()
+                .addInvitedPlayers(invitees)
+                .setAutoMatchCriteria(autoMatchCriteria)
+                .build()
+
+        mMatchView.showSpinner()
+        Games.TurnBasedMultiplayer.createMatch(getApiClient(), matchConfig)
+                .setResultCallback { processResult(it) }
+    }
+
+    fun registerMatchUpdateListener(shouldRegister: Boolean) {
+        Games.TurnBasedMultiplayer.unregisterMatchUpdateListener(getApiClient())
+        if (shouldRegister) {
+            Games.TurnBasedMultiplayer.registerMatchUpdateListener(getApiClient(), this)
+        }
+    }
+
+    override fun onTurnBasedMatchReceived(match: TurnBasedMatch) {
+        if (mMatch != null && mMatch!!.matchId == match.matchId) {
+            if (match.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN) {
+                // Turn still belongs to opponent, wait for another update
+                return
+            }
+            updateMatch(match)
+        }
+    }
+
+    override fun onTurnBasedMatchRemoved(matchId: String) {
+        if (mMatch != null && mMatch!!.matchId == matchId) {
+            mMatchView.toast(R.string.match_removed)
+            mMatch = null
+            mMatchView.clearBoard()
+        }
+    }
+
     private fun saveMatchData(): ByteArray {
         val board = mBoard.serialize()
 
@@ -599,95 +688,6 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
                     onSpaceClick(bestMove.y, bestMove.x)
                 }
             }
-        }
-    }
-
-    fun cancelMatch() {
-        if (!getApiClient().isConnected) {
-            mMatchView.displaySignInPrompt()
-        } else {
-            Games.TurnBasedMultiplayer.cancelMatch(getApiClient(), mMatch!!.matchId)
-                    .setResultCallback {
-                        result -> processResult(result)
-                    }
-        }
-    }
-
-    private fun processResult(result: TurnBasedMultiplayer.CancelMatchResult) {
-        if (result.status.isSuccess) {
-            mMatchView.toast(R.string.match_canceled_toast)
-            mMatchView.clearBoard()
-        } else {
-            mMatchView.toast(R.string.cancel_fail)
-        }
-    }
-
-    fun rematch() {
-        if (!getApiClient().isConnected) {
-            mMatchView.showSpinner()
-            Games.TurnBasedMultiplayer.rematch(getApiClient(), mMatch!!.matchId)
-                    .setResultCallback { result -> processResult(result) }
-            mMatch = null
-        } else {
-            mMatchView.displaySignInPrompt()
-        }
-    }
-
-    fun selectMatch(match: TurnBasedMatch) {
-        mMatch = match
-        if (match.data == null) {
-            startMatch(match)
-        } else {
-            updateMatch(match)
-        }
-    }
-
-    fun initiateMatch(data: Intent) {
-        val invitees = data.getStringArrayListExtra(Games.EXTRA_PLAYER_IDS)
-
-        val minAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MIN_AUTOMATCH_PLAYERS, 0)
-        val maxAutoMatchPlayers = data.getIntExtra(Multiplayer.EXTRA_MAX_AUTOMATCH_PLAYERS, 0)
-
-        val autoMatchCriteria =
-                if (minAutoMatchPlayers > 0) {
-                    RoomConfig.createAutoMatchCriteria(minAutoMatchPlayers, maxAutoMatchPlayers, 0)
-                } else {
-                    mAchievementManager.unlock(Achievements.PLAY_WITH_FRIEND)
-                    null
-                }
-
-        val matchConfig = TurnBasedMatchConfig.builder()
-                .addInvitedPlayers(invitees)
-                .setAutoMatchCriteria(autoMatchCriteria)
-                .build()
-
-        mMatchView.showSpinner()
-        Games.TurnBasedMultiplayer.createMatch(getApiClient(), matchConfig)
-                .setResultCallback { processResult(it) }
-    }
-
-    fun registerMatchUpdateListener(shouldRegister: Boolean) {
-        Games.TurnBasedMultiplayer.unregisterMatchUpdateListener(getApiClient())
-        if (shouldRegister) {
-            Games.TurnBasedMultiplayer.registerMatchUpdateListener(getApiClient(), this)
-        }
-    }
-
-    override fun onTurnBasedMatchReceived(match: TurnBasedMatch) {
-        if (mMatch != null && mMatch!!.matchId == match.matchId) {
-            if (match.turnStatus == TurnBasedMatch.MATCH_TURN_STATUS_THEIR_TURN) {
-                // Turn still belongs to opponent, wait for another update
-                return
-            }
-            updateMatch(match)
-        }
-    }
-
-    override fun onTurnBasedMatchRemoved(matchId: String) {
-        if (mMatch != null && mMatch!!.matchId == matchId) {
-            mMatchView.toast(R.string.match_removed)
-            mMatch = null
-            mMatchView.clearBoard()
         }
     }
 }
