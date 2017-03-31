@@ -17,4 +17,8 @@ data class BoardSpace(private val row: Int, private val col: Int, var color: Rev
             return color
         }
     }
+
+    override fun toString(): String {
+        return "Space($x $y)"
+    }
 }
