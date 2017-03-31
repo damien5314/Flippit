@@ -188,7 +188,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
     }
 
     fun getBoardSpaceFromNum(n: Int): BoardSpace {
-        return getSpaceAt(n % 8, n / 8)
+        return getSpaceAt((n-1) % 8, (n-1) / 8)
     }
 
     fun spaceAt(row: Int, col: Int): BoardSpace {

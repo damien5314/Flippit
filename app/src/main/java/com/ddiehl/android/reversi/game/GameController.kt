@@ -1,10 +1,7 @@
 package com.ddiehl.android.reversi.game
 
 import android.content.Intent
-import com.ddiehl.android.reversi.AUTOMATED_MULTIPLAYER
-import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
-import com.ddiehl.android.reversi.R
-import com.ddiehl.android.reversi.delay
+import com.ddiehl.android.reversi.*
 import com.ddiehl.android.reversi.model.*
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.games.Games
@@ -23,22 +20,24 @@ import java.util.*
 class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
 
     companion object {
-        private val LIGHT_START_INDEX = 0
-        private val DARK_START_INDEX = 100
+        private val LIGHT_BOARD_INDEX = 0
+        private val DARK_BOARD_INDEX = 64
+        private val LIGHT_MOVES_INDEX = 128
+        private val DARK_MOVES_INDEX = 144
     }
 
-    private val mBoard: Board = Board(8, 8)
-    private var mMatch: TurnBasedMatch? = null
-    private var mPlayer: ReversiPlayer? = null
-    private var mOpponent: ReversiPlayer? = null
-    private var mLightPlayer: ReversiPlayer? = null
-    private var mDarkPlayer: ReversiPlayer? = null
-    private val mMatchView: MatchView = view
-    private val mAchievementManager: AchievementManager by lazy {
+    internal val mBoard: Board = Board(8, 8)
+    internal var mMatch: TurnBasedMatch? = null
+    internal var mPlayer: ReversiPlayer? = null
+    internal var mOpponent: ReversiPlayer? = null
+    internal var mLightPlayer: ReversiPlayer? = null
+    internal var mDarkPlayer: ReversiPlayer? = null
+    internal val mMatchView: MatchView = view
+    internal val mAchievementManager: AchievementManager by lazy {
         AchievementManager.get(getApiClient())
     }
-    private var mUpdatingMatch = false
-    private val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
+    internal var mUpdatingMatch = false
+    internal val mQueuedMoves: MutableList<BoardSpace> = ArrayList()
 
     private fun getApiClient(): GoogleApiClient = mMatchView.getGameHelper().apiClient
 
@@ -86,7 +85,6 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
     }
 
     fun onSpaceClick(row: Int, col: Int) {
-
         Timber.d("Piece clicked @ $row $col")
         if (mUpdatingMatch || !mQueuedMoves.isEmpty()) {
             Timber.d("Error: Still evaluating last move")
@@ -124,19 +122,23 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
 
         mUpdatingMatch = true
         mMatchView.showSpinner()
-        mBoard.commitPiece(space, playerColor)
-        val data = saveMatchData()
+        mBoard.requestClaimSpace(space.y, space.x, playerColor)
+                .subscribe({
+                    val data = saveMatchData()
 
-        // Add selected piece to the end of mMatchData array
-        // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
-        var nextIndex = if (mPlayer == mLightPlayer) 164 else 64
-        // Increase index til we run into an unfilled index
-        while (data[nextIndex].toInt() != 0) {
-            nextIndex += 1
-        }
-        data[nextIndex] = mBoard.getSpaceNumber(space)
+                    // Add selected piece to the end of match data array
+                    val movesIndex = if (mPlayer === mLightPlayer) LIGHT_MOVES_INDEX else DARK_MOVES_INDEX
+                    val moveIndex = (movesIndex until movesIndex + 16)
+                            .first { data[movesIndex] == 0.toByte() }
+                    Timber.d("[DCD] Appending move @ index %d", moveIndex)
+                    data[moveIndex] = mBoard.getSpaceNumber(space)
+                    Timber.d("[DCD] Space number: %d", data[moveIndex])
+                    Timber.d("[DCD] Match data with move appended %s", byteArrayToString(data))
 
-        updateMatchState(mMatch!!, data)
+                    updateMatchState(mMatch!!, data)
+                }, {
+//                    throw IllegalMoveException("Attempting to claim an invalid space @ $space")
+                })
     }
 
     private fun updateMatchState(match: TurnBasedMatch, data: ByteArray) {
@@ -167,33 +169,32 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
         val lightParticipant = getLightPlayer(match)
         val darkParticipant = getDarkPlayer(match)
         mLightPlayer = ReversiPlayer(ReversiColor.LIGHT, lightParticipant.displayName, lightParticipant)
-        mDarkPlayer = ReversiPlayer(ReversiColor.LIGHT, darkParticipant?.displayName ?: "", darkParticipant)
+        mDarkPlayer = ReversiPlayer(ReversiColor.DARK, darkParticipant?.displayName ?: "", darkParticipant)
 
         mPlayer = getCurrentPlayer(match)
         mOpponent = getOpponent(match)
-        val matchData = match.data
 
-        // Grab the appropriate segment from mMatchData based on player's color
-        var startIndex = if (getCurrentPlayer(match) === mLightPlayer) 0 else 100
-        val playerData = Arrays.copyOfRange(matchData, startIndex, startIndex + 64)
+        // Grab the appropriate segment from mMatchData based on opponent's color
+        val boardIndex = if (mPlayer === mLightPlayer) LIGHT_BOARD_INDEX else DARK_BOARD_INDEX
+        val playerData = Arrays.copyOfRange(match.data, boardIndex, boardIndex + 64)
+        Timber.d("[DCD] Restoring board from index %d", boardIndex)
 
         mBoard.restoreState(playerData)
         mMatchView.showScore(true)
         mMatchView.displayBoard(mBoard)
         mMatchView.dismissSpinner()
 
-        // Commit opponent's moves to the deserialized Board object
-        // 0 [Light's Board] 64 [Dark's Moves] 100 [Dark's Board] 164 [Light's Moves]
-        startIndex += 64
-        while (matchData[startIndex].toInt() != 0) {
-            val space = mBoard.getBoardSpaceFromNum(matchData[startIndex++].toInt())
-            mQueuedMoves.add(space)
-        }
-
+        // Commit opponent's moves to the Board object
+        val movesIndex = if (mPlayer === mLightPlayer) DARK_MOVES_INDEX else LIGHT_MOVES_INDEX
+        Timber.d("[DCD] Restoring moves from index %d", movesIndex)
+        (movesIndex until movesIndex + 16)
+                .takeWhile { match.data[it] != 0.toByte() }
+                .mapTo(mQueuedMoves) { mBoard.getBoardSpaceFromNum(match.data[it].toInt()) }
         mUpdatingMatch = false
         if (!mQueuedMoves.isEmpty()) {
             processReceivedTurns(match)
         }
+
         updateScore(match)
 
         // Check for inactive match states
@@ -288,20 +289,28 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
     }
 
     private fun processReceivedTurns(match: TurnBasedMatch) {
+        // FIXME Now there's a strange difference between first updateMatchand subsequent updateMatch calls (board is cached?)
+
         mUpdatingMatch = true
 
         delay(CPU_TURN_DELAY_MS) {
-            mBoard.commitPiece(mQueuedMoves.removeAt(0), mOpponent!!.color)
+            val move = mQueuedMoves.removeAt(0)
+            Timber.d("[DCD] processReceivedTurn: %d %d", move.x, move.y)
+            mBoard.requestClaimSpace(move.y, move.x, mOpponent!!.color)
+                    .subscribe({
+                        // If there are not moves in the pending queue, update the score and save match data
+                        if (mQueuedMoves.isEmpty()) {
+                            mUpdatingMatch = false
+                            updateScore(match)
+//                            saveMatchData()
+//                            autoplayIfEnabled()
+                        }
+                        // Otherwise, make a recursive call to this function to process them
+                        else processReceivedTurns(match)
+                    }, {
+//                        throw IllegalMoveException("Attempting to claim an invalid space @ $move")
+                    })
 
-            // If there are not moves in the pending queue, update the score and save match data
-            if (mQueuedMoves.isEmpty()) {
-                mUpdatingMatch = false
-                updateScore(match)
-                saveMatchData()
-//                autoplayIfEnabled()
-            }
-            // Otherwise, make a recursive call to this function to process them
-            else processReceivedTurns(match)
         }
     }
 
@@ -525,9 +534,10 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
     fun rematch() {
         if (!getApiClient().isConnected) {
             mMatchView.showSpinner()
-            Games.TurnBasedMultiplayer.rematch(getApiClient(), mMatch!!.matchId)
-                    .setResultCallback { result -> processResult(result) }
+            val match = mMatch!!
             mMatch = null
+            Games.TurnBasedMultiplayer.rematch(getApiClient(), match.matchId)
+                    .setResultCallback { result -> processResult(result) }
         } else {
             mMatchView.displaySignInPrompt()
         }
@@ -591,24 +601,31 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
         }
     }
 
-    private fun saveMatchData(): ByteArray {
-        val board = mBoard.serialize()
+
+    /* 0 [Light's Board] - 64 [Dark's Board] - 128 [Light's Moves] - 144 [Dark's Moves] */
+    internal fun saveMatchData(): ByteArray {
+        Timber.d("[DCD] Saving match data for board $mBoard")
+        val serializedBoard = mBoard.serialize()
 
         val data = mMatch!!.data ?: ByteArray(256).apply {
-            System.arraycopy(board, 0, this, LIGHT_START_INDEX, board.size)
-            System.arraycopy(board, 0, this, DARK_START_INDEX, board.size)
+            System.arraycopy(serializedBoard, 0, this, LIGHT_BOARD_INDEX, serializedBoard.size)
+            System.arraycopy(serializedBoard, 0, this, DARK_BOARD_INDEX, serializedBoard.size)
         }
 
         return data.apply {
-            val startIndex = if (mPlayer === mLightPlayer) LIGHT_START_INDEX else DARK_START_INDEX
+            // Copy the serialized Board into the player's board space in data
+            val boardIndex = if (mPlayer === mLightPlayer) LIGHT_BOARD_INDEX else DARK_BOARD_INDEX
+            Timber.d("[DCD] Saving board data at index $boardIndex")
+            System.arraycopy(serializedBoard, 0, this, boardIndex, serializedBoard.size)
 
-            // Copy the serialized Board into the appropriate place in match data
-            System.arraycopy(board, 0, this, startIndex, board.size)
-
-            // Clear out the first 16 nodes following, which were the other player's previous moves
-            for (clearIndex in (startIndex + 64 until startIndex + 64 + 16)) {
-                this[clearIndex] = 0
+            // Clear out the other player's saved moves (presumably we already processed)
+            val movesIndex = if (mPlayer === mLightPlayer) DARK_MOVES_INDEX else LIGHT_MOVES_INDEX
+            Timber.d("[DCD] Clearing out moves from index $movesIndex")
+            for (index in (movesIndex until movesIndex + 16)) {
+                this[index] = 0
             }
+
+            Timber.d("[DCD] Serialized data: %s", byteArrayToString(this))
         }
     }
 
