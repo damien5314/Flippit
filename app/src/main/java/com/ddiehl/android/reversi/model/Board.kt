@@ -34,7 +34,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
                 val c = saved[index++]
 
                 when (c) {
-                    '0' -> { }
+                    '0' -> { getSpaceAt(x, y).color = null }
                     '1' -> getSpaceAt(x, y).color = ReversiColor.LIGHT
                     '2' -> getSpaceAt(x, y).color = ReversiColor.DARK
                 }

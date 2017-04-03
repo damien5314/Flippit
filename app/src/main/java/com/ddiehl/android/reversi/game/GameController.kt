@@ -124,6 +124,8 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
         mMatchView.showSpinner()
         mBoard.requestClaimSpace(space.y, space.x, playerColor)
                 .subscribe({
+                    mMatchView.displayBoard(mBoard)
+
                     val data = saveMatchData()
 
                     // Add selected piece to the end of match data array
@@ -164,6 +166,7 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
     }
 
     private fun updateMatch(match: TurnBasedMatch) {
+        Timber.d("[DCD] Match selected %s", match.matchId)
         mUpdatingMatch = true
 
         val lightParticipant = getLightPlayer(match)
@@ -298,6 +301,8 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
             Timber.d("[DCD] processReceivedTurn: %d %d", move.x, move.y)
             mBoard.requestClaimSpace(move.y, move.x, mOpponent!!.color)
                     .subscribe({
+                        mMatchView.displayBoard(mBoard)
+
                         // If there are not moves in the pending queue, update the score and save match data
                         if (mQueuedMoves.isEmpty()) {
                             mUpdatingMatch = false
