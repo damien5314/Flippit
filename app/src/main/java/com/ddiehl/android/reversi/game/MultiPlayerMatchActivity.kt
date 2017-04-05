@@ -294,7 +294,7 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
         mGameController.leaveMatch()
     }
 
-    // Generic warning/info dialog
+    /* Generic warning/info dialog */
     override fun showAlertDialog(errorTitle: Int, errorMessage: Int) {
         AlertDialog.Builder(this)
                 .setTitle(getString(errorTitle))
