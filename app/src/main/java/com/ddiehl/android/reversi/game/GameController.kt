@@ -17,7 +17,7 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMultiplayer
 import timber.log.Timber
 import java.util.*
 
-class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
+class GameController(view: MatchViewMultiPlayer) : OnTurnBasedMatchUpdateReceivedListener {
 
     companion object {
         private val LIGHT_BOARD_INDEX = 0
@@ -32,7 +32,7 @@ class GameController(view: MatchView) : OnTurnBasedMatchUpdateReceivedListener {
     internal var mOpponent: ReversiPlayer? = null
     internal var mLightPlayer: ReversiPlayer? = null
     internal var mDarkPlayer: ReversiPlayer? = null
-    internal val mMatchView: MatchView = view
+    internal val mMatchView: MatchViewMultiPlayer = view
     internal val mAchievementManager: AchievementManager by lazy {
         AchievementManager.get(getApiClient())
     }

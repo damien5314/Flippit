@@ -22,7 +22,7 @@ import com.google.android.gms.games.multiplayer.turnbased.TurnBasedMatch
 import com.google.example.games.basegameutils.GameHelper
 
 class MultiPlayerMatchActivity : BaseMatchActivity(),
-        MatchView, GameHelper.GameHelperListener {
+        MatchViewMultiPlayer, GameHelper.GameHelperListener {
 
     companion object {
         private @LayoutRes val LAYOUT_RES_ID = R.layout.match_activity
@@ -180,18 +180,6 @@ class MultiPlayerMatchActivity : BaseMatchActivity(),
 
     override fun displayBoard(board: Board) {
         mMatchFragment.displayBoard(board)
-    }
-
-    override fun toast(msg: String) {
-        toast(msg)
-    }
-
-    override fun toast(resId: Int) {
-        toast(getString(resId))
-    }
-
-    override fun toast(resId: Int, vararg args: Any) {
-        toast(getString(resId, args))
     }
 
     //endregion

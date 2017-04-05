@@ -8,10 +8,12 @@ import com.ddiehl.android.reversi.CPU_TURN_DELAY_MS
 import com.ddiehl.android.reversi.P1_CPU
 import com.ddiehl.android.reversi.P2_CPU
 import com.ddiehl.android.reversi.R
-import com.ddiehl.android.reversi.model.*
+import com.ddiehl.android.reversi.model.BoardSpace
+import com.ddiehl.android.reversi.model.ComputerAI
+import com.ddiehl.android.reversi.model.ReversiColor
+import com.ddiehl.android.reversi.model.ReversiPlayer
 import com.ddiehl.android.reversi.settings.SettingsActivity
 import com.ddiehl.android.reversi.settings.SinglePlayerSettings
-import com.google.example.games.basegameutils.GameHelper
 import rx.Observable
 import rx.android.schedulers.AndroidSchedulers
 import rx.functions.Action1
@@ -19,7 +21,7 @@ import rx.schedulers.Schedulers
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
+class SinglePlayerMatchActivity : BaseMatchActivity(), MatchViewSinglePlayer {
 
     companion object {
         private @LayoutRes val LAYOUT_RES_ID = R.layout.match_activity
@@ -271,80 +273,5 @@ class SinglePlayerMatchActivity : BaseMatchActivity(), MatchView {
             mPlayerWithFirstTurn = if (mPlayerWithFirstTurn === mPlayerLight) mPlayerDark else mPlayerLight
         }
         mCurrentPlayer = mPlayerWithFirstTurn
-    }
-
-
-    // TODO Remove these
-
-    override fun getGameHelper(): GameHelper {
-        TODO("not implemented")
-    }
-
-    override fun clearBoard() {
-        TODO("not implemented")
-    }
-
-    override fun displaySignInPrompt() {
-        TODO("not implemented")
-    }
-
-    override fun showScore(show: Boolean) {
-        TODO("not implemented")
-    }
-
-    override fun showScore(light: Int, dark: Int) {
-        TODO("not implemented")
-    }
-
-    override fun displayMessage(string: String) {
-        TODO("not implemented")
-    }
-
-    override fun displayMessage(resId: Int) {
-        TODO("not implemented")
-    }
-
-    override fun dismissMessage() {
-        TODO("not implemented")
-    }
-
-    override fun displayBoard(board: Board) {
-        TODO("not implemented")
-    }
-
-    override fun toast(msg: String) {
-        TODO("not implemented")
-    }
-
-    override fun toast(resId: Int) {
-        TODO("not implemented")
-    }
-
-    override fun showLeaveMatchDialog() {
-        TODO("not implemented")
-    }
-
-    override fun showForfeitMatchDialog() {
-        TODO("not implemented")
-    }
-
-    override fun showCancelMatchDialog() {
-        TODO("not implemented")
-    }
-
-    override fun showForfeitMatchForbiddenAlert() {
-        TODO("not implemented")
-    }
-
-    override fun showAlertDialog(errorTitle: Int, errorMessage: Int) {
-        TODO("not implemented")
-    }
-
-    override fun askForRematch() {
-        TODO("not implemented")
-    }
-
-    override fun toast(resId: Int, vararg args: Any) {
-        TODO("not implemented")
     }
 }

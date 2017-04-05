@@ -98,4 +98,16 @@ abstract class BaseMatchActivity : AppCompatActivity() {
     abstract fun onForfeitMatchClicked()
     abstract fun onShowAchievementsClicked()
     abstract fun onSettingsClicked()
+
+    fun toast(msg: String) {
+        toast(msg)
+    }
+
+    fun toast(resId: Int) {
+        toast(getString(resId))
+    }
+
+    fun toast(resId: Int, vararg args: Any) {
+        toast(getString(resId, args))
+    }
 }
