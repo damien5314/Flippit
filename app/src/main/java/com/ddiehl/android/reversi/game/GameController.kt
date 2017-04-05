@@ -139,7 +139,7 @@ class GameController(view: MatchViewMultiPlayer) : OnTurnBasedMatchUpdateReceive
 
                     updateMatchState(mMatch!!, data)
                 }, {
-//                    throw IllegalMoveException("Attempting to claim an invalid space @ $space")
+                    throw IllegalMoveException("Attempting to claim an invalid space @ $space")
                 })
     }
 
@@ -292,8 +292,6 @@ class GameController(view: MatchViewMultiPlayer) : OnTurnBasedMatchUpdateReceive
     }
 
     private fun processReceivedTurns(match: TurnBasedMatch) {
-        // FIXME Now there's a strange difference between first updateMatchand subsequent updateMatch calls (board is cached?)
-
         mUpdatingMatch = true
 
         delay(CPU_TURN_DELAY_MS) {
@@ -307,13 +305,12 @@ class GameController(view: MatchViewMultiPlayer) : OnTurnBasedMatchUpdateReceive
                         if (mQueuedMoves.isEmpty()) {
                             mUpdatingMatch = false
                             updateScore(match)
-//                            saveMatchData()
-//                            autoplayIfEnabled()
+                            autoplayIfEnabled()
                         }
                         // Otherwise, make a recursive call to this function to process them
                         else processReceivedTurns(match)
                     }, {
-//                        throw IllegalMoveException("Attempting to claim an invalid space @ $move")
+                        throw IllegalMoveException("Attempting to claim an invalid space @ $move")
                     })
 
         }
@@ -698,7 +695,7 @@ class GameController(view: MatchViewMultiPlayer) : OnTurnBasedMatchUpdateReceive
         return false
     }
 
-    // For testing full end-to-end multiplayer flow
+    /* For testing full end-to-end multiplayer flow */
     private fun autoplayIfEnabled() {
         if (!mUpdatingMatch && AUTOMATED_MULTIPLAYER
                 && mMatch!!.status == TurnBasedMatch.MATCH_STATUS_ACTIVE
