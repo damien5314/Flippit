@@ -15,13 +15,12 @@ import com.ddiehl.android.reversi.startActivity
 abstract class BaseMatchActivity : AppCompatActivity() {
 
     protected val mToolbar by bindView<Toolbar>(R.id.toolbar)
-    protected val mMatchFragment by bindView<MatchView>(R.id.match_fragment)
+    protected val mMatchFragment by bindView<MatchFragment>(R.id.match_view)
 
     protected val mBoard: Board = Board(8, 8)
 
     override fun onStop() {
         mMatchFragment.dismissMessage()
-
         super.onStop()
     }
 
@@ -69,7 +68,7 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_settings -> {
-                settingsSelected()
+                onSettingsClicked()
                 return true
             }
             R.id.action_select_match -> {
@@ -77,15 +76,15 @@ abstract class BaseMatchActivity : AppCompatActivity() {
                 return true
             }
             R.id.action_close_match -> {
-                clearBoard()
+                onCloseMatchClicked()
                 return true
             }
             R.id.action_forfeit_match -> {
-                forfeitMatchSelected()
+                onForfeitMatchClicked()
                 return true
             }
             R.id.action_achievements -> {
-                showAchievements()
+                onShowAchievementsClicked()
                 return true
             }
         }
@@ -95,8 +94,20 @@ abstract class BaseMatchActivity : AppCompatActivity() {
 
     abstract fun onStartNewMatchClicked()
     abstract fun onSelectMatchClicked()
-    abstract fun clearBoard()
-    abstract fun forfeitMatchSelected()
-    abstract fun showAchievements()
-    abstract fun settingsSelected()
+    abstract fun onCloseMatchClicked()
+    abstract fun onForfeitMatchClicked()
+    abstract fun onShowAchievementsClicked()
+    abstract fun onSettingsClicked()
+
+    fun toast(msg: String) {
+        toast(msg)
+    }
+
+    fun toast(resId: Int) {
+        toast(getString(resId))
+    }
+
+    fun toast(resId: Int, vararg args: Any) {
+        toast(getString(resId, args))
+    }
 }

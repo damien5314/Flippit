@@ -12,7 +12,7 @@
     <string name="action_how_to_play">How to Play</string>
     <string name="action_htp_previous">Prev</string>
     <string name="action_htp_next">Next</string>
-    <string name="player1_label_default">Player 1</string>
+    <string name="player1_label">Player 1</string>
     <string name="player2_label">Computer</string>
     <string name="bad_move">Invalid Move</string>
     <string name="no_moves">No moves for %s</string>

@@ -34,7 +34,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
                 val c = saved[index++]
 
                 when (c) {
-                    '0' -> { }
+                    '0' -> { getSpaceAt(x, y).color = null }
                     '1' -> getSpaceAt(x, y).color = ReversiColor.LIGHT
                     '2' -> getSpaceAt(x, y).color = ReversiColor.DARK
                 }
@@ -123,9 +123,7 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
             MOVE_DIRECTIONS
                     .filter { space.color == null }
                     .filter { (dx, dy) -> isWithinBounds(space.x + dx, space.y + dy) }
-                    .sumBy { (dx, dy) ->
-                        moveValueInDirection(space, dx, dy, playerColor)
-                    }
+                    .sumBy { (dx, dy) -> moveValueInDirection(space, dx, dy, playerColor) }
 
     private fun moveValueInDirection(space: BoardSpace, dx: Int, dy: Int, playerColor: ReversiColor): Int {
         // If the move would bring us out of bounds of the board area, just return 0
@@ -189,8 +187,8 @@ class Board(val height: Int, val width: Int) : Iterable<BoardSpace> {
         return (s.y * 8 + s.x + 1).toByte()
     }
 
-    fun getBoardSpaceFromNum(n: Int): BoardSpace? {
-        return getSpaceAt(n % 8, n / 8)
+    fun getBoardSpaceFromNum(n: Int): BoardSpace {
+        return getSpaceAt((n-1) % 8, (n-1) / 8)
     }
 
     fun spaceAt(row: Int, col: Int): BoardSpace {

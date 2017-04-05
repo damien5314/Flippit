@@ -11,8 +11,8 @@
 
         <include layout="@layout/app_toolbar" />
 
-        <com.ddiehl.android.reversi.game.MatchView
-            android:id="@+id/match_fragment"
+        <com.ddiehl.android.reversi.game.MatchFragment
+            android:id="@+id/match_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
